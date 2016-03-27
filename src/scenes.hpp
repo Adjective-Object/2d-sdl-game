@@ -6,8 +6,11 @@
 
 class MainScene : public Scene {
 public:
-   MainScene(SDL_Window * win, SDL_Renderer * ren);
+   MainScene();
    ~MainScene();
+   void init();
+   void update();
+   void render();
 };
 
 #endif

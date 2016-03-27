@@ -1,8 +1,18 @@
+#include <iostream>
 #include "scenes.hpp"
 
-MainScene::MainScene(SDL_Window * win, SDL_Renderer * ren) :
-    Scene(win, ren) {
+MainScene::MainScene() : Scene() {
 }
 
 MainScene::~MainScene() {
 }
+
+void MainScene::init() {
+}
+
+void MainScene::update() {
+}
+
+void MainScene::render() {
+}
+

@@ -1,6 +1,8 @@
 #ifndef __ENGINE_UTIL
 #define __ENGINE_UTIL
 
-SDL_Texture* loadPNG(const std::string &file, SDL_Renderer *ren);
+#include <iostream>
+
+void logSDLError(std::ostream &os, const std::string &msg);
 
 #endif

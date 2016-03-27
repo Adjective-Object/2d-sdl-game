@@ -6,21 +6,33 @@
 #include "entity.hpp"
 
 class Scene {
+private:
+    // SCENE INTERNAL STATE
     std::vector<Entity *> entities;
 
-    // SDL INTERNALS
-    SDL_Window * win;
-    SDL_Renderer * ren;
-
-    // SCENE INTERNAL STATE
-    bool readyToExit;
-
-    void update(unsigned long elapsed_millis);
-    void render();
 public:
-    Scene(SDL_Window * win, SDL_Renderer * ren);
-    ~Scene();
+    // INTERFACE
+
+    // called by Game to initialize the scene's content
+    virtual void init() = 0;
+
+    /**
+     * Starts the game's main loop
+     */
     void start();
+
+    /**
+     * Update step of the scene's main loop
+     */
+    void update();
+
+    /**
+     * Render step of the scene's main loop
+     **/
+    void render();
+
+    Scene();
+    ~Scene();
 };
 
 #endif

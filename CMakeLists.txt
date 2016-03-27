@@ -23,8 +23,12 @@ set(LIB_SRCS
     src/scenes.cpp
     src/engine/util.hpp
     src/engine/util.cpp
+    src/engine/game.hpp
+    src/engine/game.cpp
     src/engine/entity.hpp
     src/engine/entity.cpp
+    src/engine/sprite.hpp
+    src/engine/sprite.cpp
     src/engine/pair.hpp
     src/engine/pair.cpp
     src/engine/scene.hpp
