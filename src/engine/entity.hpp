@@ -7,7 +7,11 @@ class Entity {
 public:
     virtual ~Entity();
     virtual void init() = 0;
+
+    virtual void preUpdate() = 0;
     virtual void update() = 0;
+    virtual void postUpdate() = 0;
+
     virtual void render() = 0;
 };
 

@@ -14,15 +14,27 @@ public:
     // double euclidApprox();
     double euclidSquared();
 
-    Pair operator+(const Pair & p);
-    Pair operator-(const Pair & p);
-    Pair operator*(const Pair & p);
-    Pair operator/(const Pair & p);
-    
+    // pairwise new product ops
+    Pair operator+(const Pair & p) const;
+    Pair operator-(const Pair & p) const;
+    Pair operator*(const Pair & p) const;
+    Pair operator/(const Pair & p) const;
+    Pair operator^(const Pair & exp) const;
+
+    // scalar new product ops
+    Pair operator+(const double x) const;
+    Pair operator-(const double x) const;
+    Pair operator*(const double x) const;
+    Pair operator/(const double x) const;
+    Pair operator^(const double exp) const;
+   
+    // pairwise mutation ops
     void operator+=(const Pair & p);
     void operator-=(const Pair & p);
     void operator*=(const Pair & p);
     void operator/=(const Pair & p);
+    void operator^=(const Pair & exp);
+    void operator^=(const double exp);
 };
 
 #endif

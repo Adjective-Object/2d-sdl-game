@@ -17,25 +17,56 @@ double Pair::euclidSquared() {
 }
 
 
-//////////////////////////
-// ARITHMATIC OPERATORS //
-//////////////////////////
+///////////////////////////////////
+// ARITHMATIC PAIRWISE OPERATORS //
+///////////////////////////////////
 
-Pair Pair::operator+(const Pair & p) {
-   return Pair(x + p.x, y + p.y);
+Pair Pair::operator+(const Pair & p) const {
+    return Pair(x + p.x, y + p.y);
 }
 
-Pair Pair::operator-(const Pair & p) {
-   return Pair(x - p.x, y - p.y);
+Pair Pair::operator-(const Pair & p) const {
+    return Pair(x - p.x, y - p.y);
 }
 
-Pair Pair::operator*(const Pair & p) {
-   return Pair(x * p.x, y * p.y);
+Pair Pair::operator*(const Pair & p) const {
+    return Pair(x * p.x, y * p.y);
 }
 
-Pair Pair::operator/(const Pair & p) {
-   return Pair(x / p.x, y / p.y);
+Pair Pair::operator/(const Pair & p) const {
+    return Pair(x / p.x, y / p.y);
 }
+
+Pair Pair::operator^(const Pair & exp) const {
+    return Pair(pow(x, exp.x), pow(y, exp.y));
+}
+
+
+/////////////////////////////////
+// ARITHMATIC SCALAR OPERATORS //
+/////////////////////////////////
+
+Pair Pair::operator+(const double z) const {
+    return Pair(x + z, y + z);
+}
+
+Pair Pair::operator-(const double z) const {
+    return Pair(x - z, y - z);
+}
+
+Pair Pair::operator*(const double z) const {
+    return Pair(x * z, y * z);
+}
+
+Pair Pair::operator/(const double z) const {
+    return Pair(x / z, y / z);
+}
+
+Pair Pair::operator^(const double exp) const {
+    return Pair(pow(x, exp), pow(y, exp));
+}
+
+
 
 
 ////////////////////////
@@ -61,4 +92,18 @@ void Pair::operator/=(const Pair & p) {
     x/=p.x;
     y/=p.y;
 }
+
+void Pair::operator^=(const Pair & exp) {
+    x = pow(x, exp.x);
+    y = pow(y, exp.y);
+}
+
+void Pair::operator^=(const double exp) {
+    x = pow(x, exp);
+    y = pow(y, exp);
+}
+
+
+
+
 
