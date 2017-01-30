@@ -114,11 +114,15 @@ void Game::start() {
     uint32_t lastTick = SDL_GetTicks();
     this->currentScene->init();
     while (!readyToExit) {
-        // figure out the elased milliseconds
-        uint32_t thisTick = SDL_GetTicks(),
-                 tickDiff = thisTick - lastTick;
-        lastTick = thisTick;
-        this->elapsed = (tickDiff / 16.66666);
+        if (this->fixedTickrate == 0) {
+            // figure out the elased milliseconds
+            uint32_t thisTick = SDL_GetTicks(),
+                     tickDiff = thisTick - lastTick;
+            lastTick = thisTick;
+            this->elapsed = (tickDiff / 16.66666);
+        } else {
+            this->elapsed = fixedTickrate;
+        }
 
         // Process SDL events
         input.clear();

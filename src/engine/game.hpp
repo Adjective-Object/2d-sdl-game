@@ -24,6 +24,7 @@ private:
 public:
     // FlxG convenience values
     double elapsed;
+    double fixedTickrate = 0;
     Scene * currentScene;
     Input input;
 

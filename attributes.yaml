@@ -1,0 +1,104 @@
+attributes:
+    walk_initial_velocity: 0.15
+    walk_acceleration: 0
+    walk_maximum_velocity: 1.6
+    walk_animation_speed: 0.253
+    walk_mid_point: 0.621
+    fast_walk_min: 0.9775
+    friction: 0.06
+    dash_initial_velocity: 1.5
+    stopturn_initial_velocity: 0.06
+    run_initial_velocity: 0
+    run_max_velocity: 1.8
+    run_animation_scaling: 1.4
+    run_acceleration: 30
+    unknown0x34: 3
+    jump_startup_lag: 4
+    jump_h_initial_velocity: 1
+    jump_v_initial_velocity: 2.4
+    ground_air_jump_momentum_mult: 0.8
+    jump_h_max_velocity: 1.2
+    shorthop_v_initial_velocity: 1.5
+    air_jump_multiplier: 0.88
+    unknown0x54: 1
+    number_of_jumps: 2
+    gravity: 0.085
+    terminal_velocity: 2.2
+    aerial_mobility: 0.03
+    aerial_stopping_mobility: 0.02
+    max_aerial_h_velocity: 0.85
+    air friction: 0.005
+    fast_fall_terminal_velocity: 2.5
+    unknown0x78: 3
+    jab_2_window: 24
+    jab_3_window: 24
+    turn_duration: 6
+    weight: 85
+    model_scaling: 1.15
+    shield_size: 11.75
+    shield_break_initial_velocity: 2.5
+    rapid_jab_window: 5
+    unknown0x9C: 16
+    unknown0xA0: 0
+    unknown0xA4: 0
+    ledgejump_horizontal_velocity: 1
+    ledgejump_vertical_velocity: 2.4
+    item_throw_velocity: 1
+    unknown0xB4: 1
+    unknown0xB8: 0.2
+    unknown0xBC: 2.25
+    unknown0xC0: 0
+    unknown0xC4: 6
+    unknown0xC8: 0
+    unknown0xCC: 0
+    unknown0xD0: 9
+    unknown0xD4: 0
+    unknown0xD8: 6
+    unknown0xDC: 2.475
+    kirby_star_dmg: 15
+    normal_landing_lag: 4
+    n_air_landing_lag: 15
+    f_air_landing_lag: 15
+    b_air_landing_lag: 24
+    d_air_landing_lag: 15
+    u_air_landing_lag: 32
+    victory_screen_scaling: 24
+    unknown0x1000: 0.5
+    walljump_h_velocity: 1.3
+    walljump_v_velocity: 2.4
+    unknown0x10C: 1
+    unknown0x110: 0.9
+    unknown0x114: 0
+    unknown0x118: 3.2
+    unknown0x11C: 1.2
+    unknown0x120: 0
+    unknown0x124: 3.2
+    unknown0x128: 1.2
+    unknown0x12C: 0.7
+    unknown0x130: 0
+    unknown0x134: 3.5
+    unknown0x138: 1.2
+    unknown0x13C: 0.7
+    unknown0x140: 3.35
+    unknown0x144: 1.13
+    unknown0x148: 0.5
+    bubble ratio: 10
+    unknown0x150: -1
+    unknown0x154: 5.2
+    unknown0x158: 2.3
+    unknown0x15C: 1
+    ice_traction: 1
+    unknown0x164: 1
+    unknown0x168: 1
+    camera_target_zoom_bone: 15
+    unknown0x170: 0
+    unknown0x174: 0
+    unknown0x178: 0
+    special_jump_action: 0
+    weight_dep_throw_speed_flags: 0
+subactions:
+    stand:
+        - wait 15
+    walk:
+        - effect gas_cloud
+

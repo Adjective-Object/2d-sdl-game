@@ -11,6 +11,7 @@
 int main(int argc, char** argv){
     MainScene m = MainScene();
     Game g = Game(640, 480, m);
+    g.fixedTickrate = 1.0/16.0;
 
     std::cout << "entering main loop" << std::endl;
     g.start();

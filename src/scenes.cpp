@@ -9,7 +9,7 @@ MainScene::~MainScene() {
 }
 
 void MainScene::init() {
-    this->entities.push_back(new Player());
+    this->entities.push_back(new Player("attributes.yaml"));
     Scene::init();
 }
 

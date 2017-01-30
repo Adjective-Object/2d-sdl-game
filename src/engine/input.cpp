@@ -84,9 +84,27 @@ Joystick::Joystick(SDL_Joystick * controller) {
     for(size_t i=0; i<num_axies; i++) {
         axies[i] = 0;
     }
+
+    axisCalibrations = new AxisCalibration[num_axies];
+    for(size_t i=0; i<num_axies; i++) {
+        axisCalibrations[i].enabled = false;
+    }
+
 }
 
 Joystick::~Joystick() {
+}
+
+void Joystick::calibrateAxis(
+    unsigned int axisId,
+    double lower,
+    double upper,
+    double neutral) {
+
+    axisCalibrations[axisId].enabled = true;
+    axisCalibrations[axisId].upper = upper;
+    axisCalibrations[axisId].lower = lower;
+    axisCalibrations[axisId].neutral = neutral;
 }
 
 void Joystick::setDown(unsigned int buttonId) {
@@ -105,15 +123,15 @@ void Joystick::clear() {
 }
 
 bool Joystick::held(unsigned int buttonId) {
-    return (heldMask >> buttonId) && 1;
+    return (heldMask >> buttonId) & 1;
 }
 
 bool Joystick::down(unsigned int buttonId) {
-    return (downMask >> buttonId) && 1;
+    return (downMask >> buttonId) & 1;
 }
 
 bool Joystick::up(unsigned int buttonId) {
-    return (upMask >> buttonId) && 1;
+    return (upMask >> buttonId) & 1;
 }
 
 void Joystick::setAxis(unsigned int axisId, double value) {
@@ -126,5 +144,13 @@ double Joystick::axis(unsigned int axisId) {
              << " out of range" << std::endl;
         return 0;
     }
-    return this->axies[axisId];
+    AxisCalibration * calibration = & axisCalibrations[axisId];
+    if (calibration->enabled) {
+        double denom = (axies[axisId] > calibration->neutral)\
+            ? (calibration->upper - calibration->neutral)
+            : (calibration->neutral - calibration->lower);
+        return (this->axies[axisId] - calibration->neutral) / denom;
+    } else {
+        return 0;
+    }
 }
