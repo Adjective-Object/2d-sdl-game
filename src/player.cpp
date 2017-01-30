@@ -9,10 +9,6 @@ double LIMIT_WALK_SLOW_UPPER = 0.4;
 double LIMIT_WALK_MIDDLE_UPPER = 0.6;
 double LIMIT_WALK_FAST_UPPER = 0.8;
 
-int LIMIT_LOW = -30000;
-int LIMIT_HIGH = 32800;
-int NEUTRAL = 450;
-
 double slow = 0.1;
 double med = 0.6;
 double fast = 2;
@@ -21,8 +17,6 @@ Player::Player(std::string fpath) :
     config(PlayerConfig(fpath)) {
     acceleration.y = 1;
     maxVelocity.y = 40;
-    drag.x = 1;
-    drag.y = 1;
 }
 
 Player::~Player() {
@@ -31,6 +25,7 @@ Player::~Player() {
 
 void Player::init() {
     joystick = EnG->input.getJoystick(0);
+    joystick->calibrateAxis(0, -30000, 32800, 450);
 }
 
 void Player::update() {
@@ -38,26 +33,24 @@ void Player::update() {
     if (joystick->down(1) || joystick->down(2)) {
         this->velocity.y = -20;
     }
-    int x = joystick->axis(0);
-    #define somelim(limit_percent,control_edge,neutral) \
-        (limit_percent * (control_edge + neutral)) + neutral
+    double x = joystick->axis(0);
 
-    if (x < somelim(LIMIT_WALK_MIDDLE_UPPER, LIMIT_LOW, NEUTRAL)) {
+    if (x < -LIMIT_WALK_MIDDLE_UPPER) {
         maxVelocity.x = fast;
         acceleration.x = -fast;
-    } else if (x < somelim(LIMIT_WALK_SLOW_UPPER, LIMIT_LOW, NEUTRAL)) {
+    } else if (x < -LIMIT_WALK_SLOW_UPPER) {
         maxVelocity.x = med;
         acceleration.x = -med;
-    } else if (x < somelim(DEADZONE, LIMIT_LOW, NEUTRAL)) {
+    } else if (x < -DEADZONE) {
         maxVelocity.x = slow;
         acceleration.x = -slow;
-    } else if (x < somelim(DEADZONE, LIMIT_HIGH, NEUTRAL)) {
-        maxVelocity.x = slow;
+    } else if (x < DEADZONE) {
+        maxVelocity.x = DOUBLE_INFINITY;
         acceleration.x = 0;
-    } else if (x < somelim(LIMIT_WALK_SLOW_UPPER, LIMIT_HIGH, NEUTRAL)) {
+    } else if (x < LIMIT_WALK_SLOW_UPPER) {
         maxVelocity.x = slow;
         acceleration.x = slow;
-    } else if (x < somelim(LIMIT_WALK_MIDDLE_UPPER, LIMIT_HIGH, NEUTRAL)) {
+    } else if (x < LIMIT_WALK_MIDDLE_UPPER) {
         maxVelocity.x = med;
         acceleration.x = med;
     } else {
@@ -65,12 +58,12 @@ void Player::update() {
         acceleration.x = fast;
     }
 
+    // trigger landing
+    // TODO this is just to fake collision with terrain
     if (position.y > 300) {
         position.y = 300;
         velocity.y = std::min(0.0, velocity.y);
     }
-
-    maxVelocity.x *= 5;
 
     Sprite::updateMotion();
 

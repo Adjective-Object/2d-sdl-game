@@ -6,9 +6,21 @@
 #include "engine/input.hpp"
 #include "playerconfig.hpp"
 
+typedef enum PlayerState {
+    STANDING,
+    WALKING,
+    FAST_WALKING,
+    RUNNING,
+    JUMP_SQUAT,
+    LANDING,
+    STOP_TURN,
+} PlayerState;
+
 class Player : public Sprite {
     Joystick * joystick;
     PlayerConfig config;
+    bool on_ground = false;
+    bool actionable = true;
 public:
     void init() override;
     void render(SDL_Renderer * ren) override;
