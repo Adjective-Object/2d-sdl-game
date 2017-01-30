@@ -1,7 +1,8 @@
-#include "player.hpp"
-#include "engine/game.hpp"
 #include <iostream>
 #include <algorithm>
+#include "engine/game.hpp"
+#include "playerconfig.hpp"
+#include "player.hpp"
 
 double DEADZONE = 0.2;
 double LIMIT_WALK_SLOW_UPPER = 0.4;
@@ -16,7 +17,8 @@ double slow = 0.1;
 double med = 0.6;
 double fast = 2;
 
-Player::Player() {
+Player::Player(std::string fpath) :
+    config(PlayerConfig(fpath)) {
     acceleration.y = 1;
     maxVelocity.y = 40;
     drag.x = 1;

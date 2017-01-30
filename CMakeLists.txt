@@ -1,5 +1,4 @@
 cmake_minimum_required (VERSION 3.4)
-include(ExternalProject)
 
 project (sdl_game)
 set (sdl_game_VERSION_MAJOR 0)
@@ -15,17 +14,8 @@ set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+PKG_SEARCH_MODULE(YAML-CPP REQUIRED yaml-cpp)
 
-ExternalProject_Add(
-    yaml-cpp
-    # no download since it's in a git submodule
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp
-    CONFIGURE_COMMAND cmake CmakeLists.txt
-    BUILD_COMMAND make
-    BUILD_IN_SOURCE 1
-    INSTALL_COMMAND ""
-)
 
 
 ##########################
@@ -36,6 +26,8 @@ set(LIB_SRCS
     src/scenes.cpp
     src/player.hpp
     src/player.cpp
+    src/playerconfig.hpp
+    src/playerconfig.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp
@@ -55,7 +47,7 @@ target_include_directories(
     SDL_GAME_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
-    ./yaml-cpp
+    ./yaml-cpp/include
 )
 
 set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
@@ -66,9 +58,15 @@ set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
 add_executable(sdl_game
     src/main.cpp
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
-target_link_libraries(sdl_game ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})
+target_link_libraries( sdl_game
+    ${SDL2_LIBRARIES}
+    ${SDL2IMAGE_LIBRARIES} 
+    yaml-cpp
+    )
 target_include_directories(sdl_game PUBLIC
-    ${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS})
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2IMAGE_INCLUDE_DIRS}
+    )
 
 
 ########################################

@@ -7,6 +7,7 @@ in with pkgs; let
     SDL2_ttf
     SDL2_gfx
     mesa
+    libyamlcpp
   ];
 
   devDependencies = [
