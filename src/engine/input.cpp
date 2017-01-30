@@ -105,15 +105,15 @@ void Joystick::clear() {
 }
 
 bool Joystick::held(unsigned int buttonId) {
-    return (heldMask >> buttonId) && 1;
+    return (heldMask >> buttonId) & 1;
 }
 
 bool Joystick::down(unsigned int buttonId) {
-    return (downMask >> buttonId) && 1;
+    return (downMask >> buttonId) & 1;
 }
 
 bool Joystick::up(unsigned int buttonId) {
-    return (upMask >> buttonId) && 1;
+    return (upMask >> buttonId) & 1;
 }
 
 void Joystick::setAxis(unsigned int axisId, double value) {
