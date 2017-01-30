@@ -1,14 +1,17 @@
 #ifndef __ENGINE_GAME
 #define __ENGINE_GAME
 
+#include <SDL_image.h>
 #include "scene.hpp"
+#include "entity.hpp"
+#include "input.hpp"
 
 class Game;
 extern Game * EnG;
+extern SDL_Texture * FALLBACK_TEXTURE;
 
 class Game {
 private:
-    SDL_Texture *engineFallbackTexture;
     SDL_Window *win;
     SDL_Renderer *ren;
     bool readyToExit = false;
@@ -22,6 +25,7 @@ public:
     // FlxG convenience values
     double elapsed;
     Scene * currentScene;
+    Input input;
 
     // Actual Game object API
     Game(unsigned int width, unsigned int height, 
@@ -29,7 +33,6 @@ public:
             unsigned int zoomLevel = 1);
 
     ~Game();
-
     void start();
 };
 

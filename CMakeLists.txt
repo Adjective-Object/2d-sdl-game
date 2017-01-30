@@ -21,10 +21,14 @@ PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 set(LIB_SRCS 
     src/scenes.hpp
     src/scenes.cpp
+    src/player.hpp
+    src/player.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp
     src/engine/game.cpp
+    src/engine/input.hpp
+    src/engine/input.cpp
     src/engine/entity.hpp
     src/engine/entity.cpp
     src/engine/sprite.hpp

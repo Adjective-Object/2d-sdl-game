@@ -6,7 +6,7 @@
 #include "entity.hpp"
 
 class Scene {
-private:
+protected:
     // SCENE INTERNAL STATE
     std::vector<Entity *> entities;
 
@@ -29,7 +29,7 @@ public:
     /**
      * Render step of the scene's main loop
      **/
-    void render();
+    void render(SDL_Renderer * r);
 
     Scene();
     ~Scene();

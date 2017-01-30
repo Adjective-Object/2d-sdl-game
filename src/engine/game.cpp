@@ -4,8 +4,10 @@
 #include <SDL_image.h>
 #include "game.hpp"
 #include "util.hpp"
+#include "input.hpp"
 
 Game *EnG = nullptr;
+SDL_Texture *FALLBACK_TEXTURE = nullptr;
 
 // TODO use zoomLevel at all
 Game::Game(unsigned int width, unsigned int height,
@@ -20,19 +22,23 @@ Game::Game(unsigned int width, unsigned int height,
         exit(1);
     } else {
         // init SDL
-        if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS,"1");
+        if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
             exit(1);
         }
         EnG = this;
     }
 
+    // init input system
+    input.init();
+
     // create the game stuff
     win = makeWindow("poop", width, height);
     ren = makeRenderer(win);
 
     //TODO replace this with a string constant
-    engineFallbackTexture = loadPNG("fallback.png");
+    FALLBACK_TEXTURE = loadPNG("fallback.png");
 }
 
 
@@ -64,7 +70,7 @@ SDL_Window * Game::makeWindow(const std::string & name,
  **/
 SDL_Renderer * Game::makeRenderer(SDL_Window * win) {
     SDL_Renderer *ren = SDL_CreateRenderer(
-        win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        win, -1, 0);
 
     if (ren == nullptr){
         SDL_DestroyWindow(win);
@@ -85,7 +91,7 @@ SDL_Renderer * Game::makeRenderer(SDL_Window * win) {
 */
 SDL_Texture* Game::loadPNG(const std::string &file) {
     //Initialize to nullptr to avoid dangling pointer issues
-    SDL_Texture *texture = engineFallbackTexture;
+    SDL_Texture *texture = FALLBACK_TEXTURE;
     //Load the image
     SDL_Surface *loadedImage = IMG_Load(file.c_str());
     //If the loading went ok, convert to texture and return the texture
@@ -106,6 +112,7 @@ SDL_Texture* Game::loadPNG(const std::string &file) {
 
 void Game::start() {
     uint32_t lastTick = SDL_GetTicks();
+    this->currentScene->init();
     while (!readyToExit) {
         // figure out the elased milliseconds
         uint32_t thisTick = SDL_GetTicks(),
@@ -113,7 +120,8 @@ void Game::start() {
         lastTick = thisTick;
         this->elapsed = (tickDiff / 16.66666);
 
-        // Process SDL events into internal format
+        // Process SDL events
+        input.clear();
         SDL_Event e;
         while (SDL_PollEvent(&e)){
             //If user closes the window, ready to exit
@@ -121,17 +129,7 @@ void Game::start() {
                 readyToExit = true;
             } 
 
-            /*
-            //If user presses a key, collect the key down information
-            if (e.type == SDL_KEYDOWN){
-                quit = true;
-            }
-
-            //If user clicks the mouse
-            if (e.type == SDL_MOUSEBUTTONDOWN){
-                quit = true;
-            }
-            */
+            input.processEvent(&e);
         }
 
         // update the game's state
@@ -139,7 +137,7 @@ void Game::start() {
 
         // update the frame buffer
         SDL_RenderClear(ren);
-        currentScene->render();
+        currentScene->render(ren);
 
         // Update the screen
         SDL_RenderPresent(ren);

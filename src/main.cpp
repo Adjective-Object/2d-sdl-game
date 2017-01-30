@@ -8,9 +8,6 @@
 
 #define WINDOW_NAME "poop"
 
-/*
- * Lesson 0: Test to make sure SDL is setup properly
- */
 int main(int argc, char** argv){
     MainScene m = MainScene();
     Game g = Game(640, 480, m);

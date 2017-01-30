@@ -10,18 +10,10 @@ Sprite :: ~Sprite() {
 
 }
 
-void Sprite :: preUpdate() {
-
-}
-
-void Sprite :: postUpdate() {
-    
-}
-
 void Sprite :: update() {}
 
 void Sprite :: updateMotion() {
-    double delta, vdelta;
+    double vdelta;
 
     // update angle and angular velocity
     vdelta = (computeVelocity(angularVelocity, angularAcceleration,
@@ -29,6 +21,21 @@ void Sprite :: updateMotion() {
     angularVelocity += vdelta;
     angle += angularVelocity * EnG->elapsed;
     angularVelocity += vdelta;
+
+
+    // limit velocity
+    if (velocity.x < -maxVelocity.x) {
+        velocity.x = -maxVelocity.x;
+    }
+    if (velocity.x > maxVelocity.x) {
+        velocity.x = maxVelocity.x;
+    }
+    if (velocity.y < -maxVelocity.y) {
+        velocity.y = -maxVelocity.y;
+    }
+    if (velocity.y > maxVelocity.y) {
+        velocity.y = maxVelocity.y;
+    }
 
     // update x position
     vdelta = (computeVelocity(velocity.x, acceleration.x,
@@ -46,8 +53,24 @@ void Sprite :: updateMotion() {
 }
 
 void Sprite :: render (SDL_Renderer * ren) {
-    // TODO
+    SDL_Rect destination {
+        (int) position.x,
+        (int) position.y,
+        32,
+        32
+    };
+    SDL_RenderCopy( ren, FALLBACK_TEXTURE, NULL, &destination );
 }
+
+void Sprite::preUpdate() {
+
+};
+
+void Sprite::postUpdate() {
+
+};
+
+
 
 
 

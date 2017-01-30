@@ -15,6 +15,13 @@ Scene::~Scene() {
     }
 }
 
+void Scene::init() {
+    // update all the entities
+    for (Entity * e : this->entities) {
+        e->init();
+    }
+}
+
 void Scene::update() {
     // update all the entities
     for (Entity * e : this->entities) {
@@ -22,9 +29,9 @@ void Scene::update() {
     }
 }
 
-void Scene::render() {
+void Scene::render(SDL_Renderer * r) {
     for (Entity * e: this->entities) {
-        e->render();
+        e->render(r);
     }
 }
 

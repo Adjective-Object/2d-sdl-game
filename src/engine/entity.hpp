@@ -12,7 +12,7 @@ public:
     virtual void update() = 0;
     virtual void postUpdate() = 0;
 
-    virtual void render() = 0;
+    virtual void render(SDL_Renderer * ren) = 0;
 };
 
 #endif
