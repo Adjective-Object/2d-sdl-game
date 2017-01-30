@@ -8,6 +8,7 @@ in with pkgs; let
     SDL2_gfx
     mesa
     libyamlcpp
+    boost
   ];
 
   devDependencies = [

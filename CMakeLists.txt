@@ -14,9 +14,7 @@ set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
-PKG_SEARCH_MODULE(YAML-CPP REQUIRED yaml-cpp)
-
-
+PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
 
 ##########################
 # project source objects #
@@ -43,11 +41,10 @@ set(LIB_SRCS
     src/engine/scene.hpp
     src/engine/scene.cpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
-target_include_directories(
-    SDL_GAME_LIB PUBLIC
+target_include_directories(SDL_GAME_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
-    ./yaml-cpp/include
+    ${YAML_CPP_INCLUDE_DIRS}
 )
 
 set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
@@ -58,14 +55,15 @@ set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
 add_executable(sdl_game
     src/main.cpp
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
-target_link_libraries( sdl_game
+target_link_libraries(sdl_game
     ${SDL2_LIBRARIES}
     ${SDL2IMAGE_LIBRARIES} 
-    yaml-cpp
+    ${YAML_CPP_LIBRARIES}
     )
 target_include_directories(sdl_game PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
     )
 
 
