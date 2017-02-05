@@ -25,7 +25,6 @@ Player::~Player() {
 
 void Player::init() {
     joystick = EnG->input.getJoystick(0);
-    joystick->calibrateAxis(0, -30000, 32800, 450);
 }
 
 void Player::update() {

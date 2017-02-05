@@ -5,6 +5,7 @@
 #include "scene.hpp"
 #include "entity.hpp"
 #include "input.hpp"
+#include <string>
 
 class Game;
 extern Game * EnG;

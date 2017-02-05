@@ -32,6 +32,8 @@ set(LIB_SRCS
     src/engine/game.cpp
     src/engine/input.hpp
     src/engine/input.cpp
+    src/engine/joystickindicator.hpp
+    src/engine/joystickindicator.cpp
     src/engine/entity.hpp
     src/engine/entity.cpp
     src/engine/sprite.hpp

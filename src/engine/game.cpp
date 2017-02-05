@@ -140,6 +140,7 @@ void Game::start() {
         currentScene->update();
 
         // update the frame buffer
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
         currentScene->render(ren);
 
