@@ -111,14 +111,15 @@ SDL_Texture* Game::loadPNG(const std::string &file) {
 
 
 void Game::start() {
-    uint32_t lastTick = SDL_GetTicks();
+    uint32_t lastTick, thisTick = SDL_GetTicks();
     this->currentScene->init();
     while (!readyToExit) {
+        lastTick = thisTick;
+        uint32_t thisTick = SDL_GetTicks(),
+                 tickDiff = thisTick - lastTick;
+
         if (this->fixedTickrate == 0) {
             // figure out the elased milliseconds
-            uint32_t thisTick = SDL_GetTicks(),
-                     tickDiff = thisTick - lastTick;
-            lastTick = thisTick;
             this->elapsed = (tickDiff / 16.66666);
         } else {
             this->elapsed = fixedTickrate;
@@ -148,8 +149,9 @@ void Game::start() {
         SDL_RenderPresent(ren);
 
         // Cap framerate at 60fps
-        long unsigned int millis_to_delay = 16; // - (SDL_GetTicks() - lastTick));
-        SDL_Delay(std::min(0UL, millis_to_delay));
+        long int ticks = (SDL_GetTicks() - thisTick);
+        long long int millis_to_delay = 16 - ticks;
+        SDL_Delay(std::max(0LL, std::min(16LL, millis_to_delay)));
     }
 }
 

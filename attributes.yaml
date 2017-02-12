@@ -27,7 +27,7 @@ attributes:
     aerial_mobility: 0.03
     aerial_stopping_mobility: 0.02
     max_aerial_h_velocity: 0.85
-    air friction: 0.005
+    air_friction: 0.005
     fast_fall_terminal_velocity: 2.5
     unknown0x78: 3
     jab_2_window: 24

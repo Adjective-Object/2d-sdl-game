@@ -1,6 +1,7 @@
+#include <SDL.h>
 #include <iostream>
 #include "scenes.hpp"
-#include "player.hpp"
+#include "player/player.hpp"
 #include "engine/game.hpp"
 #include "engine/joystickindicator.hpp"
 
@@ -25,8 +26,10 @@ void MainScene::init() {
 }
 
 void MainScene::update() {
+    Scene::update();
 }
 
-void MainScene::render() {
+void MainScene::render(SDL_Renderer * r) {
+    Scene::render(r);
 }
 

@@ -16,10 +16,13 @@ Scene::~Scene() {
 }
 
 void Scene::init() {
-    // update all the entities
+    // init all the entities
     for (Entity * e : this->entities) {
         e->init();
     }
+}
+
+void Scene::start() {
 }
 
 void Scene::update() {

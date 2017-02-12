@@ -22,10 +22,12 @@ PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
 set(LIB_SRCS 
     src/scenes.hpp
     src/scenes.cpp
-    src/player.hpp
-    src/player.cpp
-    src/playerconfig.hpp
-    src/playerconfig.cpp
+    src/player/player.hpp
+    src/player/player.cpp
+    src/player/action.hpp
+    src/player/action.cpp
+    src/player/playerconfig.hpp
+    src/player/playerconfig.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp

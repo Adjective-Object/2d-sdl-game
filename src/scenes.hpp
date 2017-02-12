@@ -8,9 +8,9 @@ class MainScene : public Scene {
 public:
    MainScene();
    ~MainScene();
-   void init();
-   void update();
-   void render();
+   void init() override;
+   void update() override;
+   void render(SDL_Renderer * r) override;
 };
 
 #endif
