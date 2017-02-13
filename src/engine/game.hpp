@@ -20,7 +20,6 @@ private:
     SDL_Window * makeWindow(const std::string & name,
             unsigned int width, unsigned int height);
     SDL_Renderer * makeRenderer(SDL_Window * win);
-    SDL_Texture * loadPNG(const std::string & file);
 
 public:
     // FlxG convenience values
@@ -28,6 +27,8 @@ public:
     double fixedTickrate = 0;
     Scene * currentScene;
     Input input;
+
+    SDL_Texture * loadPNG(const std::string & file);
 
     // Actual Game object API
     Game(unsigned int width, unsigned int height, 

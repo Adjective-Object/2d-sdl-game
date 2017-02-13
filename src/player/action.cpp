@@ -32,8 +32,16 @@ bool interruptWithDash(Player & p) {
     return false;
 }
 
+bool interruptWithTiltTurn(Player & p) {
+    if (p.joystick->axis(0) * p.face < -0.3) {
+        p.changeAction(TURN);
+        return true;
+    }
+    return false;
+}
+
 bool interruptWithWalk(Player & p) {
-    if (std::abs(p.joystick->axis(0)) > 0.3) {
+    if (sign(p.joystick->axis(0)) == p.facing && std::abs(p.joystick->axis(0)) > 0.3) {
         p.changeAction(WALK);
         return true;
     }
@@ -106,6 +114,7 @@ class Wait : public Action {
     bool interrupt(Player & p) {
         return interruptWithJump(p)
             || interruptWithDash(p)
+            || interruptWithTiltTurn(p)
             || interruptWithWalk(p);
     }
 };
@@ -212,8 +221,22 @@ class JumpF : public Action {
     }
 
     bool interrupt(Player & p) {
-        if (interruptWithAirdodge(p)) return true;
-        return false;
+        return interruptWithAirdodge(p);
+    }
+};
+
+class Turn : public Action {
+    void step(Player &p) override {
+        if (interrupt(p)) return;
+
+        if (p.timer == p.config.getAttribute("turn_duration")) {
+            p.face = -p.face;
+            p.changeAction(WAIT);
+        }
+    }
+
+    bool interrupt(Player &p) {
+        return interruptWithJump(p);
     }
 };
 
@@ -261,6 +284,7 @@ const char * actionStateName(ActionState state) {
         case JUMPF: return "JUMPF";
         case JUMPB: return "JUMPB";
         case ESCAPEAIR: return "ESCAPEAIR";
+        case TURN: return "TURN";
         default: return "??";
     }
 }
@@ -274,5 +298,6 @@ Action* ACTIONS[__NUM_ACTION_STATES] = {
     new JumpF(),
     new JumpB(),
     new EscapeAir(),
+    new Turn(),
 };
 

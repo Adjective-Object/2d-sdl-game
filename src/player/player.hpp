@@ -6,12 +6,16 @@
 #include "../engine/input.hpp"
 #include "playerconfig.hpp"
 #include "action.hpp"
+#include "animationbank.hpp"
 
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
 
+
 class Player : public Sprite {
+    AnimationBank * bank;
 public:
+
     Joystick * joystick;
     PlayerConfig config;
 
@@ -38,7 +42,7 @@ public:
     void aerialDrift();
     void land(double y);
 
-    Player(std::string attributeFile);
+    Player(std::string attributeFile, double x, double y);
     ~Player();
 
     void changeAction(ActionState state);

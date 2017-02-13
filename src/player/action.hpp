@@ -31,6 +31,7 @@ typedef enum {
     JUMPF,
     JUMPB,
     ESCAPEAIR,
+    TURN,
     __NUM_ACTION_STATES,
 } ActionState;
 const char * actionStateName(ActionState);

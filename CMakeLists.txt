@@ -28,6 +28,8 @@ set(LIB_SRCS
     src/player/action.cpp
     src/player/playerconfig.hpp
     src/player/playerconfig.cpp
+    src/player/animationbank.hpp
+    src/player/animationbank.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp

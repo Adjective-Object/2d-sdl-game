@@ -6,26 +6,20 @@
 #include "action.hpp"
 #include "../util.hpp"
 
-double DEADZONE = 0.2;
-double LIMIT_WALK_SLOW_UPPER = 0.4;
-double LIMIT_WALK_MIDDLE_UPPER = 0.6;
-double LIMIT_WALK_FAST_UPPER = 0.8;
-
-double slow = 0.1;
-double med = 0.6;
-double fast = 2;
-
-Player::Player(std::string fpath) :
+Player::Player(std::string fpath, double x, double y) :
     config(PlayerConfig(fpath)) {
     action = ACTIONS[FALL];
+    position.x = x;
+    position.y = y;
 } 
 
 Player::~Player() {
-
 }
 
 void Player::init() {
+    std::cout << "init player" << std::endl;
     joystick = EnG->input.getJoystick(0);
+    bank = new AnimationBank();
 }
 
 void Player::update() {
@@ -37,8 +31,8 @@ void Player::update() {
     velocity = cVel + kVel;
     Sprite::updateMotion();
 
-    if (velocity.y > 0 && position.y > 0.6) {
-        this->land(0.6);
+    if (velocity.y > 0 && position.y > 2) {
+        this->land(2);
     }
 }
 
@@ -136,12 +130,20 @@ void Player::aerialDrift() {
 
 void Player::render(SDL_Renderer * ren) {
     SDL_Rect destination {
-        (int) (position.x * 400),
-        (int) (position.y * 400),
-        32,
-        32
+        (int) (position.x * 200) - 64,
+        (int) (position.y * 200) - 128,
+        128,
+        128
     };
-    SDL_RenderCopy( ren, FALLBACK_TEXTURE, NULL, &destination );
+    SDL_RenderCopyEx(
+        ren,
+        bank->getCurrentTexture(*this),
+        NULL,
+        &destination,
+        NULL,
+        NULL,
+        face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL
+    );
 
 }
 
@@ -152,4 +154,5 @@ void Player::changeAction(ActionState state) {
     timer = 0;
     action = ACTIONS[state];
     action->step(*this);
+    bank->playAnimation(state);
 }
