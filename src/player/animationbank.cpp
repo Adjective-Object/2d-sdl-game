@@ -5,25 +5,24 @@
 #include "player.hpp"
 
 AnimationBank::AnimationBank() {
-    std:: cout << "loading land-wait" << std::endl;
-    SDL_Texture * land_squat = EnG->loadPNG("./assets/land-jumpsquat.png");
     images = new SDL_Texture * [__NUM_ACTION_STATES];
     for(size_t i=0; i<__NUM_ACTION_STATES; i++) {
         images[i] = NULL;
     }
 
-    std:: cout << "loading wait" << std::endl;
-    images[WALK] = EnG->loadPNG("./assets/wait.png"); //walk
-    images[WAIT] = EnG->loadPNG("./assets/wait.png"); //wait
+    SDL_Texture * wait = EnG->loadPNG("./assets/wait.png");
+    images[WALK] = wait;
+    images[WAIT] = wait;
 
+    SDL_Texture * land_squat = EnG->loadPNG("./assets/land-jumpsquat.png");
     images[LANDING] = land_squat; //land
     images[KNEEBEND] = land_squat; // jump squat
-    std:: cout << "loading jumpf" << std::endl;
+
     images[JUMPF] = EnG->loadPNG("./assets/jumpf.png"); //jumpf
-    std:: cout << "loading jumpb" << std::endl;
     images[JUMPB] = EnG->loadPNG("./assets/jumpb.png"); //jumpb
-    std:: cout << "loading escapeair" << std::endl;
     images[ESCAPEAIR] = EnG->loadPNG("./assets/escapeair.png"); //airdodge
+    images[DASH] = EnG->loadPNG("./assets/dash.png"); // dash
+    images[RUN] = EnG->loadPNG("./assets/run.png"); //r un
 }
 
 AnimationBank::~AnimationBank() {

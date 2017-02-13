@@ -29,6 +29,16 @@ bool interruptWithAirdodge(Player & p) {
 }
 
 bool interruptWithDash(Player & p) {
+    if (sign(p.joystick->axis(0)) == p.face &&
+        std::abs(p.joystick->axis(0)) > 0.79) {
+
+        std::cout << "initiating dash " 
+            << p.joystick->axis(0) << " "
+            << p.face << std::endl;
+
+        p.changeAction(DASH);
+        return true;
+    }
     return false;
 }
 
@@ -41,12 +51,21 @@ bool interruptWithTiltTurn(Player & p) {
 }
 
 bool interruptWithWalk(Player & p) {
-    if (sign(p.joystick->axis(0)) == p.facing && std::abs(p.joystick->axis(0)) > 0.3) {
+    if (p.joystick->axis(0) * p.face > 0.3) {
         p.changeAction(WALK);
         return true;
     }
     return false;
 }
+
+bool interruptWithWait(Player & p) {
+    if (std::abs(p.joystick->axis(0)) < 0.1) {
+        p.changeAction(WAIT);
+        return true;
+    }
+    return false;
+}
+
 
 void applyTraction(Player & p, double multiplier = 1.0) {
     double friction = p.config.getAttribute("friction");
@@ -83,7 +102,7 @@ class Walk : public Action {
         float walkAcc = p.config.getAttribute("walk_acceleration");
       
         float requestedWalkSpeed = walkSpeedMax * p.joystick->axis(0);
-        if (abs(p.cVel.x) > abs(requestedWalkSpeed)) {
+        if (std::abs(p.cVel.x) > std::abs(requestedWalkSpeed)) {
             applyTraction(p, 2);
         } else {
             float requestedWalkAcc =
@@ -100,7 +119,11 @@ class Walk : public Action {
     }
 
     bool interrupt(Player & p) {
-        return interruptWithJump(p);
+        return
+            interruptWithWait(p) ||
+            interruptWithJump(p) ||
+            (p.timer <= 1 && interruptWithDash(p)) ||
+            interruptWithTiltTurn(p);
     }
 };
 
@@ -167,7 +190,7 @@ class KneeBend : public Action {
         }
 
         if (p.timer > p.config.getAttribute("jump_startup_lag")) {
-            if (p.joystick->axis(0) * p.facing > -0.3) {
+            if (p.joystick->axis(0) * p.face > -0.2) {
                 p.changeAction(JUMPF);
             } else {
                 p.changeAction(JUMPB);
@@ -230,13 +253,15 @@ class Turn : public Action {
         if (interrupt(p)) return;
 
         if (p.timer == p.config.getAttribute("turn_duration")) {
+            std::cout << "rolling back, p.timer=" << p.timer << std::endl;
             p.face = -p.face;
             p.changeAction(WAIT);
         }
     }
 
     bool interrupt(Player &p) {
-        return interruptWithJump(p);
+        return interruptWithJump(p) ||
+            (p.timer <= 1 && interruptWithDash(p));
     }
 };
 
@@ -274,6 +299,80 @@ class EscapeAir : public Action {
     }
 };
 
+
+class Dash : public Action {
+    void step (Player & p) override {
+
+        if (p.timer == 0) {
+            p.cVel.x += p.face * p.config.getAttribute("dash_initial_velocity");
+        }
+
+        if (interrupt(p)) return;
+
+        if (p.timer > 1) {
+            if (std::abs(p.joystick->axis(0)) < 0.3) {
+                applyTraction(p);
+            } else {
+                double dashVelocityMax = p.joystick->axis(0) *
+                    p.config.getAttribute("run_max_velocity");
+                double dashAcceleration = p.joystick->axis(0) *
+                    p.config.getAttribute("run_acceleration");
+
+                p.cVel.x += dashAcceleration;
+
+                // if the player is moving too fast, slow them down
+                if (sign(dashVelocityMax) == sign(p.cVel.x) &&
+                    std::abs(dashVelocityMax) < std::abs(p.cVel.x)) {
+                    applyTraction(p);
+                    p.cVel.x = sign(p.cVel.x) * std::min(std::abs(p.cVel.x), std::abs(dashVelocityMax));
+                }
+                // if the player is moving within bounds, speed them up more
+                else {
+                    p.cVel.x += dashAcceleration;
+                    p.cVel.x = sign(p.cVel.x) * std::min(std::abs(p.cVel.x), std::abs(dashVelocityMax));
+                }
+            }
+        }
+
+        if (p.timer > 30) {
+            double controllerDashThresh = p.joystick->axis(0) * p.face;
+            if (controllerDashThresh > 0.62) {
+                p.changeAction(RUN);
+                return;
+            } else {
+                p.changeAction(WAIT);
+                return;
+            }
+        }
+    }
+
+    bool interrupt(Player &p) {
+        double thisDir = p.joystick->axis(0) * p.face;
+        // if we switched directions (i.e. one pos one neg, switch to wait)
+        // this is to allow for pivots and dash dancing
+        if (thisDir <= 0) {
+            std::cout << "swithcing wait due to turn" << thisDir << std::endl;
+            p.changeAction(WAIT);
+            p.face = -p.face;
+            return true;
+        }
+        return interruptWithJump(p);
+    }
+
+
+};
+
+class Run : public Action {
+    void step (Player & p) override {
+        if (interrupt(p)) return;
+        // TODO RUNBRAKE and RUNTURN
+    }
+
+    bool interrupt(Player &p) {
+        return interruptWithJump(p);
+    }
+};
+
 const char * actionStateName(ActionState state) {
     switch(state) {
         case WALK: return "WALK";
@@ -285,6 +384,8 @@ const char * actionStateName(ActionState state) {
         case JUMPB: return "JUMPB";
         case ESCAPEAIR: return "ESCAPEAIR";
         case TURN: return "TURN";
+        case DASH: return "DASH";
+        case RUN: return "RUN";
         default: return "??";
     }
 }
@@ -299,5 +400,7 @@ Action* ACTIONS[__NUM_ACTION_STATES] = {
     new JumpB(),
     new EscapeAir(),
     new Turn(),
+    new Dash(),
+    new Run(),
 };
 
