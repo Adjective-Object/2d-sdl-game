@@ -10,19 +10,24 @@ AnimationBank::AnimationBank() {
         images[i] = NULL;
     }
 
-    SDL_Texture * wait = EnG->loadPNG("./assets/wait.png");
-    images[WALK] = wait;
-    images[WAIT] = wait;
+    images[WALK] = EnG->loadPNG("./assets/walk.png");
+    images[WAIT] = EnG->loadPNG("./assets/wait.png");
 
-    SDL_Texture * land_squat = EnG->loadPNG("./assets/land-jumpsquat.png");
-    images[LANDING] = land_squat; //land
-    images[KNEEBEND] = land_squat; // jump squat
+    images[LANDING] = EnG->loadPNG("./assets/land.png"); //land
+    images[KNEEBEND] = EnG->loadPNG("./assets/jumpsquat.png"); // jump squat
 
     images[JUMPF] = EnG->loadPNG("./assets/jumpf.png"); //jumpf
     images[JUMPB] = EnG->loadPNG("./assets/jumpb.png"); //jumpb
+    images[JUMPAIRF] = EnG->loadPNG("./assets/djumpf.png"); //jumpf
+    images[JUMPAIRB] = EnG->loadPNG("./assets/djumpb.png"); //jumpb
+
+
     images[ESCAPEAIR] = EnG->loadPNG("./assets/escapeair.png"); //airdodge
     images[DASH] = EnG->loadPNG("./assets/dash.png"); // dash
     images[RUN] = EnG->loadPNG("./assets/run.png"); //r un
+    images[FALL] = EnG->loadPNG("./assets/fall.png"); //jumpf
+    images[TURN] = EnG->loadPNG("./assets/turn.png"); //jumpf
+    images[SMASHTURN] = EnG->loadPNG("./assets/turn.png"); //jumpf
 }
 
 AnimationBank::~AnimationBank() {
@@ -30,6 +35,7 @@ AnimationBank::~AnimationBank() {
 }
 
 void AnimationBank::playAnimation(ActionState action) {
+    std::cout << "action " << action << std::endl;
     if (images[action] != NULL) {
         current = images[action];
     } else {

@@ -20,8 +20,8 @@ attributes:
     jump_h_max_velocity: 1.2
     shorthop_v_initial_velocity: 1.5
     air_jump_multiplier: 0.88
-    unknown0x54: 1
-    number_of_jumps: 2
+    air_jump_h_momentum: 1
+    number_of_jumps: 4
     gravity: 0.085
     terminal_velocity: 2.2
     aerial_mobility: 0.03
