@@ -5,9 +5,10 @@
 
 class PlayerConfig {
     YAML::Node yamlNode;
-public:
-    PlayerConfig(const std::string & configPath);
-    double getAttribute(const std::string & name);
+
+   public:
+    PlayerConfig(const std::string& configPath);
+    double getAttribute(const std::string& name);
 };
 
 #endif

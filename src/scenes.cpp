@@ -1,20 +1,18 @@
-#include <SDL.h>
-#include <iostream>
 #include "scenes.hpp"
-#include "player/player.hpp"
-#include "player/action.hpp"
 #include "engine/game.hpp"
 #include "engine/joystickindicator.hpp"
 #include "engine/text.hpp"
+#include "player/action.hpp"
+#include "player/player.hpp"
+#include <SDL.h>
+#include <iostream>
 
-MainScene::MainScene() : Scene() {
-}
+MainScene::MainScene() : Scene() {}
 
-MainScene::~MainScene() {
-}
+MainScene::~MainScene() {}
 
 void MainScene::init() {
-    Joystick * joystick = EnG->input.getJoystick(0);
+    Joystick* joystick = EnG->input.getJoystick(0);
 
     joystick->calibrateAxis(0, -30000, 32800, 450);
     joystick->calibrateAxis(1, -32000, 32000, 450);
@@ -24,20 +22,12 @@ void MainScene::init() {
     player = new Player("attributes.yaml", 0.5, 0.5);
     this->entities.push_back(player);
 
-    SDL_Renderer * r = EnG->getRenderer();
-    text = new Text(
-        r,
-        Pair(130, 10),
-        "assets/monaco.ttf",
-        20,
-        {
-            .r = 255,
-            .g = 255,
-            .b = 255,
-            .a = 255,
-        },
-        "???"
-    );
+    SDL_Renderer* r = EnG->getRenderer();
+    text = new Text(r, Pair(130, 10), "assets/monaco.ttf", 20,
+                    {
+                        .r = 255, .g = 255, .b = 255, .a = 255,
+                    },
+                    "???");
     this->entities.push_back(text);
 
     this->entities.push_back(new JoystickIndicator(0, 1, 10, 10, 50, 50));
@@ -57,19 +47,12 @@ void MainScene::update() {
     if (player->velocity.y > 0 && player->position.y > PLAYER_FLOOR) {
         player->land(PLAYER_FLOOR);
     }
-
 }
 
-void MainScene::render(SDL_Renderer * r) {
+void MainScene::render(SDL_Renderer* r) {
     SDL_SetRenderDrawColor(r, 180, 180, 180, 255);
-    SDL_Rect rect = {
-        0,
-        (int)(PLAYER_FLOOR * PLAYER_SCALE),
-        800,
-        1
-    };
+    SDL_Rect rect = {0, (int)(PLAYER_FLOOR * PLAYER_SCALE), 800, 1};
     SDL_RenderFillRect(r, &rect);
 
     Scene::render(r);
 }
-

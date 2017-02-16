@@ -14,12 +14,11 @@ typedef enum JumpType {
     JUMP_BUTTON,
 } JumpType;
 
-
 class Action {
-public:
-    virtual void step(Player & p) = 0;
-    virtual LandType getLandType(Player & p);
-    virtual void onLanding(Player & p);
+   public:
+    virtual void step(Player& p) = 0;
+    virtual LandType getLandType(Player& p);
+    virtual void onLanding(Player& p);
 };
 
 typedef enum {
@@ -41,9 +40,8 @@ typedef enum {
     RUNTURN,
     __NUM_ACTION_STATES,
 } ActionState;
-const char * actionStateName(ActionState);
+const char* actionStateName(ActionState);
 
 extern Action* ACTIONS[__NUM_ACTION_STATES];
 
 #endif
-

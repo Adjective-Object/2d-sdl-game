@@ -1,20 +1,19 @@
-#include <iostream>
-#include <algorithm>
-#include "../engine/game.hpp"
-#include "playerconfig.hpp"
 #include "player.hpp"
-#include "action.hpp"
+#include "../engine/game.hpp"
 #include "../util.hpp"
+#include "action.hpp"
+#include "playerconfig.hpp"
+#include <algorithm>
+#include <iostream>
 
-Player::Player(std::string fpath, double x, double y) :
-    config(PlayerConfig(fpath)) {
+Player::Player(std::string fpath, double x, double y)
+    : config(PlayerConfig(fpath)) {
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
 }
 
-Player::~Player() {
-}
+Player::~Player() {}
 
 void Player::init() {
     std::cout << "init player" << std::endl;
@@ -49,7 +48,8 @@ void Player::update() {
 
 /** Fall the player slowly, and allow the player to fastfall */
 void Player::fall() {
-    if (fastfalled) return;
+    if (fastfalled)
+        return;
     cVel.y += config.getAttribute("gravity");
     cVel.y = std::min(cVel.y, config.getAttribute("terminal_velocity"));
 
@@ -69,8 +69,8 @@ void Player::land(double y) {
     grounded = true;
     fastfalled = false;
     times_jumped = 0;
-    
-    switch(action->getLandType(*this)) {
+
+    switch (action->getLandType(*this)) {
         case NORMAL:
             // Trigger landing when velocity > 1
             std::cout << "cVel : " << yvel << std::endl;
@@ -88,9 +88,10 @@ void Player::land(double y) {
 /** Move the player horizontally when they are in the air */
 void Player::aerialDrift() {
     bool joystickMoving = std::abs(joystick->axis(0)) > 0.3;
-    float inputDrift = (joystickMoving)
-        ? joystick->axis(0) * config.getAttribute("max_aerial_h_velocity")
-        : 0;
+    float inputDrift =
+        (joystickMoving)
+            ? joystick->axis(0) * config.getAttribute("max_aerial_h_velocity")
+            : 0;
 
     // std::cout << inputDrift << " ";
 
@@ -98,55 +99,47 @@ void Player::aerialDrift() {
     if (abs(inputDrift) > abs(cVel.x) && sign(cVel.x) == sign(inputDrift)) {
         // std::cout << "too fast, dragging";
         if (cVel.x > 0) {
-          cVel.x = std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
+            cVel.x =
+                std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
         } else {
-          cVel.x = std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
+            cVel.x =
+                std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
         }
     }
 
     // otherwise, move them according to their aerial mobility
-    else if (joystickMoving) { 
+    else if (joystickMoving) {
         // std::cout << "moving according to mobility";
-        cVel.x += 
-            joystick->axis(0) * config.getAttribute("aerial_mobility") +
-            sign(joystick->axis(0)) * config.getAttribute("aerial_stopping_mobility");
+        cVel.x += joystick->axis(0) * config.getAttribute("aerial_mobility") +
+                  sign(joystick->axis(0)) *
+                      config.getAttribute("aerial_stopping_mobility");
     }
 
     // if the joystick is not moving, slow the player down with aerial friciton
     if (!joystickMoving) {
         // std::cout << "not moving, slowing with friction";
         if (cVel.x > 0) {
-            cVel.x = std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
+            cVel.x =
+                std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
         } else {
-            cVel.x = std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
+            cVel.x =
+                std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
         }
     }
     // std::cout << std::endl;
 }
 
-void Player::render(SDL_Renderer * ren) {
-    SDL_Rect destination {
-        (int) (position.x * PLAYER_SCALE) - 64,
-        (int) (position.y * PLAYER_SCALE) - 110,
-        128,
-        128
-    };
-    SDL_RenderCopyEx(
-        ren,
-        bank->getCurrentTexture(*this),
-        NULL,
-        &destination,
-        NULL,
-        NULL,
-        face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL
-    );
-
+void Player::render(SDL_Renderer* ren) {
+    SDL_Rect destination{(int)(position.x * PLAYER_SCALE) - 64,
+                         (int)(position.y * PLAYER_SCALE) - 110, 128, 128};
+    SDL_RenderCopyEx(ren, bank->getCurrentTexture(*this), NULL, &destination,
+                     NULL, NULL,
+                     face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 }
 
 void Player::changeAction(ActionState state) {
     std::cout << "change to state [" << state << "] "
-              << "(" << actionStateName(state) << ")"
-              << std::endl;
+              << "(" << actionStateName(state) << ")" << std::endl;
     timer = 0;
     action = ACTIONS[state];
     bank->playAnimation(state);

@@ -1,34 +1,35 @@
 #include <iostream>
 
+#include "game.hpp"
+#include "input.hpp"
+#include "util.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include "game.hpp"
-#include "util.hpp"
-#include "input.hpp"
 
-Game *EnG = nullptr;
-SDL_Texture *FALLBACK_TEXTURE = nullptr;
+Game* EnG = nullptr;
+SDL_Texture* FALLBACK_TEXTURE = nullptr;
 
 // TODO use zoomLevel at all
-Game::Game(unsigned int width, unsigned int height,
-            Scene & initialScene, unsigned int zoomLevel) :
-        currentScene(&initialScene){
-
+Game::Game(unsigned int width,
+           unsigned int height,
+           Scene& initialScene,
+           unsigned int zoomLevel)
+    : currentScene(&initialScene) {
     // check if there is an existing global reference to Game. If there is
     // not, register this as the Game singleton
     if (EnG != nullptr) {
-        std::cerr << "Tried to create another instance of singleton Game" 
+        std::cerr << "Tried to create another instance of singleton Game"
                   << std::endl;
         exit(1);
     } else {
         // init SDL
-        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS,"1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
             exit(1);
         }
-        if(TTF_Init()==-1) {
+        if (TTF_Init() == -1) {
             printf("TTF_Init: %s\n", TTF_GetError());
             exit(2);
         }
@@ -42,25 +43,24 @@ Game::Game(unsigned int width, unsigned int height,
     win = makeWindow("poop", width, height);
     ren = makeRenderer(win);
 
-    //TODO replace this with a string constant
+    // TODO replace this with a string constant
     FALLBACK_TEXTURE = loadPNG("fallback.png");
 }
-
 
 Game::~Game() {
     SDL_Quit();
 }
 
-
 /**
  * Makes the SDL window, exits program on error
  */
-SDL_Window * Game::makeWindow(const std::string & name, 
-        unsigned int width, unsigned int height) {
-    SDL_Window * win = SDL_CreateWindow(name.c_str(),
-            100, 100, (int) width, (int) height, SDL_WINDOW_SHOWN);
+SDL_Window* Game::makeWindow(const std::string& name,
+                             unsigned int width,
+                             unsigned int height) {
+    SDL_Window* win = SDL_CreateWindow(name.c_str(), 100, 100, (int)width,
+                                       (int)height, SDL_WINDOW_SHOWN);
 
-    if (win == nullptr){
+    if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         exit(1);
@@ -69,17 +69,16 @@ SDL_Window * Game::makeWindow(const std::string & name,
     return win;
 }
 
-
 /**
  * Makes a renderer for the SDL window
  **/
-SDL_Renderer * Game::makeRenderer(SDL_Window * win) {
-    SDL_Renderer *ren = SDL_CreateRenderer(
-        win, -1, 0);
+SDL_Renderer* Game::makeRenderer(SDL_Window* win) {
+    SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
 
-    if (ren == nullptr){
+    if (ren == nullptr) {
         SDL_DestroyWindow(win);
-        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError()
+                  << std::endl;
         SDL_Quit();
         exit(1);
     }
@@ -87,41 +86,37 @@ SDL_Renderer * Game::makeRenderer(SDL_Window * win) {
     return ren;
 }
 
-
 /**
 * Loads a BMP image into a texture on the rendering device
 * @param file The BMP image file to load
 * @param ren The renderer to load the texture onto
 * @return the loaded texture, or nullptr if something went wrong.
 */
-SDL_Texture* Game::loadPNG(const std::string &file) {
-    //Initialize to nullptr to avoid dangling pointer issues
-    SDL_Texture *texture = FALLBACK_TEXTURE;
-    //Load the image
-    SDL_Surface *loadedImage = IMG_Load(file.c_str());
-    //If the loading went ok, convert to texture and return the texture
-    if (loadedImage != nullptr){
+SDL_Texture* Game::loadPNG(const std::string& file) {
+    // Initialize to nullptr to avoid dangling pointer issues
+    SDL_Texture* texture = FALLBACK_TEXTURE;
+    // Load the image
+    SDL_Surface* loadedImage = IMG_Load(file.c_str());
+    // If the loading went ok, convert to texture and return the texture
+    if (loadedImage != nullptr) {
         texture = SDL_CreateTextureFromSurface(ren, loadedImage);
         SDL_FreeSurface(loadedImage);
-        //Make sure converting went ok too
-        if (texture == nullptr){
+        // Make sure converting went ok too
+        if (texture == nullptr) {
             logSDLError(std::cout, "CreateTextureFromSurface");
         }
-    }
-    else {
+    } else {
         logSDLError(std::cout, "LoadIMG");
     }
     return texture;
 }
-
 
 void Game::start() {
     uint32_t lastTick, thisTick = SDL_GetTicks();
     this->currentScene->init();
     while (!readyToExit) {
         lastTick = thisTick;
-        uint32_t thisTick = SDL_GetTicks(),
-                 tickDiff = thisTick - lastTick;
+        uint32_t thisTick = SDL_GetTicks(), tickDiff = thisTick - lastTick;
 
         if (this->fixedTickrate == 0) {
             // figure out the elased milliseconds
@@ -133,11 +128,11 @@ void Game::start() {
         // Process SDL events
         input.clear();
         SDL_Event e;
-        while (SDL_PollEvent(&e)){
-            //If user closes the window, ready to exit
-            if (e.type == SDL_QUIT){
+        while (SDL_PollEvent(&e)) {
+            // If user closes the window, ready to exit
+            if (e.type == SDL_QUIT) {
                 readyToExit = true;
-            } 
+            }
 
             input.processEvent(&e);
         }
@@ -160,7 +155,6 @@ void Game::start() {
     }
 }
 
-SDL_Renderer * Game::getRenderer() {
+SDL_Renderer* Game::getRenderer() {
     return ren;
 }
-
