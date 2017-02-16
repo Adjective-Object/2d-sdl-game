@@ -40,12 +40,11 @@ bool interruptWithAirdodge(Player & p) {
 }
 
 bool interruptWithDash(Player & p) {
-    if (sign(p.joystick->axis(0)) == p.face &&
-        std::abs(p.joystick->axis(0)) > 0.79) {
+    if (p.getXInput() > 0.79) {
 
-        std::cout << "initiating dash " 
-            << p.joystick->axis(0) << " "
-            << p.face << std::endl;
+        // std::cout << "initiating dash " 
+        //     << p.joystick->axis(0) << " "
+        //     << p.face << std::endl;
 
         p.changeAction(DASH);
         return true;
@@ -398,16 +397,20 @@ class EscapeAir : public Action {
     }
 };
 
+#define DASH_FRAME_MIN 14
+#define DASH_FRAME_MAX 26
+#define DASH_FRAME_END 30
 
 class Dash : public Action {
     void step (Player & p) override {
         if (interrupt(p)) return;
-        double dashVelocityMax = p.config.getAttribute("run_max_velocity");
+        double dMaxV = p.config.getAttribute("run_max_velocity");
+        double dAccA = p.config.getAttribute("stopturn_initial_velocity");
 
         if (p.timer == 1) {
             p.cVel.x += p.face * p.config.getAttribute("dash_initial_velocity");
-            if (std::abs(p.cVel.x) > std::abs(dashVelocityMax)) {
-                p.cVel.x = dashVelocityMax * p.face;
+            if (std::abs(p.cVel.x) > std::abs(dMaxV)) {
+                p.cVel.x = dMaxV * p.face;
             }
         }
 
@@ -415,55 +418,93 @@ class Dash : public Action {
             if (std::abs(p.joystick->axis(0)) < 0.3) {
                 applyTraction(p);
             } else {
-                double dashAcceleration = p.joystick->axis(0) *
-                    p.config.getAttribute("stopturn_initial_velocity");
-                double tempMax = p.joystick->axis(0) * dashVelocityMax;
+                double tempMax = p.joystick->axis(0) * dMaxV;
+                double tempAcc = p.joystick->axis(0) * dAccA;
 
-                p.cVel.x += dashAcceleration;
-
+                p.cVel.x += tempAcc;
                 // if the player is moving too fast, slow them down
                 if (sign(tempMax) == sign(p.cVel.x) &&
                     std::abs(tempMax) < std::abs(p.cVel.x)) {
                     applyTraction(p);
-                    p.cVel.x = sign(p.cVel.x) * std::max(std::abs(p.cVel.x), std::abs(tempMax));
+
+                    // cap at tempMax
+                    p.cVel.x =
+                        sign(p.cVel.x) *
+                        std::max(
+                            std::abs(p.cVel.x),
+                            std::abs(tempMax)
+                        );
                 }
                 // if the player is moving within bounds, speed them up more
                 else {
-                    p.cVel.x += dashAcceleration;
-                    p.cVel.x = sign(p.cVel.x) * std::min(std::abs(p.cVel.x), std::abs(tempMax));
+                    p.cVel.x += dAccA;
+
+                    // cap at tempMax
+                    p.cVel.x =
+                        sign(p.cVel.x) *
+                        std::min(
+                            std::abs(p.cVel.x),
+                            std::abs(tempMax)
+                        );
                 }
             }
-        }
-
-        if (p.timer > 4 && interruptWithSmashTurn(p)) {
-            p.cVel.x *= 0.25;
-        }
-        else if (p.timer > 27 &&
-            p.getXInput() > 0.79 &&
-            p.joystick->axis(0, 2) * p.face < 0.3) {
-            p.changeAction(DASH);
-        }
-        else if (
-            p.timer > 15 &&
-            p.getXInput() > 0.62) {
-            p.changeAction(RUN);
-        }
-        else if (p.timer > 27) {
-            p.changeAction(WAIT);
         }
     }
 
     bool interrupt(Player &p) {
-        return interruptWithJump(p);
+        if (interruptWithJump(p)) return true;
+        if (p.timer > 4 && interruptWithSmashTurn(p)) {
+            p.cVel.x *= 0.25;
+            return true;
+        }
+        else if (p.timer > DASH_FRAME_MAX &&
+            p.getXInput() > 0.79 &&
+            p.getXInput(2) < 0.3) {
+            p.changeAction(DASH);
+            return true;
+        }
+        else if (
+            p.timer > DASH_FRAME_MIN &&
+            p.getXInput() > 0.62) {
+            p.changeAction(RUN);
+            return true;
+        }
+        else if (p.timer > DASH_FRAME_END) {
+            p.changeAction(WAIT);
+            return true;
+        }
+        return false;
     }
-
-
 };
 
+#define RUN_DURATION 20
 class Run : public Action {
     void step (Player & p) override {
         if (interrupt(p)) return;
         // TODO RUNBRAKE and RUNTURN
+        double rMaxV = p.config.getAttribute("run_max_velocity");
+        double rAccA = p.config.getAttribute("stopturn_initial_velocity");
+        double rAccB = p.config.getAttribute("walk_acceleration");
+        double xInput = p.joystick->axis(0);
+
+        double tempMax = xInput * rMaxV;
+
+        p.cVel.x +=
+            (rMaxV * xInput - p.cVel.x) *
+            (0.25 / rMaxV) *
+            (rAccA + rAccB / sign(xInput));
+
+
+        if (xInput * p.face > tempMax * p.face) {
+            p.cVel.x = tempMax;
+        }
+
+        // // animation scaling
+        // double time = p.cVel.x * p.face / dMaxV;
+        // if (time > 0) {
+        //     p.timer += time;
+        // }
+
     }
 
     bool interrupt(Player &p) {
@@ -507,11 +548,11 @@ class RunTurn : public Action {
 
         if (p.timer < breakPoint && p.getXInput() < -0.3) {
             double dAccA = p.config.getAttribute("stopturn_initial_velocity");
-            double tempAcc = dAccA * (dAccA - (1 - std::abs(p.joystick->axis(0))));
+            double tempAcc = p.face * dAccA * std::abs(p.joystick->axis(0));
             p.cVel.x -= tempAcc;
         } else if (p.timer >= breakPoint && p.getXInput() < 0.3) {
             double dAccA = p.config.getAttribute("stopturn_initial_velocity");
-            double tempAcc = dAccA * (dAccA - (1 - std::abs(p.joystick->axis(0))));
+            double tempAcc = p.face * dAccA * std::abs(p.joystick->axis(0));
             p.cVel.x += tempAcc;
         }
         else {
@@ -538,8 +579,8 @@ class SmashTurn : public Action {
 
     bool interrupt(Player &p) {
         return interruptWithJump(p) ||
-            (p.timer > 2 && interruptWithDash(p)) ||
-            (p.timer > 11 && interruptWithWait(p));
+            (p.timer == 1 && interruptWithDash(p)) ||
+            (p.timer > 10 && interruptWithWait(p));
     }
 };
 

@@ -13,6 +13,9 @@ AnimationBank::AnimationBank() {
     images[WALK] = EnG->loadPNG("./assets/walk.png");
     images[WAIT] = EnG->loadPNG("./assets/wait.png");
 
+    images[RUNTURN] = EnG->loadPNG("./assets/runturn.png");
+    images[RUNBRAKE] = EnG->loadPNG("./assets/runbrake.png");
+
     images[LANDING] = EnG->loadPNG("./assets/land.png"); //land
     images[KNEEBEND] = EnG->loadPNG("./assets/jumpsquat.png"); // jump squat
 
@@ -35,7 +38,6 @@ AnimationBank::~AnimationBank() {
 }
 
 void AnimationBank::playAnimation(ActionState action) {
-    std::cout << "action " << action << std::endl;
     if (images[action] != NULL) {
         current = images[action];
     } else {

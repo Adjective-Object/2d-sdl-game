@@ -54,9 +54,22 @@ void MainScene::update() {
         lastActionState = newState;
     }
 
+    if (player->velocity.y > 0 && player->position.y > PLAYER_FLOOR) {
+        player->land(PLAYER_FLOOR);
+    }
+
 }
 
 void MainScene::render(SDL_Renderer * r) {
+    SDL_SetRenderDrawColor(r, 180, 180, 180, 255);
+    SDL_Rect rect = {
+        0,
+        (int)(PLAYER_FLOOR * PLAYER_SCALE),
+        800,
+        1
+    };
+    SDL_RenderFillRect(r, &rect);
+
     Scene::render(r);
 }
 

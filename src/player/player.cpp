@@ -31,10 +31,6 @@ void Player::update() {
 
     velocity = cVel + kVel;
     Sprite::updateMotion();
-
-    if (velocity.y > 0 && position.y > 2) {
-        this->land(2);
-    }
 }
 
 // void Player::physics() {
@@ -57,7 +53,6 @@ void Player::fall() {
     cVel.y += config.getAttribute("gravity");
     cVel.y = std::min(cVel.y, config.getAttribute("terminal_velocity"));
 
-    std::cout << joystick->axis(1) << ", " << joystick->axis(1, 3) << std::endl;
     if (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 && cVel.y > 0) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
@@ -131,8 +126,8 @@ void Player::aerialDrift() {
 
 void Player::render(SDL_Renderer * ren) {
     SDL_Rect destination {
-        (int) (position.x * 200) - 64,
-        (int) (position.y * 200) - 110,
+        (int) (position.x * PLAYER_SCALE) - 64,
+        (int) (position.y * PLAYER_SCALE) - 110,
         128,
         128
     };
@@ -163,6 +158,6 @@ ActionState Player::getActionState() {
     return actionState;
 }
 
-double Player::getXInput() {
-    return joystick->axis(0) * face;
+double Player::getXInput(int frames) {
+    return joystick->axis(frames) * face;
 }

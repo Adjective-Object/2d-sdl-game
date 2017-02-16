@@ -11,6 +11,8 @@
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
 
+#define PLAYER_FLOOR 1.2
+#define PLAYER_SCALE 275
 
 class Player : public Sprite {
     AnimationBank * bank;
@@ -48,7 +50,7 @@ public:
 
     void changeAction(ActionState state);
     ActionState getActionState();
-    double getXInput();
+    double getXInput(int frames = 0);
 
 };
 

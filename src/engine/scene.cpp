@@ -33,13 +33,6 @@ void Scene::update() {
 }
 
 void Scene::render(SDL_Renderer * r) {
-
-    SDL_SetRenderDrawColor(r, 180, 180, 180, 255);
-    SDL_Rect rect = {
-        0, 400, 800, 100
-    };
-    SDL_RenderFillRect(r, &rect);
-
     for (Entity * e: this->entities) {
         e->render(r);
     }
