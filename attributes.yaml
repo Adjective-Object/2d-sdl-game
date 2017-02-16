@@ -96,6 +96,9 @@ attributes:
     unknown0x178: 0
     special_jump_action: 0
     weight_dep_throw_speed_flags: 0
+
+    # things I have added
+    runturn_break_point: 18
 subactions:
     stand:
         - wait 15

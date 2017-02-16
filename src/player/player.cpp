@@ -11,7 +11,7 @@ Player::Player(std::string fpath, double x, double y) :
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
-} 
+}
 
 Player::~Player() {
 }
@@ -58,7 +58,7 @@ void Player::fall() {
     cVel.y = std::min(cVel.y, config.getAttribute("terminal_velocity"));
 
     std::cout << joystick->axis(1) << ", " << joystick->axis(1, 3) << std::endl;
-    if (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 && cVel.y < 1) {
+    if (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 && cVel.y > 0) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
         cVel.y = config.getAttribute("fast_fall_terminal_velocity");
@@ -156,4 +156,13 @@ void Player::changeAction(ActionState state) {
     action = ACTIONS[state];
     bank->playAnimation(state);
     action->step(*this);
+    actionState = state;
+}
+
+ActionState Player::getActionState() {
+    return actionState;
+}
+
+double Player::getXInput() {
+    return joystick->axis(0) * face;
 }

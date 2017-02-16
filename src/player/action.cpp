@@ -25,6 +25,7 @@ bool interruptWithDJump(Player & p) {
     if (jump != NO_JUMP && p.times_jumped < p.config.getAttribute("number_of_jumps")) {
         p.changeAction(
             (sign(p.joystick->axis(0)) == sign(p.face)) ? JUMPAIRF : JUMPAIRB);
+        p.fastfalled = false;
         return true;
     }
     return false;
@@ -53,7 +54,7 @@ bool interruptWithDash(Player & p) {
 }
 
 bool interruptWithSmashTurn(Player & p) {
-    if (p.joystick->axis(0) * p.face < -0.79 &&
+    if (p.getXInput() < -0.79 &&
         p.joystick->axis(0, 2) * p.face > -0.3) {
         p.changeAction(SMASHTURN);
         return true;    
@@ -62,15 +63,32 @@ bool interruptWithSmashTurn(Player & p) {
 }
 
 bool interruptWithTiltTurn(Player & p) {
-    if (p.joystick->axis(0) * p.face < -0.3) {
+    if (p.getXInput() < -0.3) {
         p.changeAction(TURN);
         return true;
     }
     return false;
 }
 
+bool interruptWithRunBrake(Player & p) {
+    if (std::abs(p.joystick->axis(0)) < 0.62) {
+        p.changeAction(RUNBRAKE);
+        return true;
+    }
+    return false;
+}
+
+bool interruptWithRunTurn(Player & p) {
+    if (p.getXInput() < -0.3) {
+        p.changeAction(RUNTURN);
+        return true;
+    }
+    return false;
+}
+
+
 bool interruptWithWalk(Player & p) {
-    if (p.joystick->axis(0) * p.face > 0.3) {
+    if (p.getXInput() > 0.3) {
         p.changeAction(WALK);
         return true;
     }
@@ -212,7 +230,7 @@ class KneeBend : public Action {
         }
 
         if (p.timer > p.config.getAttribute("jump_startup_lag")) {
-            if (p.joystick->axis(0) * p.face > -0.2) {
+            if (p.getXInput() > -0.2) {
                 p.changeAction(JUMPF);
             } else {
                 p.changeAction(JUMPB);
@@ -421,13 +439,13 @@ class Dash : public Action {
             p.cVel.x *= 0.25;
         }
         else if (p.timer > 27 &&
-            p.joystick->axis(0) * p.face > 0.79 &&
+            p.getXInput() > 0.79 &&
             p.joystick->axis(0, 2) * p.face < 0.3) {
             p.changeAction(DASH);
         }
         else if (
             p.timer > 15 &&
-            p.joystick->axis(0) * p.face > 0.62) {
+            p.getXInput() > 0.62) {
             p.changeAction(RUN);
         }
         else if (p.timer > 27) {
@@ -449,7 +467,62 @@ class Run : public Action {
     }
 
     bool interrupt(Player &p) {
-        return interruptWithJump(p);
+        return
+            interruptWithJump(p) ||
+            interruptWithRunBrake(p) ||
+            interruptWithRunTurn(p);
+    }
+};
+
+#define RUNBRAKE_DURATION 20
+class RunBrake : public Action {
+    void step (Player & p) {
+        if (interruptWithJump(p) ||
+            interruptWithRunTurn(p))
+            return;
+
+        applyTraction(p, 2.0);
+
+        if (p.timer > RUNBRAKE_DURATION) {
+            p.changeAction(WAIT);
+        }
+
+    }
+};
+
+#define RUNTURN_DURATION 20
+class RunTurn : public Action {
+    void step (Player & p) {
+        // state transitions
+        if (interruptWithJump(p)) return;
+        if (p.timer > RUNTURN_DURATION) {
+            p.changeAction(p.getXInput() > 0.6 ? RUN : WAIT);
+        }
+
+        // behavior in turn
+        int breakPoint = p.config.getAttribute("runturn_break_point");
+        if (p.timer == breakPoint) {
+            p.face *= -1;
+        }
+
+        if (p.timer < breakPoint && p.getXInput() < -0.3) {
+            double dAccA = p.config.getAttribute("stopturn_initial_velocity");
+            double tempAcc = dAccA * (dAccA - (1 - std::abs(p.joystick->axis(0))));
+            p.cVel.x -= tempAcc;
+        } else if (p.timer >= breakPoint && p.getXInput() < 0.3) {
+            double dAccA = p.config.getAttribute("stopturn_initial_velocity");
+            double tempAcc = dAccA * (dAccA - (1 - std::abs(p.joystick->axis(0))));
+            p.cVel.x += tempAcc;
+        }
+        else {
+            applyTraction(p, 2.0);
+        }
+
+
+      if (p.timer == breakPoint - 1 && p.cVel.x * p.face > 0) {
+          p.timer--;
+      }
+
     }
 };
 
@@ -486,6 +559,8 @@ const char * actionStateName(ActionState state) {
         case DASH: return "DASH";
         case RUN: return "RUN";
         case SMASHTURN: return "SMASHTURN";
+        case RUNBRAKE: return "RUNBRAKE";
+        case RUNTURN: return "RUNTURN";
         default: return "??";
     }
 }
@@ -505,5 +580,7 @@ Action* ACTIONS[__NUM_ACTION_STATES] = {
     new Dash(),
     new Run(),
     new SmashTurn(),
+    new RunBrake(),
+    new RunTurn(),
 };
 

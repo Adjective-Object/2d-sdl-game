@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "game.hpp"
 #include "util.hpp"
 #include "input.hpp"
@@ -26,6 +27,10 @@ Game::Game(unsigned int width, unsigned int height,
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
             exit(1);
+        }
+        if(TTF_Init()==-1) {
+            printf("TTF_Init: %s\n", TTF_GetError());
+            exit(2);
         }
         EnG = this;
     }
@@ -155,5 +160,7 @@ void Game::start() {
     }
 }
 
-
+SDL_Renderer * Game::getRenderer() {
+    return ren;
+}
 

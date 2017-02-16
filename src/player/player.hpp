@@ -23,6 +23,7 @@ public:
     Pair kVel = Pair(0, 0);
 
     Action * action;
+    ActionState actionState;
     bool fastfalled = false;
     bool grounded = false;
     int times_jumped = 0;
@@ -46,6 +47,8 @@ public:
     ~Player();
 
     void changeAction(ActionState state);
+    ActionState getActionState();
+    double getXInput();
 
 };
 

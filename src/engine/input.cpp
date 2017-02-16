@@ -21,6 +21,10 @@ void Input::init() {
         std::cout << "Warning: no joysticks connected!" << std::endl;
         return;
     }
+    std::cout
+        << "found "
+        << num_joysticks
+        << " joystick(s)" << std::endl;
 
     this->joysticks = new Joystick*[num_joysticks];
 
@@ -157,6 +161,10 @@ bool Joystick::held(unsigned int buttonId, int framesBack) {
 }
 
 bool Joystick::down(unsigned int buttonId, int framesBack) {
+    printf("this is %p\n", this);
+    std::cout << "framesBack = " << framesBack << std::endl;
+    std::cout << "currentHistory = " << currentHistory << std::endl;
+    std::cout << "historySize = " << historySize << std::endl;
     size_t frame = ((currentHistory - framesBack) + historySize) % historySize;
     return (downMask[frame] >> buttonId) & 1;
 }

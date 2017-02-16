@@ -37,6 +37,8 @@ public:
 
     ~Game();
     void start();
+
+    SDL_Renderer * getRenderer();
 };
 
 #endif
