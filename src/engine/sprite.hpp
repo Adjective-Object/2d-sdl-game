@@ -1,19 +1,16 @@
 #ifndef __ENGINE_SPRITE
 #define __ENGINE_SPRITE
 
-#include <SDL.h>
-#include <limits>
-#include "util.hpp"
 #include "entity.hpp"
 #include "pair.hpp"
+#include "util.hpp"
+#include <SDL.h>
+#include <limits>
 
-
-typedef enum Direction {
-    UP, DOWN, LEFT, RIGHT
-} Direction;
+typedef enum Direction { UP, DOWN, LEFT, RIGHT } Direction;
 
 class Sprite : public Entity {
-public:
+   public:
     double angle = 0;
     double angularVelocity = 0;
     double angularAcceleration = 0;
@@ -36,7 +33,7 @@ public:
     virtual void preUpdate() override;
     virtual void postUpdate() override;
     void updateMotion();
-    virtual void render(SDL_Renderer * ren) override;
+    virtual void render(SDL_Renderer* ren) override;
 };
 
 #endif

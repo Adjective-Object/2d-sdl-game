@@ -4,7 +4,7 @@
 #include <SDL.h>
 
 class Entity {
-public:
+   public:
     virtual ~Entity();
     virtual void init() = 0;
 
@@ -12,7 +12,7 @@ public:
     virtual void update() = 0;
     virtual void postUpdate() = 0;
 
-    virtual void render(SDL_Renderer * ren) = 0;
+    virtual void render(SDL_Renderer* ren) = 0;
 };
 
 #endif

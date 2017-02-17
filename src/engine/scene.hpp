@@ -6,30 +6,30 @@
 #include "entity.hpp"
 
 class Scene {
-protected:
+   protected:
     // SCENE INTERNAL STATE
-    std::vector<Entity *> entities;
+    std::vector<Entity*> entities;
 
-public:
+   public:
     // INTERFACE
 
     // called by Game to initialize the scene's content
-    virtual void init() = 0;
+    virtual void init();
 
     /**
      * Starts the game's main loop
      */
-    void start();
+    virtual void start();
 
     /**
      * Update step of the scene's main loop
      */
-    void update();
+    virtual void update();
 
     /**
      * Render step of the scene's main loop
      **/
-    void render(SDL_Renderer * r);
+    virtual void render(SDL_Renderer* r);
 
     Scene();
     ~Scene();

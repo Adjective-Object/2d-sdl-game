@@ -18,6 +18,7 @@ in with pkgs; let
     gdb
     valgrind
     pkgconfig
+    clang-tools
   ];
 
 in stdenv.mkDerivation {

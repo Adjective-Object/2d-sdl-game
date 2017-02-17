@@ -20,14 +20,14 @@ attributes:
     jump_h_max_velocity: 1.2
     shorthop_v_initial_velocity: 1.5
     air_jump_multiplier: 0.88
-    unknown0x54: 1
+    air_jump_h_momentum: 1
     number_of_jumps: 2
     gravity: 0.085
     terminal_velocity: 2.2
     aerial_mobility: 0.03
     aerial_stopping_mobility: 0.02
     max_aerial_h_velocity: 0.85
-    air friction: 0.005
+    air_friction: 0.005
     fast_fall_terminal_velocity: 2.5
     unknown0x78: 3
     jab_2_window: 24
@@ -96,6 +96,9 @@ attributes:
     unknown0x178: 0
     special_jump_action: 0
     weight_dep_throw_speed_flags: 0
+
+    # things I have added
+    runturn_break_point: 18
 subactions:
     stand:
         - wait 15
