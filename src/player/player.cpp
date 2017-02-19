@@ -190,6 +190,14 @@ ActionState Player::getActionState() {
     return actionState;
 }
 
+Action* Player::getAction() {
+    return action;
+}
+
 double Player::getXInput(int frames) {
     return joystick->axis(frames) * face;
+}
+
+Platform* Player::getCurrentPlatform() {
+    return currentPlatform;
 }

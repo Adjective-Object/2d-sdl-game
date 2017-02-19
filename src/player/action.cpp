@@ -102,6 +102,32 @@ bool interruptWithWait(Player& p) {
     return false;
 }
 
+bool interruptWithPass(Player& p) {
+    if ((p.joystick->axis(1) > 0.65 || p.joystick->axis(1, 1) > 0.65 ||
+         p.joystick->axis(1, 2) > 0.65) &&
+        p.joystick->axis(1, 6) < 0.3 && p.getCurrentPlatform()->isPassable()) {
+        p.changeAction(PASS);
+        return true;
+    }
+    return false;
+}
+
+bool interruptWithSquat(Player& p) {
+    if (p.joystick->axis(1) > 0.69) {
+        p.changeAction(SQUAT);
+        return true;
+    }
+    return false;
+}
+
+bool interruptWithSquatRv(Player& p) {
+    if (p.joystick->axis(1) < 0.69) {
+        p.changeAction(SQUATRV);
+        return true;
+    }
+    return false;
+}
+
 void applyTraction(Player& p, double multiplier = 1.0) {
     double friction = p.config.getAttribute("friction");
     if (p.cVel.x > 0) {
@@ -120,6 +146,10 @@ void Action::onLanding(Player&) {
 }
 
 bool Action::isGrounded(Player&) {
+    return true;
+}
+
+bool Action::isLandable(Player&) {
     return true;
 }
 
@@ -178,7 +208,7 @@ class Wait : public Action {
     bool interrupt(Player& p) {
         return interruptWithJump(p) || interruptWithDash(p) ||
                interruptWithSmashTurn(p) || interruptWithTiltTurn(p) ||
-               interruptWithWalk(p);
+               interruptWithWalk(p) || interruptWithSquat(p);
     }
 };
 
@@ -572,6 +602,71 @@ class SmashTurn : public Action {
     }
 };
 
+#define PASS_DURATION 5
+class Pass : public Action {
+    void step(Player& p) override {
+        if (interrupt(p))
+            return;
+
+        p.fall();
+        p.aerialDrift();
+        if (p.timer >= PASS_DURATION) {
+            p.changeAction(FALL);
+        }
+    }
+
+    bool interrupt(Player& p) {
+        return interruptWithAirdodge(p) || interruptWithDJump(p);
+    }
+
+    bool isGrounded(Player& p) { return false; }
+    bool isLandable(Player& p) { return false; }
+};
+
+#define SQUAT_DURATION 6
+#define SQUAT_RV_DURATION 6
+
+class Squat : public Action {
+    void step(Player& p) override {
+        if (interrupt(p))
+            return;
+        if (p.timer == SQUAT_DURATION) {
+            p.changeAction(SQUATWAIT);
+        }
+    }
+
+    bool interrupt(Player& p) {
+        return (p.timer == 4 && interruptWithPass(p)) || interruptWithJump(p);
+    }
+};
+
+class SquatWait : public Action {
+    void step(Player& p) override {
+        if (interrupt(p))
+            return;
+    }
+
+    bool interrupt(Player& p) {
+        return interruptWithSquatRv(p) || interruptWithJump(p) ||
+               interruptWithDash(p) || interruptWithSmashTurn(p);
+    }
+};
+
+class SquatRv : public Action {
+    void step(Player& p) override {
+        if (interrupt(p))
+            return;
+        if (p.timer == SQUAT_RV_DURATION) {
+            p.changeAction(WAIT);
+        }
+    }
+
+    bool interrupt(Player& p) {
+        return interruptWithJump(p) || interruptWithDash(p) ||
+               interruptWithSmashTurn(p) || interruptWithWalk(p);
+    }
+};
+
 const char* actionStateName(ActionState state) {
     if (state < __NUM_ACTION_STATES) {
         return ACTION_STATE_NAMES[state];
@@ -580,16 +675,26 @@ const char* actionStateName(ActionState state) {
     }
 }
 
-Action* ACTIONS[__NUM_ACTION_STATES] = {
-        [WALK] = new Walk(),           [ WAIT ] = new Wait(),
-        [ FALL ] = new Fall(),         [ LANDING ] = new Landing(),
-        [ KNEEBEND ] = new KneeBend(), [ JUMPF ] = new JumpF(),
-        [ JUMPB ] = new JumpB(),       [ JUMPAIRF ] = new JumpAir(),
-        [ JUMPAIRB ] = new JumpAir(),  [ ESCAPEAIR ] = new EscapeAir(),
-        [ TURN ] = new Turn(),         [ DASH ] = new Dash(),
-        [ RUN ] = new Run(),           [ SMASHTURN ] = new SmashTurn(),
-        [ RUNBRAKE ] = new RunBrake(), [ RUNTURN ] = new RunTurn(),
-};
+Action* ACTIONS[__NUM_ACTION_STATES] = {[WALK] = new Walk(),
+                                        [ WAIT ] = new Wait(),
+                                        [ FALL ] = new Fall(),
+                                        [ LANDING ] = new Landing(),
+                                        [ KNEEBEND ] = new KneeBend(),
+                                        [ JUMPF ] = new JumpF(),
+                                        [ JUMPB ] = new JumpB(),
+                                        [ JUMPAIRF ] = new JumpAir(),
+                                        [ JUMPAIRB ] = new JumpAir(),
+                                        [ ESCAPEAIR ] = new EscapeAir(),
+                                        [ TURN ] = new Turn(),
+                                        [ DASH ] = new Dash(),
+                                        [ RUN ] = new Run(),
+                                        [ SMASHTURN ] = new SmashTurn(),
+                                        [ RUNBRAKE ] = new RunBrake(),
+                                        [ RUNTURN ] = new RunTurn(),
+                                        [ PASS ] = new Pass(),
+                                        [ SQUAT ] = new Squat(),
+                                        [ SQUATWAIT ] = new SquatWait(),
+                                        [ SQUATRV ] = new SquatRv()};
 
 #define ACTION_STATE(x) #x,
 const char* ACTION_STATE_NAMES[__NUM_ACTION_STATES + 1] = {

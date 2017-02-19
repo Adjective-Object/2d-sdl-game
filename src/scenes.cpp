@@ -43,21 +43,27 @@ void MainScene::init() {
     entities.push_back(new JoystickIndicator(3, 4, 70, 10, 50, 50));
 
     Platform* p;
-    p = new Platform({
-        Pair(0.5, 0.8), Pair(0.8, 0.8),
-    });
+    p = new Platform(
+        {
+            Pair(0.5, 0.8), Pair(0.8, 0.8),
+        },
+        true);
     platforms.push_back(p);
     entities.push_back(p);
 
-    p = new Platform({
-        Pair(1.5, 0.8), Pair(1.8, 0.8),
-    });
+    p = new Platform(
+        {
+            Pair(1.5, 0.8), Pair(1.8, 0.8),
+        },
+        true);
     platforms.push_back(p);
     entities.push_back(p);
 
-    p = new Platform({
-        Pair(1, 0.4), Pair(1.3, 0.4),
-    });
+    p = new Platform(
+        {
+            Pair(1, 0.4), Pair(1.3, 0.4),
+        },
+        true);
     platforms.push_back(p);
     entities.push_back(p);
 
@@ -84,7 +90,7 @@ void MainScene::update() {
     sprintf(tmp, "(%.2f, %.2f)", player->position.x, player->position.y);
     posText->updateText(tmp);
 
-    if (player->velocity.y > 0) {
+    if (player->velocity.y > 0 && player->getAction()->isLandable(*player)) {
         for (Platform* p : platforms) {
             double y;
             if (p->checkCollision(player->previousPosition, player->position,
