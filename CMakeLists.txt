@@ -136,4 +136,7 @@ add_custom_target(run_tests
     COMMAND ./ctest
     DEPENDS ctest)
 
+add_custom_target(run_tests_valgrind
+    COMMAND valgrind ./ctest
+    DEPENDS ctest)
 

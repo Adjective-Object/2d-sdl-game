@@ -49,7 +49,8 @@ void Player::update() {
             changeAction(FALL);
             times_jumped = 1;
         }
-        velocity = kVel;
+        velocity = kVel + stepVel / EnG->elapsed;
+
     } else {
         if (actionState != ESCAPEAIR) {
             cVel.x = sign(cVel.x) *
