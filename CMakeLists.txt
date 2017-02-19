@@ -16,6 +16,18 @@ PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
+set(GTEST_DIR $ENV{GTEST_DIR})
+find_library(GTEST_LIBRARY 
+                NAMES gtest 
+                      libgtest 
+                      libgtest.a 
+                PATHS "${GTEST_DIR}/lib")
+find_library(GTEST_LIBRARY_MAIN 
+                NAMES gtest_main 
+                      libgtest_main 
+                      libgtest.a 
+                PATHS "${GTEST_DIR}/lib")
+set(GTEST_INCLUDE_DIR "${GTEST_DIR}/include")
 
 ##########################
 # project source objects #
@@ -59,6 +71,9 @@ target_include_directories(SDL_GAME_LIB PUBLIC
     ${YAML_CPP_INCLUDE_DIRS}
 )
 
+# set(TEST_SRCS)
+# add_library(TEST_LIB OBJECT ${TEST_SRCS})
+
 set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
 
 #####################
@@ -78,8 +93,30 @@ target_include_directories(sdl_game PUBLIC
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    "src"
     )
 
+
+add_executable(ctest
+    tests/main.cpp
+    # $<TARGET_OBJECTS:TEST_LIB>
+    $<TARGET_OBJECTS:SDL_GAME_LIB>)
+target_link_libraries(ctest
+    ${SDL2_LIBRARIES}
+    ${SDL2IMAGE_LIBRARIES} 
+    ${SDL2TTF_LIBRARIES} 
+    ${YAML_CPP_LIBRARIES}
+    ${GTEST_LIBRARY}
+    ${GTEST_LIBRARY_MAIN}
+    )
+target_include_directories(ctest PUBLIC
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2IMAGE_INCLUDE_DIRS}
+    ${SDL2TTF_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIR}
+    "src"
+    )
 
 ########################################
 # Code formatting and linting commands #
@@ -94,5 +131,9 @@ add_custom_target(lint
 
 add_custom_target(format
     COMMAND clang-format -i ${ALL_SRCS})
+
+add_custom_target(run_tests
+    COMMAND ./ctest
+    DEPENDS ctest)
 
 

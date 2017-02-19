@@ -32,7 +32,33 @@ void Player::update() {
     timer++;
     action->step(*this);
 
-    velocity = cVel + kVel;
+    // if we are currently grounded, adapt the x of cVel to
+    // move along the platform
+
+    if (joystick->down(7)) {
+        position.x = 1;
+        position.y = 0.6;
+    }
+
+    if (action->isGrounded(*this) && currentPlatform != NULL) {
+        printf("grounded movement on %p\n", currentPlatform);
+
+        Pair stepVel = cVel * EnG->elapsed;
+        if (!currentPlatform->groundedMovement(position, stepVel)) {
+            currentPlatform = NULL;
+            changeAction(FALL);
+            times_jumped = 1;
+        }
+        velocity = kVel;
+    } else {
+        if (actionState != ESCAPEAIR) {
+            cVel.x = sign(cVel.x) *
+                     std::min(std::abs(cVel.x),
+                              config.getAttribute("max_aerial_h_velocity"));
+        }
+        velocity = cVel + kVel;
+    }
+
     Sprite::updateMotion();
 }
 
@@ -66,13 +92,16 @@ void Player::fall() {
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(double y) {
+void Player::land(Platform* p, double y) {
     double yvel = cVel.y;
     position.y = y;
     cVel.y = 0;
     grounded = true;
     fastfalled = false;
     times_jumped = 0;
+
+    currentPlatform = p;
+    printf("landing on %p\n", p);
 
     switch (action->getLandType(*this)) {
         case NORMAL:

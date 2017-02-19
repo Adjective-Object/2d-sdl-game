@@ -119,6 +119,10 @@ void Action::onLanding(Player&) {
     std::cerr << "no action registered on landing" << std::endl;
 }
 
+bool Action::isGrounded(Player&) {
+    return true;
+}
+
 class Walk : public Action {
     void step(Player& p) override {
         if (p.timer == 0) {
@@ -192,6 +196,8 @@ class Fall : public Action {
     bool interrupt(Player& p) {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 // normal landing
@@ -269,6 +275,8 @@ class JumpB : public Action {
     bool interrupt(Player& p) {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 class JumpF : public Action {
@@ -291,6 +299,8 @@ class JumpF : public Action {
     bool interrupt(Player& p) {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 void startDoubleJump(Player& p) {
@@ -332,6 +342,8 @@ class JumpAir : public Action {
         return interruptWithAirdodge(p) ||
                (p.timer != 0 && interruptWithDJump(p));
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 class Turn : public Action {
@@ -354,6 +366,8 @@ class Turn : public Action {
     bool interrupt(Player& p) {
         return interruptWithJump(p) || (p.timer <= 1 && interruptWithDash(p));
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 #define PI 3.14159265
@@ -388,6 +402,8 @@ class EscapeAir : public Action {
             p.cVel.y = 0;
         }
     }
+
+    bool isGrounded(Player& p) override { return false; }
 };
 
 #define DASH_FRAME_MIN 14

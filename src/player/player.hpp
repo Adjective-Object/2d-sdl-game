@@ -6,6 +6,7 @@
 #include "action.hpp"
 #include "animationbank.hpp"
 #include "playerconfig.hpp"
+#include "../terrain/platform.hpp"
 #include <SDL.h>
 
 #define FACE_LEFT -1;
@@ -13,6 +14,7 @@
 
 class Player : public Sprite {
     AnimationBank* bank;
+    Platform* currentPlatform = NULL;
 
    public:
     Joystick* joystick;
@@ -40,7 +42,7 @@ class Player : public Sprite {
 
     void fall();
     void aerialDrift();
-    void land(double y);
+    void land(Platform* p, double y);
 
     Player(std::string attributeFile, double x, double y);
     ~Player();

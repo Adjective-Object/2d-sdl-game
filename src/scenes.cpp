@@ -49,19 +49,24 @@ void MainScene::init() {
     platforms.push_back(p);
     entities.push_back(p);
 
-    // p = new Platform({
-    //     Pair(1.5, 0.8),
-    //     Pair(1.8, 0.8),
-    // });
-    // platforms.push_back(p);
-    // entities.push_back(p);
+    p = new Platform({
+        Pair(1.5, 0.8), Pair(1.8, 0.8),
+    });
+    platforms.push_back(p);
+    entities.push_back(p);
 
-    // p = new Platform({
-    //     Pair(1, 0.4),
-    //     Pair(1.3, 0.4),
-    // });
-    // platforms.push_back(p);
-    // entities.push_back(p);
+    p = new Platform({
+        Pair(1, 0.4), Pair(1.3, 0.4),
+    });
+    platforms.push_back(p);
+    entities.push_back(p);
+
+    p = new Platform({
+        Pair(0.1, 1.2), Pair(0.3, 1.15), Pair(1.0, 1.2), Pair(1.5, 1.15),
+        Pair(2.1, 1.2),
+    });
+    platforms.push_back(p);
+    entities.push_back(p);
 
     Scene::init();
 }
@@ -84,20 +89,13 @@ void MainScene::update() {
             double y;
             if (p->checkCollision(player->previousPosition, player->position,
                                   &y)) {
-                player->land(y);
+                player->land(p, y);
                 break;
             }
-        }
-
-        if (player->position.y > PLAYER_FLOOR) {
-            player->land(PLAYER_FLOOR);
         }
     }
 }
 
 void MainScene::render(SDL_Renderer* r) {
-    SDL_SetRenderDrawColor(r, 180, 180, 180, 255);
-    SDL_Rect rect = {0, (int)(PLAYER_FLOOR * PLAYER_SCALE), 800, 1};
-    SDL_RenderFillRect(r, &rect);
     Scene::render(r);
 }

@@ -20,6 +20,7 @@ class Platform : public Entity {
                                  Pair& otherPair);
 
     bool checkCollision(Pair& previous, Pair& next, double* out);
+    bool groundedMovement(Pair& position, Pair& velocity);
 
     void init();
     void preUpdate();
