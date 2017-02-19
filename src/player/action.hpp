@@ -19,6 +19,7 @@ class Action {
     virtual void step(Player& p) = 0;
     virtual LandType getLandType(Player& p);
     virtual void onLanding(Player& p);
+    virtual bool isGrounded(Player& p);
 };
 
 typedef enum {

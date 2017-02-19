@@ -1,13 +1,14 @@
 #include "player.hpp"
 #include "../engine/game.hpp"
 #include "../util.hpp"
+#include "../scenes.hpp"
 #include "action.hpp"
 #include "playerconfig.hpp"
 #include <algorithm>
 #include <iostream>
 
 Player::Player(std::string fpath, double x, double y)
-    : config(PlayerConfig(fpath)) {
+    : config(PlayerConfig(fpath)), previousPosition(x, y) {
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
@@ -23,12 +24,40 @@ void Player::init() {
 }
 
 void Player::update() {
+    previousPosition.x = position.x;
+    previousPosition.y = position.y;
+
     Sprite::update();
 
     timer++;
     action->step(*this);
 
-    velocity = cVel + kVel;
+    // reset position when player presses START.
+    if (joystick->down(7)) {
+        position.x = 1.15;
+        position.y = 0.6;
+    }
+
+    // if we are currently grounded, adapt the x of cVel to
+    // move along the platform
+    if (action->isGrounded(*this) && currentPlatform != NULL) {
+        Pair stepVel = cVel * EnG->elapsed;
+        if (!currentPlatform->groundedMovement(position, stepVel)) {
+            currentPlatform = NULL;
+            changeAction(FALL);
+            times_jumped = 1;
+        }
+        velocity = kVel + stepVel / EnG->elapsed;
+
+    } else {
+        if (actionState != ESCAPEAIR) {
+            cVel.x = sign(cVel.x) *
+                     std::min(std::abs(cVel.x),
+                              config.getAttribute("max_aerial_h_velocity"));
+        }
+        velocity = cVel + kVel;
+    }
+
     Sprite::updateMotion();
 }
 
@@ -62,13 +91,16 @@ void Player::fall() {
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(double y) {
+void Player::land(Platform* p, double y) {
     double yvel = cVel.y;
     position.y = y;
     cVel.y = 0;
     grounded = true;
     fastfalled = false;
     times_jumped = 0;
+
+    currentPlatform = p;
+    printf("landing on %p\n", p);
 
     switch (action->getLandType(*this)) {
         case NORMAL:
@@ -132,9 +164,16 @@ void Player::aerialDrift() {
 void Player::render(SDL_Renderer* ren) {
     SDL_Rect destination{(int)(position.x * PLAYER_SCALE) - 64,
                          (int)(position.y * PLAYER_SCALE) - 110, 128, 128};
-    SDL_RenderCopyEx(ren, bank->getCurrentTexture(*this), NULL, &destination,
-                     NULL, NULL,
-                     face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+    SDL_RenderCopyEx(ren, bank->getCurrentTexture(*this), NULL, &destination, 0,
+                     NULL, face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+    // SDL_RenderDrawRect(ren, &destination);
+
+    SDL_Rect p{(int)(position.x * PLAYER_SCALE) - 5,
+               (int)(position.y * PLAYER_SCALE), 10, 10};
+    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
+    SDL_RenderFillRect(ren, &p);
 }
 
 void Player::changeAction(ActionState state) {

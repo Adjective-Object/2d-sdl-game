@@ -1,5 +1,6 @@
-#include "pair.hpp"
+#include <iostream>
 #include <cmath>
+#include "pair.hpp"
 
 Pair::Pair(double x, double y) : x(x), y(y) {}
 
@@ -95,4 +96,31 @@ void Pair::operator^=(const Pair& exp) {
 void Pair::operator^=(const double exp) {
     x = pow(x, exp);
     y = pow(y, exp);
+}
+
+void Pair::operator*=(const double factor) {
+    x = x * factor;
+    y = y * factor;
+}
+
+void Pair::operator/=(const double factor) {
+    x = x / factor;
+    y = y / factor;
+}
+
+/////////////////
+// COMPARATORS //
+/////////////////
+
+#define EPSILON 0.00001
+bool Pair::operator==(const Pair& p) const {
+    return fabs(p.x - x) < EPSILON && fabs(p.y - y) < EPSILON;
+}
+
+/////////////
+// PRINTER //
+/////////////
+
+std::ostream& operator<<(std::ostream& strm, const Pair& p) {
+    return strm << "Pair(" << p.x << ", " << p.y << ")";
 }

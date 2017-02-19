@@ -1,6 +1,8 @@
 #ifndef __ENGINE_PAIR
 #define __ENGINE_PAIR
 
+#include <iostream>
+
 class Pair {
    public:
     double x;
@@ -35,6 +37,13 @@ class Pair {
     void operator/=(const Pair& p);
     void operator^=(const Pair& exp);
     void operator^=(const double exp);
+    void operator*=(const double factor);
+    void operator/=(const double factor);
+
+    // comparators
+    bool operator==(const Pair& p) const;
 };
+
+std::ostream& operator<<(std::ostream& strm, const Pair& p);
 
 #endif

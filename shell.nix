@@ -19,10 +19,14 @@ in with pkgs; let
     valgrind
     pkgconfig
     clang-tools
+    gmock
   ];
 
 in stdenv.mkDerivation {
   name = "sdl2game";
   buildInputs = dependencies ++ devDependencies;
+  shellHook = ''
+    export GTEST_DIR=${gtest}
+  '';
 }
 

@@ -8,7 +8,7 @@ Text::Text(SDL_Renderer* ren,
            int fontsize,
            SDL_Color color,
            const char* text)
-    : position(position), ren(ren), color(color) {
+    : ren(ren), color(color), position(position) {
     font = TTF_OpenFont(fontName, fontsize);
     this->updateText(text);
 }

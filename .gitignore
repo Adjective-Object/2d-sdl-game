@@ -8,3 +8,5 @@ Makefile
 
 # build outputs
 sdl_game
+ctest
+
