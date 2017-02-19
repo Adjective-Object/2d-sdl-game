@@ -11,9 +11,6 @@
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
 
-#define PLAYER_FLOOR 1.2
-#define PLAYER_SCALE 275
-
 class Player : public Sprite {
     AnimationBank* bank;
 
@@ -23,6 +20,7 @@ class Player : public Sprite {
 
     Pair cVel = Pair(0, 0);
     Pair kVel = Pair(0, 0);
+    Pair previousPosition;
 
     Action* action;
     ActionState actionState;

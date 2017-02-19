@@ -31,6 +31,8 @@ set(LIB_SRCS
     src/player/playerconfig.cpp
     src/player/animationbank.hpp
     src/player/animationbank.cpp
+    src/terrain/platform.hpp
+    src/terrain/platform.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp
