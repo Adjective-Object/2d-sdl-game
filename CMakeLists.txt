@@ -71,32 +71,23 @@ target_include_directories(SDL_GAME_LIB PUBLIC
     ${YAML_CPP_INCLUDE_DIRS}
 )
 
-# set(TEST_SRCS)
-# add_library(TEST_LIB OBJECT ${TEST_SRCS})
-
-set(ALL_SRCS ${LIB_SRCS} src/main.cpp)
-
-#####################
-# output executable #
-#####################
-add_executable(sdl_game
-    src/main.cpp
-    $<TARGET_OBJECTS:SDL_GAME_LIB>)
-target_link_libraries(sdl_game
-    ${SDL2_LIBRARIES}
-    ${SDL2IMAGE_LIBRARIES} 
-    ${SDL2TTF_LIBRARIES} 
-    ${YAML_CPP_LIBRARIES}
-    )
-target_include_directories(sdl_game PUBLIC
+set(TEST_SRCS
+    tests/platform.cpp)
+add_library(TEST_LIB OBJECT ${TEST_SRCS})
+target_include_directories(TEST_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIR}
     "src"
     )
 
+set(ALL_SRCS ${LIB_SRCS} ${TEST_SRCS} src/main.cpp tests/main.cpp)
 
+#####################
+# output executable #
+#####################
 add_executable(ctest
     tests/main.cpp
     # $<TARGET_OBJECTS:TEST_LIB>
@@ -115,6 +106,23 @@ target_include_directories(ctest PUBLIC
     ${SDL2TTF_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIR}
+    "src"
+    )
+
+add_executable(sdl_game
+    src/main.cpp
+    $<TARGET_OBJECTS:SDL_GAME_LIB>)
+target_link_libraries(sdl_game
+    ${SDL2_LIBRARIES}
+    ${SDL2IMAGE_LIBRARIES} 
+    ${SDL2TTF_LIBRARIES} 
+    ${YAML_CPP_LIBRARIES}
+    )
+target_include_directories(sdl_game PUBLIC
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2IMAGE_INCLUDE_DIRS}
+    ${SDL2TTF_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
     "src"
     )
 

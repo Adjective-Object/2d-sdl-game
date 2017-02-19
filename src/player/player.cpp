@@ -32,17 +32,15 @@ void Player::update() {
     timer++;
     action->step(*this);
 
-    // if we are currently grounded, adapt the x of cVel to
-    // move along the platform
-
+    // reset position when player presses START.
     if (joystick->down(7)) {
-        position.x = 1;
+        position.x = 1.15;
         position.y = 0.6;
     }
 
+    // if we are currently grounded, adapt the x of cVel to
+    // move along the platform
     if (action->isGrounded(*this) && currentPlatform != NULL) {
-        printf("grounded movement on %p\n", currentPlatform);
-
         Pair stepVel = cVel * EnG->elapsed;
         if (!currentPlatform->groundedMovement(position, stepVel)) {
             currentPlatform = NULL;

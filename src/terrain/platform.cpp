@@ -39,6 +39,7 @@ Pair Platform::movePointToSegmentSpace(Pair& platformPoint,
     return Pair(std::cos(psAngle) * length, std::sin(psAngle) * length);
 }
 
+#define PLATFORM_LAND_EPSILON 0.000001
 bool Platform::checkCollision(Pair& previous, Pair& next, double* out) {
     if (points.size() < 2) {
         // this is an error situation
@@ -56,22 +57,23 @@ bool Platform::checkCollision(Pair& previous, Pair& next, double* out) {
 
         Pair psNextPair = this->movePointToSegmentSpace(p1, angle, next);
 
-        if (psPreviousPair.y <= 0 && psNextPair.y >= 0) {
+        if (psPreviousPair.y <= PLATFORM_LAND_EPSILON &&
+            psNextPair.y >= PLATFORM_LAND_EPSILON) {
             // the player has crossed the platform, check the x bounds
-            // TODO think about a better way to do this..
-            Pair p2 = points[i + 1];
+            // this will work well enough for mostly vertical platforms
 
-            std::cout << "player crossed platform:\t" << psPreviousPair.x
-                      << ",\t" << psPreviousPair.y << "\t"
-                      << "\t->\t" << psNextPair.x << ",\t" << psNextPair.y
-                      << "\t" << std::endl;
+            // printf(
+            //     "player crossed platform: %d [len: %.03f] (%.03f, %.03f) -> "
+            //     "(%.03f %.03f)\n",
+            //     i, lengths[i], psPreviousPair.x, psPreviousPair.y,
+            //     psNextPair.x,
+            //     psNextPair.y);
 
-            std::cout << "other platform:\t" << (p2 - p1).x << ", "
-                      << (p2 - p1).y << std::endl;
-
-            if ((psPreviousPair.x > 0 || psNextPair.x > 0) &&
-                (psPreviousPair.x < lengths[i] || psNextPair.x < lengths[i])) {
-                std::cout << "collision detected @ " << p1.y << std::endl;
+            if ((psPreviousPair.x > -PLATFORM_LAND_EPSILON ||
+                 psNextPair.x > -PLATFORM_LAND_EPSILON) &&
+                (psPreviousPair.x < lengths[i] + PLATFORM_LAND_EPSILON ||
+                 psNextPair.x < lengths[i] + PLATFORM_LAND_EPSILON)) {
+                // std::cout << "collision detected @ " << p1.y << std::endl;
 
                 *out = (double)p1.y;  // TODO
                 return true;
@@ -115,7 +117,7 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
 
     i--;
 
-    std::cout << "i: " << i << std::endl;
+    // std::cout << "i: " << i << std::endl;
 
     // std::cout << "resting on segment " << i << std::endl;
     // std::cout << "length is " << lengths[i] << std::endl;
@@ -125,14 +127,15 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     double remainingDistance = std::abs(velocity.x);
     double direction = velocity.x == 0 ? 1 : sign(velocity.x);
 
-    std::cout << "direction " << direction << std::endl;
-    std::cout << "distance " << remainingDistance << std::endl;
+    // std::cout << "direction " << direction << std::endl;
+    // std::cout << "distance " << remainingDistance << std::endl;
 
     while (1) {
-        std::cout << "reducing movment by remaining length of current platform"
-                  << std::endl;
-        std::cout << "length: " << lengths[i]
-                  << " percent: " << currentPlatformPercent << std::endl;
+        // std::cout << "reducing movment by remaining length of current
+        // platform"
+        //           << std::endl;
+        // std::cout << "length: " << lengths[i]
+        //           << " percent: " << currentPlatformPercent << std::endl;
 
         if (direction < 0) {
             // leftware motion
@@ -143,14 +146,15 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
             remainingDistance -= lengths[i] * (1 - currentPlatformPercent);
             currentPlatformPercent = 0;
         }
-        std::cout << "remaining distance " << remainingDistance << std::endl;
+
+        // std::cout << "remaining distance " << remainingDistance << std::endl;
 
         // if we've gone too negative remainingDistance, then we've
         // exhausted the requested platform motion. Undo the previous
         // motion to get to remainingDistance of zero and resturn the
         // corresponding position w/ 0 velocity
         if (remainingDistance < 0) {
-            std::cout << "ending motion" << std::endl;
+            // std::cout << "ending motion" << std::endl;
 
             currentPlatformPercent = -remainingDistance / lengths[i];
             if (direction < 0) {
@@ -170,8 +174,9 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         // position on the platform with x velocity corresponding to
         // remaining distance
         if (i < 0 || i >= lengths.size()) {
-            printf("stepping off platform (direction: %f, reamining dist:%f)",
-                   direction, remainingDistance);
+            // printf("stepping off platform (direction: %f, reamining
+            // dist:%f)",
+            //        direction, remainingDistance);
             i -= direction;
             velocity.x = direction * remainingDistance;
             position.x = points[i].x;
