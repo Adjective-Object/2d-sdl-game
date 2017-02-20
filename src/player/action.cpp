@@ -532,8 +532,8 @@ class Run : public Action {
     }
 
     bool interrupt(Player& p) {
-        return interruptWithJump(p) || interruptWithRunBrake(p) ||
-               interruptWithRunTurn(p);
+        return interruptWithJump(p) || interruptWithSquat(p) ||
+               interruptWithRunBrake(p) || interruptWithRunTurn(p);
     }
 };
 
@@ -633,6 +633,7 @@ class Squat : public Action {
         if (p.timer == SQUAT_DURATION) {
             p.changeAction(SQUATWAIT);
         }
+        applyTraction(p, 2.0);
     }
 
     bool interrupt(Player& p) {
@@ -644,6 +645,7 @@ class SquatWait : public Action {
     void step(Player& p) override {
         if (interrupt(p))
             return;
+        applyTraction(p, 2.0);
     }
 
     bool interrupt(Player& p) {
@@ -659,6 +661,7 @@ class SquatRv : public Action {
         if (p.timer == SQUAT_RV_DURATION) {
             p.changeAction(WAIT);
         }
+        applyTraction(p, 2.0);
     }
 
     bool interrupt(Player& p) {

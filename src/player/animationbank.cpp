@@ -30,6 +30,11 @@ AnimationBank::AnimationBank() {
     images[FALL] = EnG->loadPNG("./assets/fall.png");            // jumpf
     images[TURN] = EnG->loadPNG("./assets/turn.png");            // jumpf
     images[SMASHTURN] = EnG->loadPNG("./assets/turn.png");       // jumpf
+
+    images[SQUAT] = EnG->loadPNG("./assets/squat.png");
+    images[SQUATRV] = EnG->loadPNG("./assets/squat.png");
+    images[PASS] = EnG->loadPNG("./assets/pass.png");
+    images[SQUATWAIT] = EnG->loadPNG("./assets/jumpsquat.png");
 }
 
 AnimationBank::~AnimationBank() {}
