@@ -605,10 +605,21 @@ class SmashTurn : public Action {
 #define PASS_DURATION 5
 class Pass : public Action {
     void step(Player& p) override {
+        if (p.timer < 0)
+            return;
         if (interrupt(p))
             return;
 
-        p.fall();
+        if (p.fastfalled) {
+        } else {
+            p.cVel.y += p.config.getAttribute("gravity");
+            if (p.cVel.y > p.config.getAttribute("terminal_velocity")) {
+                p.cVel.y = p.config.getAttribute("terminal_velocity");
+            }
+            if (p.joystick->axis(1) > 0.67 && p.joystick->axis(1, 5) < 0.3) {
+                p.fall(true);
+            }
+        }
         p.aerialDrift();
         if (p.timer >= PASS_DURATION) {
             p.changeAction(FALL);

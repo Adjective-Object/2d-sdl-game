@@ -40,7 +40,7 @@ class Player : public Sprite {
     void render(SDL_Renderer* ren) override;
     void update() override;
 
-    void fall();
+    void fall(bool fast = false);
     void aerialDrift();
     void land(Platform* p, double y);
 

@@ -76,13 +76,14 @@ void Player::update() {
 // }
 
 /** Fall the player slowly, and allow the player to fastfall */
-void Player::fall() {
+void Player::fall(bool fast) {
     if (fastfalled)
         return;
     cVel.y += config.getAttribute("gravity");
     cVel.y = std::min(cVel.y, config.getAttribute("terminal_velocity"));
 
-    if (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 && cVel.y > 0) {
+    if (fast || (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 &&
+                 cVel.y > 0)) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
         cVel.y = config.getAttribute("fast_fall_terminal_velocity");

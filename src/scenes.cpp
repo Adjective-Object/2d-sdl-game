@@ -45,7 +45,7 @@ void MainScene::init() {
     Platform* p;
     p = new Platform(
         {
-            Pair(0.5, 0.8), Pair(0.8, 0.8),
+            Pair(0.4, 0.8), Pair(0.8, 0.8),
         },
         true);
     platforms.push_back(p);
@@ -53,7 +53,7 @@ void MainScene::init() {
 
     p = new Platform(
         {
-            Pair(1.5, 0.8), Pair(1.8, 0.8),
+            Pair(1.5, 0.8), Pair(1.9, 0.8),
         },
         true);
     platforms.push_back(p);
@@ -61,7 +61,7 @@ void MainScene::init() {
 
     p = new Platform(
         {
-            Pair(1, 0.4), Pair(1.3, 0.4),
+            Pair(0.95, 0.5), Pair(1.35, 0.5),
         },
         true);
     platforms.push_back(p);
