@@ -7,7 +7,8 @@
 #include "../scenes.hpp"
 #include "../util.hpp"
 
-Platform::Platform(std::vector<Pair> points) : points(points) {
+Platform::Platform(std::vector<Pair> points, bool passable)
+    : points(points), passable(passable) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "platform construciton with less than 2 points"
@@ -184,6 +185,10 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
             return false;
         }
     }
+}
+
+bool Platform::isPassable() {
+    return passable;
 }
 
 void Platform::init(){};

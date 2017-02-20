@@ -40,7 +40,7 @@ class Player : public Sprite {
     void render(SDL_Renderer* ren) override;
     void update() override;
 
-    void fall();
+    void fall(bool fast = false);
     void aerialDrift();
     void land(Platform* p, double y);
 
@@ -48,8 +48,10 @@ class Player : public Sprite {
     ~Player();
 
     void changeAction(ActionState state);
-    ActionState getActionState();
     double getXInput(int frames = 0);
+    Platform* getCurrentPlatform();
+    ActionState getActionState();
+    Action* getAction();
 };
 
 #endif

@@ -10,9 +10,10 @@ class Platform : public Entity {
     std::vector<Pair> points;
     std::vector<double> angles;
     std::vector<double> lengths;
+    bool passable;
 
    public:
-    Platform(std::vector<Pair> points);
+    Platform(std::vector<Pair> points, bool passable = false);
     ~Platform();
 
     Pair movePointToSegmentSpace(Pair& platformPair,
@@ -27,6 +28,7 @@ class Platform : public Entity {
     void update();
     void postUpdate();
     void render(SDL_Renderer* r);
+    bool isPassable();
 };
 
 #endif
