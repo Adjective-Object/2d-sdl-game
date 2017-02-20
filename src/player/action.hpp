@@ -22,27 +22,15 @@ class Action {
     virtual bool isGrounded(Player& p);
 };
 
+#define ACTION_STATE(x) x,
 typedef enum {
-    WALK,
-    WAIT,
-    FALL,
-    LANDING,
-    KNEEBEND,
-    JUMPF,
-    JUMPB,
-    JUMPAIRF,
-    JUMPAIRB,
-    ESCAPEAIR,
-    TURN,
-    DASH,
-    RUN,
-    SMASHTURN,
-    RUNBRAKE,
-    RUNTURN,
-    __NUM_ACTION_STATES,
+#include "actionstates"
 } ActionState;
+#undef ACTION_STATE
+
 const char* actionStateName(ActionState);
 
 extern Action* ACTIONS[__NUM_ACTION_STATES];
+extern const char* ACTION_STATE_NAMES[__NUM_ACTION_STATES + 1];
 
 #endif

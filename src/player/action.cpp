@@ -573,47 +573,26 @@ class SmashTurn : public Action {
 };
 
 const char* actionStateName(ActionState state) {
-    switch (state) {
-        case WALK:
-            return "WALK";
-        case WAIT:
-            return "WAIT";
-        case FALL:
-            return "FALL";
-        case LANDING:
-            return "LANDING";
-        case KNEEBEND:
-            return "KNEEBEND (Jump Squat)";
-        case JUMPF:
-            return "JUMPF";
-        case JUMPB:
-            return "JUMPB";
-        case JUMPAIRF:
-            return "JUMPAIRF";
-        case JUMPAIRB:
-            return "JUMPAIRB";
-        case ESCAPEAIR:
-            return "ESCAPEAIR";
-        case TURN:
-            return "TURN";
-        case DASH:
-            return "DASH";
-        case RUN:
-            return "RUN";
-        case SMASHTURN:
-            return "SMASHTURN";
-        case RUNBRAKE:
-            return "RUNBRAKE";
-        case RUNTURN:
-            return "RUNTURN";
-        default:
-            return "??";
+    if (state < __NUM_ACTION_STATES) {
+        return ACTION_STATE_NAMES[state];
+    } else {
+        return "??";
     }
 }
 
 Action* ACTIONS[__NUM_ACTION_STATES] = {
-    new Walk(),     new Wait(),      new Fall(),     new Landing(),
-    new KneeBend(), new JumpF(),     new JumpB(),    new JumpAir(),
-    new JumpAir(),  new EscapeAir(), new Turn(),     new Dash(),
-    new Run(),      new SmashTurn(), new RunBrake(), new RunTurn(),
+        [WALK] = new Walk(),           [ WAIT ] = new Wait(),
+        [ FALL ] = new Fall(),         [ LANDING ] = new Landing(),
+        [ KNEEBEND ] = new KneeBend(), [ JUMPF ] = new JumpF(),
+        [ JUMPB ] = new JumpB(),       [ JUMPAIRF ] = new JumpAir(),
+        [ JUMPAIRB ] = new JumpAir(),  [ ESCAPEAIR ] = new EscapeAir(),
+        [ TURN ] = new Turn(),         [ DASH ] = new Dash(),
+        [ RUN ] = new Run(),           [ SMASHTURN ] = new SmashTurn(),
+        [ RUNBRAKE ] = new RunBrake(), [ RUNTURN ] = new RunTurn(),
 };
+
+#define ACTION_STATE(x) #x,
+const char* ACTION_STATE_NAMES[__NUM_ACTION_STATES + 1] = {
+#include "actionstates"
+};
+#undef ACTION_STATE
