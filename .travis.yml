@@ -1,0 +1,3 @@
+nguage: nix
+script: nix-shell --command "make run_tests && git clang-format"
+
