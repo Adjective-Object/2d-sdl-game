@@ -4,6 +4,7 @@
 #include "engine/text.hpp"
 #include "player/action.hpp"
 #include "player/player.hpp"
+#include "terrain/collisiontype.hpp"
 #include <SDL.h>
 #include <vector>
 #include <iostream>
@@ -67,6 +68,30 @@ void MainScene::init() {
     platforms.push_back(p);
     entities.push_back(p);
 
+    p = new Platform(
+        {
+            Pair(2.2, 0.5), Pair(2.0, 0.2),
+        },
+        false);
+    platforms.push_back(p);
+    entities.push_back(p);
+
+    p = new Platform(
+        {
+            Pair(1.9, 1.0), Pair(2.2, 0.5),
+        },
+        false);
+    platforms.push_back(p);
+    entities.push_back(p);
+
+    p = new Platform(
+        {
+            Pair(2.1, 1.2), Pair(1.9, 1.0),
+        },
+        false);
+    platforms.push_back(p);
+    entities.push_back(p);
+
     p = new Platform({
         Pair(0.1, 1.2), Pair(0.3, 1.15), Pair(1.0, 1.2), Pair(1.5, 1.15),
         Pair(2.1, 1.2),
@@ -90,17 +115,22 @@ void MainScene::update() {
     sprintf(tmp, "(%.2f, %.2f)", player->position.x, player->position.y);
     posText->updateText(tmp);
 
-    if (player->velocity.y > 0) {
-        for (Platform* p : platforms) {
-            double y;
+    for (Platform* p : platforms) {
+        Pair position = Pair(0, 0);
+        TerrainCollisionType collisionType;
 
-            if (player->getAction()->isLandable(*player, p) &&
-                p->checkCollision(
-                    player->previousCollision->postCollision.bottom,
-                    player->currentCollision->postCollision.bottom, &y)) {
-                player->land(p, y);
-                break;
-            }
+        collisionType = p->checkCollision(
+            player->previousCollision->postCollision.bottom,
+            player->currentCollision->postCollision.bottom, position);
+
+        if (player->velocity.y > 0 &&
+            player->getAction()->isLandable(*player, p) &&
+            collisionType == FLOOR_COLLISION) {
+            player->land(p, position);
+            break;
+        } else if (collisionType != NO_COLLISION) {
+            std::cout << "ignoring collision of type " << collisionType
+                      << " against " << p << std::endl;
         }
     }
 }

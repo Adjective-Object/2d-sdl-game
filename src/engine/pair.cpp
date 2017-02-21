@@ -8,11 +8,11 @@ Pair::Pair(double x, double y) : x(x), y(y) {}
 // MISC OPERATORS //
 ////////////////////
 
-double Pair::euclid() {
+double Pair::euclid() const {
     return sqrt(x * x + y * y);
 }
 
-double Pair::euclidSquared() {
+double Pair::euclidSquared() const {
     return x * x + y * y;
 }
 

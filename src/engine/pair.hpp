@@ -8,13 +8,13 @@ class Pair {
     double x;
     double y;
 
-    double euclid();
+    double euclid() const;
 
     Pair(double x, double y);
 
     // TODO implement the quake fast inverse sqrt
     // double euclidApprox();
-    double euclidSquared();
+    double euclidSquared() const;
 
     // pairwise new product ops
     Pair operator+(const Pair& p) const;

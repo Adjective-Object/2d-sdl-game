@@ -2,7 +2,7 @@
 #include "engine/pair.hpp"
 
 #define ECB_DEFAULT_WIDTH 0.06
-#define ECB_DEFAULT_HEIGHT 0.09
+#define ECB_DEFAULT_HEIGHT 0.1
 
 #define _left(length) left(origin + Pair(-length, 0))
 #define _right(length) right(origin + Pair(+length, 0))

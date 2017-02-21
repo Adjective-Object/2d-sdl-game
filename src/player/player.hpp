@@ -49,7 +49,7 @@ class Player : public Sprite {
 
     void fall(bool fast = false);
     void aerialDrift();
-    void land(Platform* p, double y);
+    void land(Platform* p, Pair const& y);
     void fixEcbBottom(int frames, Pair position);
 
     Player(std::string attributeFile, double x, double y);

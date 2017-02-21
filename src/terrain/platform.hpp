@@ -5,6 +5,7 @@
 #include <vector>
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
+#include "./collisiontype.hpp"
 
 class Platform : public Entity {
     std::vector<Pair> points;
@@ -20,7 +21,7 @@ class Platform : public Entity {
                                  double platformAngle,
                                  Pair& otherPair);
 
-    bool checkCollision(Pair& previous, Pair& next, double* out);
+    TerrainCollisionType checkCollision(Pair& previous, Pair& next, Pair& out);
     bool groundedMovement(Pair& position, Pair& velocity);
 
     void init();

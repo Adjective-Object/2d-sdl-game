@@ -77,7 +77,8 @@ target_include_directories(SDL_GAME_LIB PUBLIC
 )
 
 set(TEST_SRCS
-    tests/platform.cpp)
+    tests/platform.cpp
+    tests/util.cpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}

@@ -82,3 +82,16 @@ TEST(Platform, GroundedMovement_Walkoff) {
     EXPECT_EQ(Pair(0, 0), pos);
     EXPECT_EQ(Pair(-0.5, 0), vel);
 }
+
+TEST(Platform, checkCollision_Basic) {
+    // flat surface with walkoff
+    Platform p = Platform({
+        Pair(0, 1), Pair(2, 1),
+    });
+    Pair lastPosition = Pair(1, 0), newPosition = Pair(1, 2);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
+              FLOOR_COLLISION);
+    EXPECT_EQ(Pair(1, 1), out);
+}

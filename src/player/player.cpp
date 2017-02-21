@@ -113,9 +113,10 @@ void Player::fall(bool fast) {
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(Platform* p, double y) {
+void Player::land(Platform* p, Pair const& landPosition) {
     double yvel = cVel.y;
-    position.y = y;
+    position.y = landPosition.y;
+    position.x = landPosition.x;
     cVel.y = 0;
     grounded = true;
     fastfalled = false;

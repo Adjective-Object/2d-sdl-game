@@ -6,6 +6,7 @@
 #include "platform.hpp"
 #include "scenes.hpp"
 #include "util.hpp"
+#include "./collisiontype.hpp"
 
 Platform::Platform(std::vector<Pair> points, bool passable)
     : points(points), passable(passable) {
@@ -41,50 +42,34 @@ Pair Platform::movePointToSegmentSpace(Pair& platformPoint,
 }
 
 #define PLATFORM_LAND_EPSILON 0.000001
-bool Platform::checkCollision(Pair& previous, Pair& next, double* out) {
+TerrainCollisionType Platform::checkCollision(Pair& previous,
+                                              Pair& next,
+                                              Pair& out) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
-        return false;
+        return NO_COLLISION;
     }
 
     for (size_t i = 0; i < points.size() - 1; i++) {
         Pair p1 = points[i];
-        double angle = angles[i];
+        Pair p2 = points[i + 1];
+        Pair intersectionPoint = Pair(0, 0);
+        if (checkLineIntersection(previous, next, p1, p2, intersectionPoint,
+                                  PLATFORM_LAND_EPSILON)) {
+            Pair psPoint = movePointToSegmentSpace(p1, angles[i], previous);
+            out = intersectionPoint;
 
-        // get point in platform space
-        Pair psPreviousPair =
-            this->movePointToSegmentSpace(p1, angle, previous);
-
-        Pair psNextPair = this->movePointToSegmentSpace(p1, angle, next);
-
-        if (psPreviousPair.y <= PLATFORM_LAND_EPSILON &&
-            psNextPair.y >= PLATFORM_LAND_EPSILON) {
-            // the player has crossed the platform, check the x bounds
-            // this will work well enough for mostly vertical platforms
-
-            // printf(
-            //     "player crossed platform: %d [len: %.03f] (%.03f, %.03f) -> "
-            //     "(%.03f %.03f)\n",
-            //     i, lengths[i], psPreviousPair.x, psPreviousPair.y,
-            //     psNextPair.x,
-            //     psNextPair.y);
-
-            if ((psPreviousPair.x > -PLATFORM_LAND_EPSILON ||
-                 psNextPair.x > -PLATFORM_LAND_EPSILON) &&
-                (psPreviousPair.x < lengths[i] + PLATFORM_LAND_EPSILON ||
-                 psNextPair.x < lengths[i] + PLATFORM_LAND_EPSILON)) {
-                // std::cout << "collision detected @ " << p1.y << std::endl;
-
-                *out = (double)p1.y;  // TODO
-                return true;
-            }
+            return (previous.y <= 0 && std::abs(std::sin(angles[i])) > 0.9)
+                       ? WALL_COLLISION
+                       : FLOOR_COLLISION;
         }
     }
 
-    return false;
+    return NO_COLLISION;
 }
 
+#define PLATFORM_DIR_OFFSET 0.03
 void Platform::render(SDL_Renderer* r) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
@@ -93,6 +78,16 @@ void Platform::render(SDL_Renderer* r) {
                            (int)(points[i].y * PLAYER_SCALE),
                            (int)(points[i + 1].x * PLAYER_SCALE),
                            (int)(points[i + 1].y * PLAYER_SCALE));
+
+        Pair offset = Pair(-std::sin(angles[i]) * PLATFORM_DIR_OFFSET,
+                           std::cos(angles[i]) * PLATFORM_DIR_OFFSET);
+        Pair q1 = points[i] + offset;
+        Pair q2 = points[i + 1] + offset;
+
+        SDL_SetRenderDrawColor(r, 200, 0, 200, 255);
+        SDL_RenderDrawLine(
+            r, (int)(q1.x * PLAYER_SCALE), (int)(q1.y * PLAYER_SCALE),
+            (int)(q2.x * PLAYER_SCALE), (int)(q2.y * PLAYER_SCALE));
     }
 }
 
