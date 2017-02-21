@@ -1,6 +1,7 @@
 #ifndef __GAME_ACTION_HPP
 #define __GAME_ACTION_HPP
 class Player;
+class Platform;
 
 typedef enum LandType {
     NORMAL,
@@ -20,7 +21,7 @@ class Action {
     virtual LandType getLandType(Player& p);
     virtual void onLanding(Player& p);
     virtual bool isGrounded(Player& p);
-    virtual bool isLandable(Player& p);
+    virtual bool isLandable(Player& p, Platform* plat);
 };
 
 #define ACTION_STATE(x) x,

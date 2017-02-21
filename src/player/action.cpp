@@ -149,7 +149,7 @@ bool Action::isGrounded(Player&) {
     return true;
 }
 
-bool Action::isLandable(Player&) {
+bool Action::isLandable(Player&, Platform*) {
     return true;
 }
 
@@ -274,6 +274,8 @@ void startGroundedJump(Player& p, bool isShort) {
     p.cVel.y -= p.config.getAttribute(isShort ? "shorthop_v_initial_velocity"
                                               : "jump_v_initial_velocity");
 
+    p.fixEcbBottom(10, Pair(0, 0));
+
     double maxJumpVel = p.config.getAttribute("jump_h_max_velocity");
 
     p.cVel.x =
@@ -334,6 +336,8 @@ class JumpF : public Action {
 };
 
 void startDoubleJump(Player& p) {
+    p.fixEcbBottom(10, Pair(0, -0.1));
+
     p.cVel.y = -p.config.getAttribute("jump_v_initial_velocity") *
                p.config.getAttribute("air_jump_multiplier");
 
@@ -602,11 +606,14 @@ class SmashTurn : public Action {
     }
 };
 
-#define PASS_DURATION 5
+#define PASS_DURATION 15
 class Pass : public Action {
     void step(Player& p) override {
         if (p.timer < 0)
             return;
+        if (p.timer == 0) {
+            p.fixEcbBottom(10, Pair(0, 0));
+        }
         if (interrupt(p))
             return;
 
@@ -631,7 +638,9 @@ class Pass : public Action {
     }
 
     bool isGrounded(Player& p) { return false; }
-    bool isLandable(Player& p) { return false; }
+    bool isLandable(Player& p, Platform* plat) {
+        return plat != p.getCurrentPlatform();
+    }
 };
 
 #define SQUAT_DURATION 6

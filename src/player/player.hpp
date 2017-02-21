@@ -1,13 +1,14 @@
 #ifndef __GAME_MAINPLAYER
 #define __GAME_MAINPLAYER
 
-#include "../engine/input.hpp"
-#include "../engine/sprite.hpp"
+#include <SDL.h>
+#include "engine/input.hpp"
+#include "engine/sprite.hpp"
+#include "terrain/platform.hpp"
 #include "action.hpp"
 #include "animationbank.hpp"
 #include "playerconfig.hpp"
-#include "../terrain/platform.hpp"
-#include <SDL.h>
+#include "playercollision.hpp"
 
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
@@ -17,8 +18,14 @@ class Player : public Sprite {
     Platform* currentPlatform = NULL;
 
    public:
+    PlayerCollision* previousCollision = new PlayerCollision();
+    PlayerCollision* currentCollision = new PlayerCollision();
+
     Joystick* joystick;
     PlayerConfig config;
+
+    int ecbFixedCounter;
+    Pair ecbBottomFixedPosition = Pair(0, 0);
 
     Pair cVel = Pair(0, 0);
     Pair kVel = Pair(0, 0);
@@ -43,6 +50,7 @@ class Player : public Sprite {
     void fall(bool fast = false);
     void aerialDrift();
     void land(Platform* p, double y);
+    void fixEcbBottom(int frames, Pair position);
 
     Player(std::string attributeFile, double x, double y);
     ~Player();

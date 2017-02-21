@@ -90,11 +90,14 @@ void MainScene::update() {
     sprintf(tmp, "(%.2f, %.2f)", player->position.x, player->position.y);
     posText->updateText(tmp);
 
-    if (player->velocity.y > 0 && player->getAction()->isLandable(*player)) {
+    if (player->velocity.y > 0) {
         for (Platform* p : platforms) {
             double y;
-            if (p->checkCollision(player->previousPosition, player->position,
-                                  &y)) {
+
+            if (player->getAction()->isLandable(*player, p) &&
+                p->checkCollision(
+                    player->previousCollision->postCollision.bottom,
+                    player->currentCollision->postCollision.bottom, &y)) {
                 player->land(p, y);
                 break;
             }

@@ -3,8 +3,8 @@
 
 #include <SDL.h>
 #include <vector>
-#include "../engine/pair.hpp"
-#include "../engine/entity.hpp"
+#include "engine/pair.hpp"
+#include "engine/entity.hpp"
 
 class Platform : public Entity {
     std::vector<Pair> points;

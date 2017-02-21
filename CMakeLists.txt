@@ -43,6 +43,10 @@ set(LIB_SRCS
     src/player/playerconfig.cpp
     src/player/animationbank.hpp
     src/player/animationbank.cpp
+    src/player/ecb.hpp
+    src/player/ecb.cpp
+    src/player/playercollision.hpp
+    src/player/playercollision.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
     src/engine/util.hpp
@@ -69,6 +73,7 @@ target_include_directories(SDL_GAME_LIB PUBLIC
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    "src"
 )
 
 set(TEST_SRCS

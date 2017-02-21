@@ -12,6 +12,8 @@ Player::Player(std::string fpath, double x, double y)
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
+    previousCollision->reset(position);
+    currentCollision->reset(position);
 }
 
 Player::~Player() {}
@@ -36,7 +38,16 @@ void Player::update() {
     if (joystick->down(7)) {
         position.x = 1.15;
         position.y = 0.6;
+        currentPlatform = NULL;
+        changeAction(FALL);
     }
+
+    // swap previous and current collision, reset the new current collision
+    PlayerCollision* tmp = previousCollision;
+    previousCollision = currentCollision;
+    currentCollision = tmp;
+    // this should be from animation data
+    currentCollision->reset(position + Pair(0, -0.2));
 
     // if we are currently grounded, adapt the x of cVel to
     // move along the platform
@@ -59,6 +70,16 @@ void Player::update() {
     }
 
     Sprite::updateMotion();
+
+    if (action->isGrounded(*this)) {
+        currentCollision->playerModified.bottom = position;
+        currentCollision->postCollision.bottom = position;
+    } else if (ecbFixedCounter > 0) {
+        ecbFixedCounter--;
+        Pair newPos = position + ecbBottomFixedPosition;
+        currentCollision->playerModified.bottom = newPos;
+        currentCollision->postCollision.bottom = newPos;
+    }
 }
 
 // void Player::physics() {
@@ -102,6 +123,8 @@ void Player::land(Platform* p, double y) {
 
     currentPlatform = p;
     printf("landing on %p\n", p);
+
+    currentCollision->postCollision.bottom = position;
 
     switch (action->getLandType(*this)) {
         case NORMAL:
@@ -163,6 +186,12 @@ void Player::aerialDrift() {
 }
 
 void Player::render(SDL_Renderer* ren) {
+    SDL_SetRenderDrawColor(ren, 255, 215, 0, 255);
+    previousCollision->postCollision.render(ren, PLAYER_SCALE);
+
+    SDL_SetRenderDrawColor(ren, 255, 127, 80, 255);
+    currentCollision->postCollision.render(ren, PLAYER_SCALE);
+
     SDL_Rect destination{(int)(position.x * PLAYER_SCALE) - 64,
                          (int)(position.y * PLAYER_SCALE) - 110, 128, 128};
     SDL_RenderCopyEx(ren, bank->getCurrentTexture(*this), NULL, &destination, 0,
@@ -171,10 +200,15 @@ void Player::render(SDL_Renderer* ren) {
     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
     // SDL_RenderDrawRect(ren, &destination);
 
-    SDL_Rect p{(int)(position.x * PLAYER_SCALE) - 5,
-               (int)(position.y * PLAYER_SCALE), 10, 10};
     SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
-    SDL_RenderFillRect(ren, &p);
+    SDL_RenderDrawLine(ren, ((int)(position.x * PLAYER_SCALE)) - 3,
+                       ((int)(position.y * PLAYER_SCALE)),
+                       ((int)(position.x * PLAYER_SCALE)) + 3,
+                       ((int)(position.y * PLAYER_SCALE)));
+    SDL_RenderDrawLine(ren, ((int)(position.x * PLAYER_SCALE)),
+                       ((int)(position.y * PLAYER_SCALE)) - 3,
+                       ((int)(position.x * PLAYER_SCALE)),
+                       ((int)(position.y * PLAYER_SCALE)) + 3);
 }
 
 void Player::changeAction(ActionState state) {
@@ -185,6 +219,11 @@ void Player::changeAction(ActionState state) {
     bank->playAnimation(state);
     action->step(*this);
     actionState = state;
+}
+
+void Player::fixEcbBottom(int frames, Pair position) {
+    ecbFixedCounter = frames;
+    ecbBottomFixedPosition = position;
 }
 
 ActionState Player::getActionState() {

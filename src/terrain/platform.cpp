@@ -2,10 +2,10 @@
 #include <cmath>
 #include <iostream>
 #include <SDL.h>
-#include "../engine/pair.hpp"
+#include "engine/pair.hpp"
 #include "platform.hpp"
-#include "../scenes.hpp"
-#include "../util.hpp"
+#include "scenes.hpp"
+#include "util.hpp"
 
 Platform::Platform(std::vector<Pair> points, bool passable)
     : points(points), passable(passable) {
