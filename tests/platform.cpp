@@ -150,6 +150,50 @@ TEST(Platform, GroundedMovmeent_Flat_ConvolutedSurface) {
     EXPECT_EQ(Pair(-0.5, 0), vel);
 }
 
+TEST(Platform, GroundedMovement_WalkIntoConvolutedSurface) {
+    //
+    //     _______
+    //   __\     /__
+    //
+    Platform p = Platform({
+        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+        Pair(2, 1),
+    });
+    Pair pos = Pair(-0.5, 1), vel = Pair(1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(0.25, 1), pos);
+    EXPECT_EQ(Pair(0.25, 0), vel);
+
+    pos = Pair(1.5, 1);
+    vel = Pair(-1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(0.75, 1), pos);
+    EXPECT_EQ(Pair(-0.25, 0), vel);
+}
+
+TEST(Platform, GroundedMovement_WalkFromExactEndOfSurface) {
+    //
+    //   _______
+    //
+    Platform p = Platform({
+        Pair(1, 1), Pair(3, 1),
+    });
+    Pair pos = Pair(1, 1), vel = Pair(0, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(1, 1), pos);
+    EXPECT_EQ(Pair(0, 0), vel);
+
+    pos = Pair(3, 1);
+    vel = Pair(0, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(3, 1), pos);
+    EXPECT_EQ(Pair(0, 0), vel);
+}
+
 TEST(Platform, isWall) {
     EXPECT_FALSE(Platform::isWall(0));
     EXPECT_FALSE(Platform::isWall(0.25 * M_PI));

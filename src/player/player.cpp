@@ -130,6 +130,9 @@ bool Player::canGrabLedge() {
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
 void Player::land(Platform* p, Pair const& landPosition) {
+    if (p->isPassable() && actionState == FALL && joystick->axis(1) > 0.67)
+        return;
+
     double yvel = cVel.y;
     position.y = landPosition.y;
     position.x = landPosition.x;

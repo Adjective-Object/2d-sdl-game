@@ -726,7 +726,7 @@ class CliffCatch : public Action {
         Ledge* l = p.currentLedge;
 
         // character offset
-        Pair target = l->position + Pair(-0.12 * p.face, 0.35);
+        Pair target = l->position + Pair(-0.08 * p.face, 0.38);
 
         p.position = target;
         p.cVel = Pair(0, 0);
