@@ -14,4 +14,6 @@ int checkLineIntersection(Pair const& p0,
                           Pair& out,
                           double epsilon = 0);
 
+#define M_PI 3.14159265358979323846 /* pi */
+
 #endif

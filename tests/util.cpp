@@ -4,7 +4,7 @@
 
 TEST(Util, checkLineIntersection_Basic) {
     // flat surface with walkoff
-    Pair a1 = Pair(0, 1), a2 = Pair(2, 1);
+    Pair a1 = Pair(-1, 1), a2 = Pair(2, 1);
     Pair b1 = Pair(1, 0), b2 = Pair(1, 2);
 
     Pair out = Pair(0, 0);

@@ -12,8 +12,8 @@ Player::Player(std::string fpath, double x, double y)
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
-    previousCollision->reset(position);
-    currentCollision->reset(position);
+    previousCollision->reset(position + Pair(0, -0.2));
+    currentCollision->reset(position + Pair(0, -0.2));
 }
 
 Player::~Player() {}
@@ -23,6 +23,11 @@ void Player::init() {
     joystick = EnG->input.getJoystick(0);
     bank = new AnimationBank();
     changeAction(FALL);
+}
+
+void Player::moveTo(Pair newPos) {
+    position = newPos;
+    currentCollision->reset(position + Pair(0, -0.2));
 }
 
 void Player::update() {

@@ -51,6 +51,7 @@ class Player : public Sprite {
     void aerialDrift();
     void land(Platform* p, Pair const& y);
     void fixEcbBottom(int frames, Pair position);
+    void moveTo(Pair newPos);
 
     Player(std::string attributeFile, double x, double y);
     ~Player();

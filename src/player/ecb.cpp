@@ -37,10 +37,10 @@ Ecb::Ecb(Pair origin,
 
 void Ecb::setOrigin(Pair newOrigin) {
     origin = newOrigin;
-    left = origin + Pair(-widthLeft, 0);
-    right = origin + Pair(widthRight, 0);
-    top = origin + Pair(0, -heightTop);
-    bottom = origin + Pair(0, heightBottom);
+    left = newOrigin + Pair(-widthLeft, 0);
+    right = newOrigin + Pair(widthRight, 0);
+    top = newOrigin + Pair(0, -heightTop);
+    bottom = newOrigin + Pair(0, heightBottom);
 }
 
 void Ecb::render(SDL_Renderer* ren, double SCALE) {

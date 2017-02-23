@@ -23,7 +23,7 @@ int checkLineIntersection(Pair const& p0,
 
     if (s >= -epsilon_s && s <= 1 + epsilon_s && t >= -epsilon_t &&
         t <= 1 + epsilon_t) {
-        out = p0 * (1.0 - s) + p1 * s;
+        out = p0 * (1.0 - t) + p1 * t;
         return sign(ip);
     }
 

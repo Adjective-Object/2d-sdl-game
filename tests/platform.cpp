@@ -84,7 +84,6 @@ TEST(Platform, GroundedMovement_Walkoff) {
     EXPECT_EQ(Pair(-0.5, 0), vel);
 }
 
-#define M_PI 3.14159265358979323846 /* pi */
 // note: it looks like calculations are done in y-inverted
 // cartesian coordinates
 TEST(Platform, movePointToSegmentSpace) {
@@ -130,7 +129,7 @@ TEST(Platform, movePointToSegmentSpace) {
 TEST(Platform, checkCollision_Basic_Floor) {
     // collision with floor
     Platform p = Platform({
-        Pair(0, 1), Pair(2, 1),
+        Pair(-1, 1), Pair(2, 1),
     });
     Pair lastPosition = Pair(1, 0), newPosition = Pair(1, 2);
     Pair out = Pair(0, 0);

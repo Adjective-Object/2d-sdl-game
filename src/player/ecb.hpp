@@ -15,7 +15,7 @@
  */
 class Ecb {
    public:
-    Pair origin, left, right, bottom, top;
+    Pair origin, left, right, top, bottom;
     double widthLeft, widthRight, heightTop, heightBottom;
 
     Ecb();

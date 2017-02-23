@@ -92,6 +92,14 @@ void MainScene::init() {
     platforms.push_back(p);
     entities.push_back(p);
 
+    p = new Platform(
+        {
+            Pair(1.2, 1.2), Pair(1.2, 0),
+        },
+        false);
+    platforms.push_back(p);
+    entities.push_back(p);
+
     p = new Platform({
         Pair(0.1, 1.2), Pair(0.3, 1.15), Pair(1.0, 1.2), Pair(1.5, 1.15),
         Pair(2.1, 1.2),
@@ -103,34 +111,54 @@ void MainScene::init() {
 }
 
 void MainScene::update() {
+    // update player positions
     Scene::update();
 
+    // update action label when the player's action state updates
     ActionState newState = player->getActionState();
     if (lastActionState != newState) {
         stateText->updateText(actionStateName(newState));
         lastActionState = newState;
     }
 
+    // update position text to the player's position
     char tmp[128];
     sprintf(tmp, "(%.2f, %.2f)", player->position.x, player->position.y);
     posText->updateText(tmp);
 
+    // perform collisions
     for (Platform* p : platforms) {
-        Pair position = Pair(0, 0);
+        Pair collPos = Pair(0, 0);
         TerrainCollisionType collisionType;
 
-        collisionType = p->checkCollision(
-            player->previousCollision->postCollision.bottom,
-            player->currentCollision->postCollision.bottom, position);
+        Ecb* oldEcb = &(player->previousCollision->postCollision);
+        Ecb* newEcb = &(player->currentCollision->postCollision);
+
+        collisionType =
+            p->checkCollision(oldEcb->bottom, newEcb->bottom, collPos);
 
         if (player->velocity.y > 0 &&
             player->getAction()->isLandable(*player, p) &&
             collisionType == FLOOR_COLLISION) {
-            player->land(p, position);
-            break;
-        } else if (collisionType != NO_COLLISION) {
-            std::cout << "ignoring collision of type " << collisionType
-                      << " against " << p << std::endl;
+            player->land(p, collPos);
+        }
+
+        collisionType =
+            p->checkCollision(oldEcb->origin, newEcb->right, collPos);
+
+        if (collisionType == WALL_COLLISION) {
+            std::cout << "wall on right" << std::endl;
+
+            std::cout << "player moving at " << player->cVel << std::endl;
+            std::cout << "player at " << player->position << std::endl;
+            std::cout << "right ecb at " << newEcb->right << std::endl;
+            std::cout << "collision at " << collPos << std::endl;
+            std::cout << (newEcb->right - collPos) << std::endl;
+            player->moveTo(player->position - (newEcb->right - collPos));
+            std::cout << "player ends at " << player->position << std::endl;
+            std::cout << "right ecb end sat "
+                      << player->currentCollision->postCollision.right
+                      << std::endl;
         }
     }
 }
