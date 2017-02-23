@@ -66,7 +66,7 @@ void MainScene::init() {
     joystick->calibrateAxis(3, -29100, 32000, 450);
     joystick->calibrateAxis(4, -32000, 30000, 450);
 
-    player = new Player("attributes.yaml", 0.5, 0.5);
+    player = new Player("assets/attributes.yaml", 0.5, 0.5);
     entities.push_back(player);
 
     SDL_Renderer* r = EnG->getRenderer();

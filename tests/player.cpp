@@ -2,7 +2,7 @@
 #include "player/player.hpp"
 
 TEST(Player, moveTo) {
-    Player p = Player("./attributes.yaml", 0, 0);
+    Player p = Player("./assets/attributes.yaml", 0, 0);
 
     Ecb oldEcb = p.currentCollision->root;
     p.moveTo(Pair(10, 10));

@@ -1,3 +1,3 @@
 language: nix
-script: nix-shell --command "cmake CMakeLists.txt && make run_tests && git clang-format"
+script: nix-shell --command "make && make run_tests && git-clang-format"
 
