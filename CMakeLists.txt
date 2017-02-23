@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 3.4)
+include(cmake/common.cmake)
 
 project (sdl_game)
 set (sdl_game_VERSION_MAJOR 0)
@@ -17,18 +18,7 @@ PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
-set(GTEST_DIR $ENV{GTEST_DIR})
-find_library(GTEST_LIBRARY 
-                NAMES gtest 
-                      libgtest 
-                      libgtest.a 
-                PATHS "${GTEST_DIR}/lib")
-find_library(GTEST_LIBRARY_MAIN 
-                NAMES gtest_main 
-                      libgtest_main 
-                      libgtest.a 
-                PATHS "${GTEST_DIR}/lib")
-set(GTEST_INCLUDE_DIR "${GTEST_DIR}/include")
+include(cmake/gtest.cmake)
 
 ##########################
 # project source objects #
@@ -101,6 +91,7 @@ target_include_directories(TEST_LIB PUBLIC
     )
 
 set(ALL_SRCS ${LIB_SRCS} ${TEST_SRCS} src/main.cpp tests/main.cpp)
+PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})
 
 #####################
 # output executable #
@@ -147,6 +138,8 @@ target_include_directories(sdl_game PUBLIC
     "src"
     )
 
+copy_files(sdl_game ${PROJECT_SOURCE_DIR}/assets/* ${CMAKE_BINARY_DIR}/assets)
+
 ########################################
 # Code formatting and linting commands #
 ########################################
@@ -156,10 +149,10 @@ add_custom_target(lint
         --enable=warning
         --enable=missingInclude
         --enable=performance
-        src/sdl_game.cpp ${ALL_SRCS})
+        src/sdl_game.cpp ${ABSOLUTE_ALL_SRCS})
 
 add_custom_target(format
-    COMMAND clang-format -i ${ALL_SRCS})
+    COMMAND clang-format -i ${ABSOLUTE_ALL_SRCS})
 
 add_custom_target(run_tests
     COMMAND ./ctest

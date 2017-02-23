@@ -1,12 +1,10 @@
-# Cmake inputs / build byproducts
+G# Cmake inputs / build byproducts
 compile_commands.json
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
-Makefile
 *-prefix
 
 # build outputs
-sdl_game
-ctest
+build/*
 

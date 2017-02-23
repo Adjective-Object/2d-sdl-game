@@ -44,7 +44,7 @@ Game::Game(unsigned int width,
     ren = makeRenderer(win);
 
     // TODO replace this with a string constant
-    FALLBACK_TEXTURE = loadPNG("fallback.png");
+    FALLBACK_TEXTURE = loadPNG("assets/fallback.png");
 }
 
 Game::~Game() {
