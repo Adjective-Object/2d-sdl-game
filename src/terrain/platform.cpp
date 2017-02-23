@@ -129,8 +129,8 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     double remainingDistance = std::abs(velocity.x);
     int direction = velocity.x == 0 ? 1 : sign(velocity.x);
 
-    std::cout << "direction " << direction << std::endl;
-    std::cout << "distance " << remainingDistance << std::endl;
+    // std::cout << "direction " << direction << std::endl;
+    // std::cout << "distance " << remainingDistance << std::endl;
 
     while (1) {
         // std::cout << "reducing movment by remaining len of platform " << i
