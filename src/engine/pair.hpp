@@ -10,6 +10,7 @@ class Pair {
 
     double euclid() const;
 
+    Pair();
     Pair(double x, double y);
 
     // TODO implement the quake fast inverse sqrt

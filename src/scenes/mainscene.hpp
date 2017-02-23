@@ -8,17 +8,14 @@
 #include "engine/scene.hpp"
 #include "engine/text.hpp"
 #include "player/player.hpp"
-#include "terrain/platform.hpp"
-
-#define PLAYER_FLOOR 1.2
-#define PLAYER_SCALE 275
+#include "terrain/map.hpp"
 
 class MainScene : public Scene {
     Joystick* joystick;
     Player* player;
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;
-    std::vector<Platform*> platforms = std::vector<Platform*>();
+    Map* map;
 
    public:
     MainScene();

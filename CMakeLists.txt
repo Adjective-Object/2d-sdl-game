@@ -15,6 +15,7 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
+PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
 set(GTEST_DIR $ENV{GTEST_DIR})
 find_library(GTEST_LIBRARY 
@@ -33,8 +34,8 @@ set(GTEST_INCLUDE_DIR "${GTEST_DIR}/include")
 # project source objects #
 ##########################
 set(LIB_SRCS 
-    src/scenes.hpp
-    src/scenes.cpp
+    src/scenes/mainscene.hpp
+    src/scenes/mainscene.cpp
     src/util.hpp
     src/util.cpp
     src/player/player.hpp
@@ -51,6 +52,10 @@ set(LIB_SRCS
     src/player/playercollision.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
+    src/terrain/map.hpp
+    src/terrain/map.cpp
+    src/terrain/ledge.hpp
+    src/terrain/ledge.cpp
     src/engine/util.hpp
     src/engine/util.cpp
     src/engine/game.hpp
@@ -74,6 +79,7 @@ target_include_directories(SDL_GAME_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     "src"
 )
@@ -88,6 +94,7 @@ target_include_directories(TEST_LIB PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIR}
     "src"
@@ -106,6 +113,7 @@ target_link_libraries(ctest
     ${SDL2_LIBRARIES}
     ${SDL2IMAGE_LIBRARIES} 
     ${SDL2TTF_LIBRARIES} 
+    ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
@@ -114,6 +122,7 @@ target_include_directories(ctest PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIR}
     "src"
@@ -126,12 +135,14 @@ target_link_libraries(sdl_game
     ${SDL2_LIBRARIES}
     ${SDL2IMAGE_LIBRARIES} 
     ${SDL2TTF_LIBRARIES} 
+    ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
     )
 target_include_directories(sdl_game PUBLIC
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     "src"
     )

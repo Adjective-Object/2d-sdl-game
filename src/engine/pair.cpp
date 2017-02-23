@@ -2,6 +2,7 @@
 #include <cmath>
 #include "pair.hpp"
 
+Pair::Pair() {}
 Pair::Pair(double x, double y) : x(x), y(y) {}
 
 ////////////////////

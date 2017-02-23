@@ -4,7 +4,7 @@
 #include "engine/game.hpp"
 #include "engine/scene.hpp"
 #include "engine/util.hpp"
-#include "scenes.hpp"
+#include "scenes/mainscene.hpp"
 
 #define WINDOW_NAME "poop"
 

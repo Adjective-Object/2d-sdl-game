@@ -1,7 +1,7 @@
 #include "player.hpp"
 #include "../engine/game.hpp"
 #include "../util.hpp"
-#include "../scenes.hpp"
+#include "constants.hpp"
 #include "action.hpp"
 #include "playerconfig.hpp"
 #include <algorithm>
