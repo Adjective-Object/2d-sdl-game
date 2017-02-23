@@ -7,10 +7,10 @@
 
 // forward declare map class
 class Ledge {
+   public:
     Pair position;
     Facing facing;
 
-   public:
     Ledge(Pair position, Facing facing);
     void render(SDL_Renderer* r);
 };

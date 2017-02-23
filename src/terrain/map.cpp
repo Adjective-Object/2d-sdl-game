@@ -1,10 +1,27 @@
 #include "./map.hpp"
+#include "util.hpp"
+#include "constants.hpp"
+#include <iostream>
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
 
 void Map::updateCollision(Player& player) {
-    // perform collisions
+    // grab ledges
+    if (player.canGrabLedge()) {
+        for (Ledge& l : ledges) {
+            Pair ledgebox_position = player.position + Pair(0, -LEDGEBOX_BASE);
+            Pair diff = l.position - ledgebox_position;
+            if (sign(diff.x) == sign(player.face) && player.face != l.facing &&
+                std::abs(diff.x) < LEDGEBOX_WIDTH &&
+                diff.y > -LEDGEBOX_HEIGHT && diff.y < 0) {
+                player.grabLedge(&l);
+                break;
+            }
+        }
+    }
+
+    // perform land and wall collisions
     for (Platform& p : platforms) {
         Pair collPos = Pair(0, 0);
         TerrainCollisionType collisionType;

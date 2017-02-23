@@ -35,6 +35,10 @@ AnimationBank::AnimationBank() {
     images[SQUATRV] = EnG->loadPNG("./assets/squat.png");
     images[PASS] = EnG->loadPNG("./assets/pass.png");
     images[SQUATWAIT] = EnG->loadPNG("./assets/jumpsquat.png");
+
+    images[SPECIALFALL] = EnG->loadPNG("./assets/pass.png");
+    images[CLIFFCATCH] = EnG->loadPNG("./assets/cliffcatch.png");
+    images[CLIFFWAIT] = EnG->loadPNG("./assets/cliffwait.png");
 }
 
 AnimationBank::~AnimationBank() {}

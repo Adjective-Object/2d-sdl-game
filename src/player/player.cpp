@@ -37,6 +37,7 @@ void Player::update() {
     Sprite::update();
 
     timer++;
+    ledgeRegrabCounter--;
     action->step(*this);
 
     // reset position when player presses START.
@@ -115,6 +116,15 @@ void Player::fall(bool fast) {
         fastfalled = true;
         cVel.y = config.getAttribute("fast_fall_terminal_velocity");
     }
+}
+
+void Player::grabLedge(Ledge* l) {
+    currentLedge = l;
+    changeAction(CLIFFCATCH);
+}
+
+bool Player::canGrabLedge() {
+    return ledgeRegrabCounter <= 0 && action->canGrabLedge(*this);
 }
 
 /** Transition from falling to being on ground
@@ -216,6 +226,14 @@ void Player::render(SDL_Renderer* ren) {
                        ((int)(position.y * PLAYER_SCALE)) - 3,
                        ((int)(position.x * PLAYER_SCALE)),
                        ((int)(position.y * PLAYER_SCALE)) + 3);
+
+    SDL_SetRenderDrawColor(ren, 100, 255, 100, 255);
+    SDL_Rect ledgeGrabBox = {
+        ((int)(position.x * PLAYER_SCALE)),
+        ((int)((position.y - LEDGEBOX_BASE) * PLAYER_SCALE)),
+        ((int)((face * LEDGEBOX_WIDTH) * PLAYER_SCALE)),
+        ((int)((-LEDGEBOX_HEIGHT) * PLAYER_SCALE))};
+    SDL_RenderDrawRect(ren, &ledgeGrabBox);
 }
 
 void Player::changeAction(ActionState state) {

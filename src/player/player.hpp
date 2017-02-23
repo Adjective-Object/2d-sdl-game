@@ -5,6 +5,7 @@
 #include "engine/input.hpp"
 #include "engine/sprite.hpp"
 #include "terrain/platform.hpp"
+#include "terrain/ledge.hpp"
 #include "action.hpp"
 #include "animationbank.hpp"
 #include "playerconfig.hpp"
@@ -15,16 +16,19 @@
 
 class Player : public Sprite {
     AnimationBank* bank;
-    Platform* currentPlatform = NULL;
 
    public:
+    Platform* currentPlatform = NULL;
+    Ledge* currentLedge = NULL;
+
     PlayerCollision* previousCollision = new PlayerCollision();
     PlayerCollision* currentCollision = new PlayerCollision();
 
     Joystick* joystick;
     PlayerConfig config;
 
-    int ecbFixedCounter;
+    int ecbFixedCounter = 0;
+    int ledgeRegrabCounter = 0;
     Pair ecbBottomFixedPosition = Pair(0, 0);
 
     Pair cVel = Pair(0, 0);
@@ -49,6 +53,8 @@ class Player : public Sprite {
 
     void fall(bool fast = false);
     void aerialDrift();
+    bool canGrabLedge();
+    void grabLedge(Ledge* l);
     void land(Platform* p, Pair const& y);
     void fixEcbBottom(int frames, Pair position);
     void moveTo(Pair newPos);

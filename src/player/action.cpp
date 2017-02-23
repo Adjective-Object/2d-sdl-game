@@ -1,8 +1,8 @@
-#include "action.hpp"
-#include "../util.hpp"
-#include "player.hpp"
 #include <iostream>
-#include <map>
+#include "action.hpp"
+#include "util.hpp"
+#include "terrain/ledge.hpp"
+#include "./player.hpp"
 
 JumpType checkJumpInput(Joystick& j) {
     if (j.down(1) || j.down(2))
@@ -157,6 +157,10 @@ bool Action::canWalkOff(Player&) {
     return true;
 }
 
+bool Action::canGrabLedge(Player&) {
+    return false;
+}
+
 class Walk : public Action {
     void step(Player& p) override {
         if (p.timer == 0) {
@@ -232,6 +236,19 @@ class Fall : public Action {
     }
 
     bool isGrounded(Player& p) override { return false; }
+    bool canGrabLedge(Player& p) override { return true; }
+};
+
+class SpecialFall : public Action {
+    void init(Player& p) {}
+
+    void step(Player& p) override {
+        p.fall();
+        p.aerialDrift();
+    }
+
+    bool isGrounded(Player& p) override { return false; }
+    bool canGrabLedge(Player& p) override { return true; }
 };
 
 // normal landing
@@ -424,8 +441,7 @@ class EscapeAir : public Action {
             p.cVel.x *= 0.9;
             p.cVel.y *= 0.9;
         } else {
-            p.aerialDrift();
-            p.fall();
+            p.changeAction(SPECIALFALL);
         }
     }
 
@@ -696,6 +712,50 @@ class SquatRv : public Action {
     }
 };
 
+#define CLIFFCATCH_DURATION 4
+
+class CliffCatch : public Action {
+    void step(Player& p) override {
+        if (p.timer == 0) {
+            p.times_jumped = 0;
+        }
+        if (p.timer == CLIFFCATCH_DURATION) {
+            p.changeAction(CLIFFWAIT);
+        }
+        // fix self to the ledge
+        Ledge* l = p.currentLedge;
+
+        // character offset
+        Pair target = l->position + Pair(-0.12 * p.face, 0.35);
+
+        p.position = target;
+        p.cVel = Pair(0, 0);
+    }
+
+    bool isGrounded(Player& p) { return false; }
+};
+
+class CliffWait : public Action {
+    void step(Player& p) override {
+        if (interrupt(p))
+            return;
+        p.cVel = Pair(0, 0);
+    }
+
+    bool interrupt(Player& p) {
+        if ((p.getXInput() < -0.2 && p.getXInput(1) >= -0.2) ||
+            (p.joystick->axis(1) > 0.2 && p.joystick->axis(1, 1) >= -0.2)) {
+            p.times_jumped++;
+            p.ledgeRegrabCounter = 30;
+            p.changeAction(FALL);
+            return true;
+        }
+        return false;
+    }
+
+    bool isGrounded(Player& p) { return false; }
+};
+
 const char* actionStateName(ActionState state) {
     if (state < __NUM_ACTION_STATES) {
         return ACTION_STATE_NAMES[state];
@@ -704,26 +764,31 @@ const char* actionStateName(ActionState state) {
     }
 }
 
-Action* ACTIONS[__NUM_ACTION_STATES] = {[WALK] = new Walk(),
-                                        [ WAIT ] = new Wait(),
-                                        [ FALL ] = new Fall(),
-                                        [ LANDING ] = new Landing(),
-                                        [ KNEEBEND ] = new KneeBend(),
-                                        [ JUMPF ] = new JumpF(),
-                                        [ JUMPB ] = new JumpB(),
-                                        [ JUMPAIRF ] = new JumpAir(),
-                                        [ JUMPAIRB ] = new JumpAir(),
-                                        [ ESCAPEAIR ] = new EscapeAir(),
-                                        [ TURN ] = new Turn(),
-                                        [ DASH ] = new Dash(),
-                                        [ RUN ] = new Run(),
-                                        [ SMASHTURN ] = new SmashTurn(),
-                                        [ RUNBRAKE ] = new RunBrake(),
-                                        [ RUNTURN ] = new RunTurn(),
-                                        [ PASS ] = new Pass(),
-                                        [ SQUAT ] = new Squat(),
-                                        [ SQUATWAIT ] = new SquatWait(),
-                                        [ SQUATRV ] = new SquatRv()};
+Action* ACTIONS[__NUM_ACTION_STATES] = {
+        [WALK] = new Walk(),
+        [ WAIT ] = new Wait(),
+        [ FALL ] = new Fall(),
+        [ SPECIALFALL ] = new SpecialFall(),
+        [ LANDING ] = new Landing(),
+        [ KNEEBEND ] = new KneeBend(),
+        [ JUMPF ] = new JumpF(),
+        [ JUMPB ] = new JumpB(),
+        [ JUMPAIRF ] = new JumpAir(),
+        [ JUMPAIRB ] = new JumpAir(),
+        [ ESCAPEAIR ] = new EscapeAir(),
+        [ TURN ] = new Turn(),
+        [ DASH ] = new Dash(),
+        [ RUN ] = new Run(),
+        [ SMASHTURN ] = new SmashTurn(),
+        [ RUNBRAKE ] = new RunBrake(),
+        [ RUNTURN ] = new RunTurn(),
+        [ PASS ] = new Pass(),
+        [ SQUAT ] = new Squat(),
+        [ SQUATWAIT ] = new SquatWait(),
+        [ SQUATRV ] = new SquatRv(),
+        [ CLIFFCATCH ] = new CliffCatch(),
+        [ CLIFFWAIT ] = new CliffWait(),
+};
 
 #define ACTION_STATE(x) #x,
 const char* ACTION_STATE_NAMES[__NUM_ACTION_STATES + 1] = {

@@ -4,4 +4,8 @@
 #define PLAYER_FLOOR 1.2
 #define PLAYER_SCALE 275
 
+#define LEDGEBOX_WIDTH 0.15
+#define LEDGEBOX_HEIGHT 0.15
+#define LEDGEBOX_BASE 0.2
+
 #endif
