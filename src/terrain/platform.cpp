@@ -70,7 +70,11 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
 #define PLATFORM_DIR_OFFSET 0.03
 void Platform::render(SDL_Renderer* r) {
     for (size_t i = 0; i < points.size() - 1; i++) {
-        SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+        if (passable) {
+            SDL_SetRenderDrawColor(r, 100, 100, 255, 255);
+        } else {
+            SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+        }
 
         SDL_RenderDrawLine(r, (int)(points[i].x * PLAYER_SCALE),
                            (int)(points[i].y * PLAYER_SCALE),

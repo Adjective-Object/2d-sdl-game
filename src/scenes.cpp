@@ -46,7 +46,7 @@ void MainScene::init() {
     Platform* p;
     p = new Platform(
         {
-            Pair(0.4, 0.8), Pair(0.8, 0.8),
+            Pair(0.4, 1), Pair(0.8, 1),
         },
         true);
     platforms.push_back(p);
@@ -54,7 +54,7 @@ void MainScene::init() {
 
     p = new Platform(
         {
-            Pair(1.5, 0.8), Pair(1.9, 0.8),
+            Pair(1.5, 1), Pair(1.9, 1),
         },
         true);
     platforms.push_back(p);
@@ -62,47 +62,24 @@ void MainScene::init() {
 
     p = new Platform(
         {
-            Pair(0.95, 0.5), Pair(1.35, 0.5),
+            Pair(0.95, 0.7), Pair(1.35, 0.7),
         },
         true);
-    platforms.push_back(p);
-    entities.push_back(p);
-
-    p = new Platform(
-        {
-            Pair(2.2, 0.5), Pair(2.0, 0.2),
-        },
-        false);
-    platforms.push_back(p);
-    entities.push_back(p);
-
-    p = new Platform(
-        {
-            Pair(1.9, 1.0), Pair(2.2, 0.5),
-        },
-        false);
-    platforms.push_back(p);
-    entities.push_back(p);
-
-    p = new Platform(
-        {
-            Pair(2.1, 1.2), Pair(1.9, 1.0),
-        },
-        false);
-    platforms.push_back(p);
-    entities.push_back(p);
-
-    p = new Platform(
-        {
-            Pair(1.2, 1.2), Pair(1.2, 0),
-        },
-        false);
     platforms.push_back(p);
     entities.push_back(p);
 
     p = new Platform({
-        Pair(0.1, 1.2), Pair(0.3, 1.15), Pair(1.0, 1.2), Pair(1.5, 1.15),
-        Pair(2.1, 1.2),
+        Pair(2.1, 0.5), Pair(2.5, 0.5), Pair(2.5, 1), Pair(2.1, 1),
+        Pair(2.1, 0.5),
+    });
+    platforms.push_back(p);
+    entities.push_back(p);
+
+    p = new Platform({
+        Pair(0.1, 2.0), Pair(0.1, 1.6), Pair(0.7, 1.6), Pair(0.7, 1.2),
+        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
+        Pair(2.0, 2.0), Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+
     });
     platforms.push_back(p);
     entities.push_back(p);
