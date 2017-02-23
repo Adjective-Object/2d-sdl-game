@@ -58,7 +58,8 @@ void Player::update() {
     // move along the platform
     if (action->isGrounded(*this) && currentPlatform != NULL) {
         Pair stepVel = cVel * EnG->elapsed;
-        if (!currentPlatform->groundedMovement(position, stepVel)) {
+        bool walkedOff = !currentPlatform->groundedMovement(position, stepVel);
+        if (walkedOff && action->canWalkOff(*this)) {
             currentPlatform = NULL;
             changeAction(FALL);
             times_jumped = 1;

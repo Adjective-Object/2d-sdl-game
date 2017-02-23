@@ -22,6 +22,7 @@ class Action {
     virtual void onLanding(Player& p);
     virtual bool isGrounded(Player& p);
     virtual bool isLandable(Player& p, Platform* plat);
+    virtual bool canWalkOff(Player& p);
 };
 
 #define ACTION_STATE(x) x,

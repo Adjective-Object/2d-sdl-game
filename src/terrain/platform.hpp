@@ -30,6 +30,7 @@ class Platform : public Entity {
     void postUpdate();
     void render(SDL_Renderer* r);
     bool isPassable();
+    static bool isWall(double angle);
 };
 
 #endif

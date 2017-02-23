@@ -153,6 +153,10 @@ bool Action::isLandable(Player&, Platform*) {
     return true;
 }
 
+bool Action::canWalkOff(Player&) {
+    return true;
+}
+
 class Walk : public Action {
     void step(Player& p) override {
         if (p.timer == 0) {
@@ -268,6 +272,8 @@ class KneeBend : public Action {
             }
         }
     }
+
+    bool canWalkOff() { return false; }
 };
 
 void startGroundedJump(Player& p, bool isShort) {

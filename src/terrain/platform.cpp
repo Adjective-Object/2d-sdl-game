@@ -41,6 +41,10 @@ Pair Platform::movePointToSegmentSpace(Pair& platformPoint,
     return Pair(std::cos(psAngle) * length, std::sin(psAngle) * length);
 }
 
+bool Platform::isWall(double angle) {
+    return (std::abs(angle) > M_PI * 3.0 / 8.0);
+}
+
 #define PLATFORM_LAND_EPSILON 0.000001
 TerrainCollisionType Platform::checkCollision(Pair& previous,
                                               Pair& next,
@@ -59,8 +63,7 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
-            return (std::abs(angles[i]) <= M_PI * 3.0 / 8.0) ? FLOOR_COLLISION
-                                                             : WALL_COLLISION;
+            return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
 
@@ -101,9 +104,12 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     }
 
     // find the segment of the platform we're on
-    size_t i = 0;
-    while (i < points.size() && position.x >= points[i].x) {
-        i++;
+    size_t i;
+    for (i = 0; i < points.size() - 1; i++) {
+        if (!isWall(angles[i]) && points[i].x <= position.x &&
+            position.x <= points[i + 1].x) {
+            break;
+        }
     }
 
     // if we've stepped beyond the end of the platform, abandon it
@@ -113,8 +119,6 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         return false;
     }
 
-    i--;
-
     // std::cout << "i: " << i << std::endl;
 
     // std::cout << "resting on segment " << i << std::endl;
@@ -123,14 +127,13 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     double currentPlatformPercent =
         (position - points[i]).euclid() / lengths[i];
     double remainingDistance = std::abs(velocity.x);
-    double direction = velocity.x == 0 ? 1 : sign(velocity.x);
+    int direction = velocity.x == 0 ? 1 : sign(velocity.x);
 
-    // std::cout << "direction " << direction << std::endl;
-    // std::cout << "distance " << remainingDistance << std::endl;
+    std::cout << "direction " << direction << std::endl;
+    std::cout << "distance " << remainingDistance << std::endl;
 
     while (1) {
-        // std::cout << "reducing movment by remaining length of current
-        // platform"
+        // std::cout << "reducing movment by remaining len of platform " << i
         //           << std::endl;
         // std::cout << "length: " << lengths[i]
         //           << " percent: " << currentPlatformPercent << std::endl;
@@ -145,7 +148,7 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
             currentPlatformPercent = 0;
         }
 
-        // std::cout << "remaining distance " << remainingDistance << std::endl;
+        // std::cout << "remaining dist " << remainingDistance << std::endl;
 
         // if we've gone too negative remainingDistance, then we've
         // exhausted the requested platform motion. Undo the previous
@@ -172,10 +175,20 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         // position on the platform with x velocity corresponding to
         // remaining distance
         if (i < 0 || i >= lengths.size()) {
-            // printf("stepping off platform (direction: %f, reamining
-            // dist:%f)",
-            //        direction, remainingDistance);
+            // printf(
+            //     "stepping off platform %d (direction: %d, dist left:%f)\n",
+            //     i, direction, remainingDistance);
             i -= direction;
+            velocity.x = direction * remainingDistance;
+            position.x = points[i].x;
+            position.y = points[i].y;
+            return false;
+        }
+
+        if (isWall(angles[i])) {
+            if (direction == -1) {
+                i++;
+            }
             velocity.x = direction * remainingDistance;
             position.x = points[i].x;
             position.y = points[i].y;

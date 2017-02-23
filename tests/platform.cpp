@@ -84,6 +84,91 @@ TEST(Platform, GroundedMovement_Walkoff) {
     EXPECT_EQ(Pair(-0.5, 0), vel);
 }
 
+TEST(Platform, GroundedMovement_Walkoff_Wall) {
+    // flat surface with walkoff
+    Platform p = Platform({
+        Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3),
+    });
+    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(1, 0), pos);
+    EXPECT_EQ(Pair(0.5, 0), vel);
+
+    pos = Pair(0.5, 0);
+    vel = Pair(-1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(0, 0), pos);
+    EXPECT_EQ(Pair(-0.5, 0), vel);
+}
+
+TEST(Platform, GroundedMovement_Walkoff_Wall_Platform) {
+    // flat surface with walkoff
+    //
+    //     ____
+    //  __|    |__
+    //
+    Platform p = Platform({
+        Pair(-1, 3), Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3), Pair(2, 3),
+    });
+    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(1, 0), pos);
+    EXPECT_EQ(Pair(0.5, 0), vel);
+
+    pos = Pair(0.5, 0);
+    vel = Pair(-1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(0, 0), pos);
+    EXPECT_EQ(Pair(-0.5, 0), vel);
+}
+
+TEST(Platform, GroundedMovmeent_Flat_ConvolutedSurface) {
+    // flat surface with walkoff
+    //
+    //     _______
+    //   __\     /__
+    //
+    Platform p = Platform({
+        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+        Pair(2, 1),
+    });
+    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(1, 0), pos);
+    EXPECT_EQ(Pair(0.5, 0), vel);
+
+    pos = Pair(0.5, 0);
+    vel = Pair(-1, 0);
+    p.groundedMovement(pos, vel);
+
+    EXPECT_EQ(Pair(0, 0), pos);
+    EXPECT_EQ(Pair(-0.5, 0), vel);
+}
+
+TEST(Platform, isWall) {
+    EXPECT_FALSE(Platform::isWall(0));
+    EXPECT_FALSE(Platform::isWall(0.25 * M_PI));
+    EXPECT_FALSE(Platform::isWall(-0.25 * M_PI));
+    EXPECT_FALSE(Platform::isWall(0.3 * M_PI));
+    EXPECT_FALSE(Platform::isWall(-0.3 * M_PI));
+
+    EXPECT_TRUE(Platform::isWall(0.5 * M_PI));
+    EXPECT_TRUE(Platform::isWall(-0.5 * M_PI));
+    EXPECT_TRUE(Platform::isWall(0.6 * M_PI));
+    EXPECT_TRUE(Platform::isWall(-0.6 * M_PI));
+    EXPECT_TRUE(Platform::isWall(0.7 * M_PI));
+    EXPECT_TRUE(Platform::isWall(-0.7 * M_PI));
+    EXPECT_TRUE(Platform::isWall(0.8 * M_PI));
+    EXPECT_TRUE(Platform::isWall(-0.8 * M_PI));
+    EXPECT_TRUE(Platform::isWall(0.9 * M_PI));
+    EXPECT_TRUE(Platform::isWall(-0.9 * M_PI));
+}
+
 // note: it looks like calculations are done in y-inverted
 // cartesian coordinates
 TEST(Platform, movePointToSegmentSpace) {
