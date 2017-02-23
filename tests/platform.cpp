@@ -1,3 +1,4 @@
+#include <math.h>
 #include "gtest/gtest.h"
 #include "engine/pair.hpp"
 #include "terrain/platform.hpp"
@@ -83,13 +84,113 @@ TEST(Platform, GroundedMovement_Walkoff) {
     EXPECT_EQ(Pair(-0.5, 0), vel);
 }
 
-TEST(Platform, checkCollision_Basic) {
-    // flat surface with walkoff
+#define M_PI 3.14159265358979323846 /* pi */
+// note: it looks like calculations are done in y-inverted
+// cartesian coordinates
+TEST(Platform, movePointToSegmentSpace) {
+    Pair origin = Pair(0, 0);
+    Pair other = Pair(0, 0);
+
+    EXPECT_EQ(Platform::movePointToSegmentSpace(origin, 0, other), Pair(0, 0));
+
+    // 45 degree triangle
+    other = Pair(1, 0);
+    EXPECT_EQ(
+        Platform::movePointToSegmentSpace(origin,
+                                          -M_PI / 4,  // angle of the platform
+                                          other),
+        Pair(sqrt(2) / 2, sqrt(2) / 2));
+
+    // 45 degree triangle in negative
+    EXPECT_EQ(
+        Platform::movePointToSegmentSpace(origin,
+                                          M_PI / 4,  // angle of the platform
+                                          other),
+        Pair(sqrt(2) / 2, -sqrt(2) / 2));
+
+    // same as above, but not at origin
+
+    // 45 degree triangle
+    origin = Pair(1, 0);
+    other = Pair(2, 0);
+    EXPECT_EQ(
+        Platform::movePointToSegmentSpace(origin,
+                                          -M_PI / 4,  // angle of the platform
+                                          other),
+        Pair(sqrt(2) / 2, sqrt(2) / 2));
+
+    // 45 degree triangle in negative
+    EXPECT_EQ(
+        Platform::movePointToSegmentSpace(origin,
+                                          M_PI / 4,  // angle of the platform
+                                          other),
+        Pair(sqrt(2) / 2, -sqrt(2) / 2));
+}
+
+TEST(Platform, checkCollision_Basic_Floor) {
+    // collision with floor
     Platform p = Platform({
         Pair(0, 1), Pair(2, 1),
     });
     Pair lastPosition = Pair(1, 0), newPosition = Pair(1, 2);
     Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
+              FLOOR_COLLISION);
+    EXPECT_EQ(Pair(1, 1), out);
+}
+
+TEST(Platform, checkCollision_Reverse_Floor) {
+    // collising going up through floor
+    Platform p = Platform({
+        Pair(0, 1), Pair(2, 1),
+    });
+    Pair lastPosition = Pair(1, 0), newPosition = Pair(1, 2);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(newPosition, lastPosition, out), NO_COLLISION);
+}
+
+TEST(Platform, checkCollision_Basic_Wall) {
+    // collision through wall
+    Platform p = Platform({
+        Pair(1, 2), Pair(1, 0),
+    });
+    Pair lastPosition = Pair(0, 1), newPosition = Pair(2, 1);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out), WALL_COLLISION);
+    EXPECT_EQ(Pair(1, 1), out);
+}
+
+TEST(Platform, checkCollision_Reverse_Wall) {
+    // collision through wall
+    Platform p = Platform({
+        Pair(1, 2), Pair(1, 0),
+    });
+    Pair lastPosition = Pair(0, 1), newPosition = Pair(2, 1);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(newPosition, lastPosition, out), NO_COLLISION);
+}
+
+TEST(Platform, checkCollision_Diagonal_Floor) {
+    // check that up to 45 degrees is considered a floor collision
+    Platform p = Platform({
+        Pair(0, 0), Pair(2, 2),
+    });
+    Pair lastPosition = Pair(0, 2), newPosition = Pair(2, 0);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
+              FLOOR_COLLISION);
+    EXPECT_EQ(Pair(1, 1), out);
+
+    p = Platform({
+        Pair(0, 0), Pair(2, -2),
+    });
+    lastPosition = Pair(2, 0), Pair(0, -2);
+    out = Pair(0, 0);
 
     EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
               FLOOR_COLLISION);

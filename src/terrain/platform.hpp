@@ -17,9 +17,9 @@ class Platform : public Entity {
     Platform(std::vector<Pair> points, bool passable = false);
     ~Platform();
 
-    Pair movePointToSegmentSpace(Pair& platformPair,
-                                 double platformAngle,
-                                 Pair& otherPair);
+    static Pair movePointToSegmentSpace(Pair& platformPair,
+                                        double platformAngle,
+                                        Pair& otherPair);
 
     TerrainCollisionType checkCollision(Pair& previous, Pair& next, Pair& out);
     bool groundedMovement(Pair& position, Pair& velocity);

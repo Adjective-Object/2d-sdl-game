@@ -9,26 +9,16 @@
 #define _top(length) top(origin + Pair(0, -length))
 #define _bottom(length) bottom(origin + Pair(0, length))
 
-Ecb::Ecb()
-    : origin(Pair(0, 0)),
-      _left(ECB_DEFAULT_WIDTH),
-      _right(ECB_DEFAULT_WIDTH),
-      _top(ECB_DEFAULT_HEIGHT),
-      _bottom(ECB_DEFAULT_HEIGHT) {}
+Ecb::Ecb() : Ecb(Pair(0, 0)) {}
 
-Ecb::Ecb(Pair origin)
-    : origin(origin),
-      _left(ECB_DEFAULT_WIDTH),
-      _right(ECB_DEFAULT_WIDTH),
-      _top(ECB_DEFAULT_HEIGHT),
-      _bottom(ECB_DEFAULT_HEIGHT) {}
+Ecb::Ecb(Pair origin) : Ecb(origin, ECB_DEFAULT_WIDTH, ECB_DEFAULT_HEIGHT) {}
 
 Ecb::Ecb(Pair origin, double width, double height)
-    : origin(origin),
-      _left(width),
-      _right(width),
-      _top(height),
-      _bottom(height) {}
+    : Ecb(origin,
+          ECB_DEFAULT_WIDTH,
+          ECB_DEFAULT_HEIGHT,
+          ECB_DEFAULT_WIDTH,
+          ECB_DEFAULT_HEIGHT) {}
 
 Ecb::Ecb(Pair origin,
          double widthLeft,
@@ -39,15 +29,18 @@ Ecb::Ecb(Pair origin,
       _left(widthLeft),
       _right(widthRight),
       _top(heightTop),
-      _bottom(heightBottom) {}
+      _bottom(heightBottom),
+      widthLeft(widthLeft),
+      widthRight(widthRight),
+      heightTop(heightTop),
+      heightBottom(heightBottom) {}
 
 void Ecb::setOrigin(Pair newOrigin) {
-    Pair delta = newOrigin - origin;
     origin = newOrigin;
-    left += delta;
-    right += delta;
-    top += delta;
-    bottom += delta;
+    left = origin + Pair(-widthLeft, 0);
+    right = origin + Pair(widthRight, 0);
+    top = origin + Pair(0, -heightTop);
+    bottom = origin + Pair(0, heightBottom);
 }
 
 void Ecb::render(SDL_Renderer* ren, double SCALE) {

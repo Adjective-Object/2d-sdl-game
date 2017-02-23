@@ -44,17 +44,23 @@ double computeVelocity(double v, double a, double drag, double cap) {
     return v;
 }
 
-bool checkLineIntersection(Pair const& p0,
-                           Pair const& p1,
-                           Pair const& p2,
-                           Pair const& p3,
-                           Pair& out,
-                           double epsilon) {
+template <typename T>
+int sign(T val) {
+    return (T(0) < val) - (val < T(0));
+};
+
+int checkLineIntersection(Pair const& p0,
+                          Pair const& p1,
+                          Pair const& p2,
+                          Pair const& p3,
+                          Pair& out,
+                          double epsilon) {
     Pair const s1 = p1 - p0;
     Pair const s2 = p3 - p2;
 
     Pair const u = p0 - p2;
 
+    // 1 over the cross product of s1 and s2
     float const ip = 1.f / (-s2.x * s1.y + s1.x * s2.y);
 
     float const s = (-s1.y * u.x + s1.x * u.y) * ip;
@@ -66,8 +72,8 @@ bool checkLineIntersection(Pair const& p0,
     if (s >= -epsilon_s && s <= 1 + epsilon_s && t >= -epsilon_t &&
         t <= 1 + epsilon_t) {
         out = p0 * (1.0 - s) + p1 * s;
-        return true;
+        return -sign(ip);
     }
 
-    return false;
+    return 0;
 }

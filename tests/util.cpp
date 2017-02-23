@@ -9,6 +9,9 @@ TEST(Util, checkLineIntersection_Basic) {
 
     Pair out = Pair(0, 0);
 
-    EXPECT_TRUE(checkLineIntersection(a1, a2, b1, b2, out));
+    EXPECT_EQ(checkLineIntersection(a1, a2, b1, b2, out), 1);
+    EXPECT_EQ(Pair(1, 1), out);
+
+    EXPECT_EQ(checkLineIntersection(a1, a2, b2, b1, out), -1);
     EXPECT_EQ(Pair(1, 1), out);
 }

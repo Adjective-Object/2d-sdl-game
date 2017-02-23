@@ -55,14 +55,12 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
         Pair p1 = points[i];
         Pair p2 = points[i + 1];
         Pair intersectionPoint = Pair(0, 0);
-        if (checkLineIntersection(previous, next, p1, p2, intersectionPoint,
-                                  PLATFORM_LAND_EPSILON)) {
-            Pair psPoint = movePointToSegmentSpace(p1, angles[i], previous);
+        int direction = checkLineIntersection(
+            previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
+        if (direction > 0) {
             out = intersectionPoint;
-
-            return (previous.y <= 0 && std::abs(std::sin(angles[i])) > 0.9)
-                       ? WALL_COLLISION
-                       : FLOOR_COLLISION;
+            return (std::abs(std::cos(angles[i])) < 0.3) ? WALL_COLLISION
+                                                         : FLOOR_COLLISION;
         }
     }
 
