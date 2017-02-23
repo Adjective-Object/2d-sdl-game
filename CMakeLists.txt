@@ -35,6 +35,8 @@ set(GTEST_INCLUDE_DIR "${GTEST_DIR}/include")
 set(LIB_SRCS 
     src/scenes.hpp
     src/scenes.cpp
+    src/util.hpp
+    src/util.cpp
     src/player/player.hpp
     src/player/player.cpp
     src/player/action.hpp

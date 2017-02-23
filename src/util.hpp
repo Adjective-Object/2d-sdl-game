@@ -7,12 +7,11 @@ int sign(T val) {
     return (T(0) < val) - (val < T(0));
 };
 
-int checkLineIntersection(
-    Pair const& p0,
-    Pair const& p1,
-    Pair const& p2,
-    Pair const& p3,
-    Pair & out,
-    double epsilon=0);
+int checkLineIntersection(Pair const& p0,
+                          Pair const& p1,
+                          Pair const& p2,
+                          Pair const& p3,
+                          Pair& out,
+                          double epsilon = 0);
 
 #endif

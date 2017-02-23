@@ -179,7 +179,7 @@ TEST(Platform, checkCollision_Diagonal_Floor) {
     Platform p = Platform({
         Pair(0, 0), Pair(2, 2),
     });
-    Pair lastPosition = Pair(0, 2), newPosition = Pair(2, 0);
+    Pair newPosition = Pair(0, 2), lastPosition = Pair(2, 0);
     Pair out = Pair(0, 0);
 
     EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
@@ -189,10 +189,34 @@ TEST(Platform, checkCollision_Diagonal_Floor) {
     p = Platform({
         Pair(0, 0), Pair(2, -2),
     });
-    lastPosition = Pair(2, 0), Pair(0, -2);
+    lastPosition = Pair(0, -2);
+    newPosition = Pair(2, 0);
     out = Pair(0, 0);
 
     EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out),
               FLOOR_COLLISION);
-    EXPECT_EQ(Pair(1, 1), out);
+    EXPECT_EQ(out, Pair(1, -1));
+}
+
+TEST(Platform, checkCollision_Diagonal_Floor_Miss) {
+    // check that collisions missing the platform do not trigger
+    // platform collision
+    Platform p = Platform({
+        Pair(0, 0), Pair(2, 2),
+    });
+    Pair newPosition = Pair(0, 2), lastPosition = Pair(3, 3);
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out), NO_COLLISION);
+    EXPECT_EQ(out, Pair(0, 0));
+
+    p = Platform({
+        Pair(0, 0), Pair(2, -2),
+    });
+    lastPosition = Pair(0, -2);
+    newPosition = Pair(-3, -4);
+    out = Pair(0, 0);
+
+    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out), NO_COLLISION);
+    EXPECT_EQ(out, Pair(0, 0));
 }

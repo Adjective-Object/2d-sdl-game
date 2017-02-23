@@ -57,7 +57,7 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
         Pair intersectionPoint = Pair(0, 0);
         int direction = checkLineIntersection(
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
-        if (direction > 0) {
+        if (direction < 0) {
             out = intersectionPoint;
             return (std::abs(std::cos(angles[i])) < 0.3) ? WALL_COLLISION
                                                          : FLOOR_COLLISION;
