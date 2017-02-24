@@ -43,6 +43,7 @@ class Pair {
 
     // comparators
     bool operator==(const Pair& p) const;
+    bool operator!=(const Pair& p) const;
 };
 
 std::ostream& operator<<(std::ostream& strm, const Pair& p);

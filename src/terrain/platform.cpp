@@ -46,9 +46,10 @@ bool Platform::isWall(double angle) {
 }
 
 #define PLATFORM_LAND_EPSILON 0.000001
-TerrainCollisionType Platform::checkCollision(Pair& previous,
-                                              Pair& next,
-                                              Pair& out) {
+TerrainCollisionType Platform::checkCollision(Pair const& previous,
+                                              Pair const& next,
+                                              Pair& out,
+                                              int & segment) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -63,11 +64,38 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
+            segment = i;
             return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
 
     return NO_COLLISION;
+}
+
+Pair Platform::moveAlongWall(Pair const& start, Pair const& destination, int segment) {
+    // TODO make it work for left walls too lol
+    double dest_x, dest_y, frac;
+    Pair upperWallPoint, lowerWallPoint;
+
+    if (destination.x < start.x) {
+        upperWallPoint = points[segment + 1];
+        lowerWallPoint = points[segment];
+    } else {
+        upperWallPoint = points[segment];
+        lowerWallPoint = points[segment + 1];
+    }
+
+    if (destination.y > start.y) {
+        dest_y = std::min(destination.y, upperWallPoint.y);
+    } else {
+        dest_y = std::max(destination.y, upperWallPoint.y);        
+    }
+
+    // move linearly along the platform to dest_y
+    frac = (dest_y - lowerWallPoint.y) / (upperWallPoint.y - lowerWallPoint.y);
+    dest_x = frac * upperWallPoint.x + (1 - frac) * lowerWallPoint.x;
+
+    return Pair(dest_x, dest_y);
 }
 
 #define PLATFORM_DIR_OFFSET 0.03

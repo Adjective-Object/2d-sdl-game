@@ -118,6 +118,11 @@ bool Pair::operator==(const Pair& p) const {
     return fabs(p.x - x) < EPSILON && fabs(p.y - y) < EPSILON;
 }
 
+bool Pair::operator!=(const Pair& p) const {
+    return ! (*this == p);
+}
+
+
 /////////////
 // PRINTER //
 /////////////

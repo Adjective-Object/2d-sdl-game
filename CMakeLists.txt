@@ -78,6 +78,7 @@ set(TEST_SRCS
     tests/platform.cpp
     tests/player.cpp
     tests/ecb.cpp
+    tests/map.cpp
     tests/util.cpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC

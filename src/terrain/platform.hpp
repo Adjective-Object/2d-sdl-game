@@ -21,8 +21,13 @@ class Platform : public Entity {
                                         double platformAngle,
                                         Pair& otherPair);
 
-    TerrainCollisionType checkCollision(Pair& previous, Pair& next, Pair& out);
+    TerrainCollisionType checkCollision(Pair const& previous, Pair const& next, Pair& out, int & segmentNo);
+
     bool groundedMovement(Pair& position, Pair& velocity);
+
+    // move from start to destination, clamping x at wall.
+    // returns the endpoint of the traversal
+    Pair moveAlongWall(Pair const& start, Pair const& destination, int segmentNo);
 
     void init();
     void preUpdate();

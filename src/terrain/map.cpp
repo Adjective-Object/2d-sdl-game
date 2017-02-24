@@ -6,6 +6,69 @@
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
 
+bool Map::getClosestCollision(
+            Pair const& start,
+            Pair const& end,
+            CollisionDatum & out) {
+
+    double closestDist = DOUBLE_INFINITY;
+    int segment;
+    Pair collisionPoint;
+
+    for(Platform & p: platforms) {
+        TerrainCollisionType t = p.checkCollision(
+            start, end, collisionPoint, segment);
+
+        double distance = (collisionPoint - start).euclid();
+        if (t != NO_COLLISION && distance < closestDist) {
+            out.type = t;
+            out.platform = &p;
+            out.position = collisionPoint;
+            out.segment = segment;
+        }
+    }
+}
+
+bool Map::getClosestEcbCollision(
+            Ecb const& start,
+            Ecb const& end,
+            CollisionDatum & closestCollisionut) {
+
+    double closestDist = DOUBLE_INFINITY;
+    CollisionDatum collision;
+    bool anyCollision = false;
+
+    getClosestCollision(start.left, end.left, collision);
+    if ((collision.position - start).euclid() < closestDist){
+        closestCollision = collision;
+        closestCollision.position.x -= start.widthLeft;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.right, end.right, collision);
+    if ((collision.position - start).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.x += start.widthRight;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.top, end.top, collision);
+    if ((collision.position - start).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.y -= start.heightTop;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.bottom, end.bottom, collision);
+    if ((collision.position - start).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.y += start.heightBottom;
+        anyCollision = true;
+    }
+
+    return anyCollision;
+}
+
 void Map::updateCollision(Player& player) {
     // grab ledges
     if (player.canGrabLedge()) {
@@ -21,40 +84,26 @@ void Map::updateCollision(Player& player) {
         }
     }
 
-    // perform land and wall collisions
-    for (Platform& p : platforms) {
-        Pair collPos = Pair(0, 0);
-        TerrainCollisionType collisionType;
+    Ecb currentEcb = player.previousCollision->playerModified;
+    Ecb predictedEcb = player.currentCollision->playerModified;
+    Pair direction = predictedEcb.origin - currentEcb.origin;
 
-        Ecb* oldEcb = &(player.previousCollision->postCollision);
-        Ecb* newEcb = &(player.currentCollision->postCollision);
+    while(currentEcb.origin != predictedEcb.origin) {
+        CollisionDatum collision;
 
-        collisionType =
-            p.checkCollision(oldEcb->bottom, newEcb->bottom, collPos);
+        getClosestCollision(
+            currentEcb.right,
+            predictedEcb.right,
+            collision
+        );
 
-        if (player.velocity.y > 0 &&
-            player.getAction()->isLandable(player, &p) &&
-            collisionType == FLOOR_COLLISION) {
-            player.land(&p, collPos);
+        // walls clamp the x. We move the current Ecb to either the
+        // end of the wall or the y position on the wall of the predicted
+        // ecb
+        if (collision.type == WALL_COLLISION) {
+
         }
 
-        collisionType =
-            p.checkCollision(oldEcb->origin, newEcb->right, collPos);
-
-        if (collisionType == WALL_COLLISION) {
-            std::cout << "wall on right" << std::endl;
-
-            std::cout << "player moving at " << player.cVel << std::endl;
-            std::cout << "player at " << player.position << std::endl;
-            std::cout << "right ecb at " << newEcb->right << std::endl;
-            std::cout << "collision at " << collPos << std::endl;
-            std::cout << (newEcb->right - collPos) << std::endl;
-            player.moveTo(player.position - (newEcb->right - collPos));
-            std::cout << "player ends at " << player.position << std::endl;
-            std::cout << "right ecb end sat "
-                      << player.currentCollision->postCollision.right
-                      << std::endl;
-        }
     }
 }
 
