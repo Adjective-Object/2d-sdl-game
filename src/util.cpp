@@ -29,3 +29,16 @@ int checkLineIntersection(Pair const& p0,
 
     return 0;
 }
+
+bool checkLineSweep(
+        Pair const& a1,
+        Pair const& a2,
+        Pair const& b1,
+        Pair const& b2,
+        Pair const& c,
+        Pair & out1,
+        Pair & out2,
+        double epsilon) {
+    return false;
+}
+

@@ -80,16 +80,6 @@ set(TEST_SRCS
     tests/ecb.cpp
     tests/map.cpp
     tests/util.cpp)
-add_library(TEST_LIB OBJECT ${TEST_SRCS})
-target_include_directories(TEST_LIB PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_INCLUDE_DIRS}
-    ${YAML_CPP_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIR}
-    "src"
-    )
 
 set(ALL_SRCS ${LIB_SRCS} ${TEST_SRCS} src/main.cpp tests/main.cpp)
 PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})

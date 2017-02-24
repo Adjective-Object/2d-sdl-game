@@ -14,6 +14,7 @@ bool Map::getClosestCollision(
     double closestDist = DOUBLE_INFINITY;
     int segment;
     Pair collisionPoint;
+    bool anyCollision = false;
 
     for(Platform & p: platforms) {
         TerrainCollisionType t = p.checkCollision(
@@ -25,42 +26,45 @@ bool Map::getClosestCollision(
             out.platform = &p;
             out.position = collisionPoint;
             out.segment = segment;
+            anyCollision = true;
         }
     }
+    
+    return anyCollision;
 }
 
 bool Map::getClosestEcbCollision(
             Ecb const& start,
             Ecb const& end,
-            CollisionDatum & closestCollisionut) {
+            CollisionDatum & closestCollision) {
 
     double closestDist = DOUBLE_INFINITY;
     CollisionDatum collision;
     bool anyCollision = false;
 
     getClosestCollision(start.left, end.left, collision);
-    if ((collision.position - start).euclid() < closestDist){
+    if ((collision.position - start.left).euclid() < closestDist){
         closestCollision = collision;
         closestCollision.position.x -= start.widthLeft;
         anyCollision = true;
     }
 
     getClosestCollision(start.right, end.right, collision);
-    if ((collision.position - start).euclid() < closestDist) {
+    if ((collision.position - start.right).euclid() < closestDist) {
         closestCollision = collision;
         closestCollision.position.x += start.widthRight;
         anyCollision = true;
     }
 
     getClosestCollision(start.top, end.top, collision);
-    if ((collision.position - start).euclid() < closestDist) {
+    if ((collision.position - start.top).euclid() < closestDist) {
         closestCollision = collision;
         closestCollision.position.y -= start.heightTop;
         anyCollision = true;
     }
 
     getClosestCollision(start.bottom, end.bottom, collision);
-    if ((collision.position - start).euclid() < closestDist) {
+    if ((collision.position - start.bottom).euclid() < closestDist) {
         closestCollision = collision;
         closestCollision.position.y += start.heightBottom;
         anyCollision = true;

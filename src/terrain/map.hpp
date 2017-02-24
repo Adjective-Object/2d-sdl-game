@@ -27,9 +27,10 @@ class Map {
             Pair const& start,
             Pair const& end,
             CollisionDatum & out);
+
     bool getClosestEcbCollision(
-            Pair const& start,
-            Pair const& end,
+            Ecb const& start,
+            Ecb const& end,
             CollisionDatum & out);
 
 };
