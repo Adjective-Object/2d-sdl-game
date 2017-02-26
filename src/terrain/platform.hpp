@@ -7,7 +7,10 @@
 #include "engine/entity.hpp"
 #include "./collisiontype.hpp"
 
+class PlatformSegment;
+
 class Platform : public Entity {
+    friend class PlatformSegment;
     std::vector<Pair> points;
     std::vector<double> angles;
     std::vector<double> lengths;
@@ -21,13 +24,18 @@ class Platform : public Entity {
                                         double platformAngle,
                                         Pair& otherPair);
 
-    TerrainCollisionType checkCollision(Pair const& previous, Pair const& next, Pair& out, int & segmentNo);
+    TerrainCollisionType checkCollision(Pair const& previous,
+                                        Pair const& next,
+                                        Pair& out,
+                                        PlatformSegment& segmentOut);
 
     bool groundedMovement(Pair& position, Pair& velocity);
 
     // move from start to destination, clamping x at wall.
     // returns the endpoint of the traversal
-    Pair moveAlongWall(Pair const& start, Pair const& destination, int segmentNo);
+    Pair moveAlongWall(Pair const& start,
+                       Pair const& destination,
+                       int segmentNo);
 
     void init();
     void preUpdate();
@@ -37,5 +45,16 @@ class Platform : public Entity {
     bool isPassable();
     static bool isWall(double angle);
 };
+
+class PlatformSegment : {
+    Platform* platform;
+    int index;
+
+   public:
+    PlatformSegment(platform, index);
+    Pair* firstPoint();
+    Pair* secondPoint();
+    Pair slope();
+}
 
 #endif

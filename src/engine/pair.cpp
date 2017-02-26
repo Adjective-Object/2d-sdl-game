@@ -119,9 +119,8 @@ bool Pair::operator==(const Pair& p) const {
 }
 
 bool Pair::operator!=(const Pair& p) const {
-    return ! (*this == p);
+    return !(*this == p);
 }
-
 
 /////////////
 // PRINTER //

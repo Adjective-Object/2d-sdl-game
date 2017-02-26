@@ -6,14 +6,6 @@
 #include "./platform.hpp"
 #include "./ledge.hpp"
 
-class CollisionDatum {
-public:
-    TerrainCollisionType type;
-    Platform * platform;
-    int segment;
-    Pair position;
-};
-
 class Map {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
@@ -23,16 +15,13 @@ class Map {
     void updateCollision(Player& player);
     void render(SDL_Renderer* r);
 
-    bool getClosestCollision(
-            Pair const& start,
-            Pair const& end,
-            CollisionDatum & out);
+    bool getClosestCollision(Pair const& start,
+                             Pair const& end,
+                             CollisionDatum& out);
 
-    bool getClosestEcbCollision(
-            Ecb const& start,
-            Ecb const& end,
-            CollisionDatum & out);
-
+    bool getClosestEcbCollision(Ecb const& start,
+                                Ecb const& end,
+                                CollisionDatum& out);
 };
 
 #endif

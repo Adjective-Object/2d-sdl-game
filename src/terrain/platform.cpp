@@ -49,7 +49,7 @@ bool Platform::isWall(double angle) {
 TerrainCollisionType Platform::checkCollision(Pair const& previous,
                                               Pair const& next,
                                               Pair& out,
-                                              int & segment) {
+                                              PlatformSegment& segmentOut) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -64,7 +64,8 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
-            segment = i;
+            segment.platform = this;
+            segment.index = i;
             return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
@@ -72,7 +73,9 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
     return NO_COLLISION;
 }
 
-Pair Platform::moveAlongWall(Pair const& start, Pair const& destination, int segment) {
+Pair Platform::moveAlongWall(Pair const& start,
+                             Pair const& destination,
+                             int segment) {
     // TODO make it work for left walls too lol
     double dest_x, dest_y, frac;
     Pair upperWallPoint, lowerWallPoint;
@@ -88,7 +91,7 @@ Pair Platform::moveAlongWall(Pair const& start, Pair const& destination, int seg
     if (destination.y > start.y) {
         dest_y = std::min(destination.y, upperWallPoint.y);
     } else {
-        dest_y = std::max(destination.y, upperWallPoint.y);        
+        dest_y = std::max(destination.y, upperWallPoint.y);
     }
 
     // move linearly along the platform to dest_y
@@ -233,3 +236,21 @@ void Platform::init(){};
 void Platform::preUpdate(){};
 void Platform::update(){};
 void Platform::postUpdate(){};
+
+PlatformSegment::PlatformSegment(Platform* p, int index)
+    : platform(platform), index(index) {}
+
+Pair* PlatformSegment::firstPoint() {
+    return platform->points[index];
+}
+
+Pair* PlatformSegment::secondPoint() {
+    return platform->points[index + 1];
+}
+
+Pair PlatformSegment::slope() {
+    Pair p;
+    p = (firstPoint() - secondPoint());
+    return p / p.euclid();
+}
+
