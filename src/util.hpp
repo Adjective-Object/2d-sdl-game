@@ -15,11 +15,11 @@ int checkLineIntersection(Pair const& p0,
                           double epsilon = 0);
 
 bool checkLineSweep(
-        Pair const& a1,
-        Pair const& a2,
-        Pair const& b1,
-        Pair const& b2,
-        Pair const& c,
+        Pair & a1,
+        Pair & a2,
+        Pair & b1,
+        Pair & b2,
+        Pair & c,
         Pair & out1,
         Pair & out2,
         double epsilon = 0);
