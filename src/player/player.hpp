@@ -29,7 +29,7 @@ class Player : public Sprite {
 
     int ecbFixedCounter = 0;
     int ledgeRegrabCounter = 0;
-    Pair ecbBottomFixedPosition = Pair(0, 0);
+    double ecbBottomFixedSize = 0;
 
     Pair cVel = Pair(0, 0);
     Pair kVel = Pair(0, 0);
@@ -53,20 +53,25 @@ class Player : public Sprite {
 
     void fall(bool fast = false);
     void aerialDrift();
-    bool canGrabLedge();
     void grabLedge(Ledge* l);
     void land(Platform* p, Pair const& y);
-    void fixEcbBottom(int frames, Pair position);
+    void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
 
     Player(std::string attributeFile, double x, double y);
     ~Player();
+
+    bool canGrabLedge();
+    bool isGrounded();
+    bool canFallOff();
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);
     Platform* getCurrentPlatform();
     ActionState getActionState();
     Action* getAction();
+
+    void setPosition(Pair newPosition);
 };
 
 #endif

@@ -13,7 +13,7 @@ class Map {
 
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
-    void updateCollision(Player& player);
+    void updateCollision(Player& player, Pair& requestedDistance);
     void render(SDL_Renderer* r);
 
     bool getClosestCollision(Pair const& start,
@@ -23,6 +23,8 @@ class Map {
     bool getClosestEcbCollision(Ecb const& start,
                                 Ecb const& end,
                                 CollisionDatum& out);
+
+    Platform* getPlatform(size_t index);
 };
 
 #endif

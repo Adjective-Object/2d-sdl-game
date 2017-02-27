@@ -3,6 +3,9 @@
 #include <SDL.h>
 #include "engine/pair.hpp"
 
+#define ECB_DEFAULT_WIDTH 0.06
+#define ECB_DEFAULT_HEIGHT 0.1
+
 /**
  * Class for managing environemnt collision box
  *
@@ -28,6 +31,10 @@ class Ecb {
         double heightBottom);
 
     void setOrigin(Pair origin);
+    void setRight(Pair right);
+    void setLeft(Pair left);
+    void setBottom(Pair bottom);
+    void setTop(Pair top);
     void render(SDL_Renderer* r, double scale);
 };
 

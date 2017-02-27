@@ -5,9 +5,9 @@
 #include <vector>
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
+#include "./platformsegment.hpp"
 #include "./collisiontype.hpp"
-
-class PlatformSegment;
+#include "./collisiondatum.hpp"
 
 class Platform : public Entity {
     friend class PlatformSegment;
@@ -27,15 +27,11 @@ class Platform : public Entity {
     TerrainCollisionType checkCollision(Pair const& previous,
                                         Pair const& next,
                                         Pair& out,
-                                        PlatformSegment& segmentOut);
-
-    bool groundedMovement(Pair& position, Pair& velocity);
-
-    // move from start to destination, clamping x at wall.
-    // returns the endpoint of the traversal
-    Pair moveAlongWall(Pair const& start,
-                       Pair const& destination,
-                       int segmentNo);
+                                        PlatformSegment& segment);
+    bool findSegment(Pair& position, PlatformSegment& out);
+    bool stepAlongSegment(PlatformSegment& segment,
+                          Pair& position,
+                          double& distance);
 
     void init();
     void preUpdate();
@@ -43,20 +39,9 @@ class Platform : public Entity {
     void postUpdate();
     void render(SDL_Renderer* r);
     bool isPassable();
+    PlatformSegment getSegment(int index);
+
     static bool isWall(double angle);
-};
-
-class PlatformSegment {
-    Platform* platform;
-    int index;
-
-   public:
-    PlatformSegment();
-    PlatformSegment(Platform* platform, int index);
-    Pair* firstPoint();
-    Pair* secondPoint();
-    Pair slope();
-    Platform* getPlatform();
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "engine/pair.hpp"
 #include "platform.hpp"
+#include "platformsegment.hpp"
 #include "constants.hpp"
 #include "util.hpp"
 #include "./collisiontype.hpp"
@@ -49,7 +50,7 @@ bool Platform::isWall(double angle) {
 TerrainCollisionType Platform::checkCollision(Pair const& previous,
                                               Pair const& next,
                                               Pair& out,
-                                              PlatformSegment& segmentOut) {
+                                              PlatformSegment& segment) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -64,40 +65,12 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
-            segmentOut = PlatformSegment(this, i);
+            segment = PlatformSegment(this, i);
             return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
 
     return NO_COLLISION;
-}
-
-Pair Platform::moveAlongWall(Pair const& start,
-                             Pair const& destination,
-                             int segment) {
-    // TODO make it work for left walls too lol
-    double dest_x, dest_y, frac;
-    Pair upperWallPoint, lowerWallPoint;
-
-    if (destination.x < start.x) {
-        upperWallPoint = points[segment + 1];
-        lowerWallPoint = points[segment];
-    } else {
-        upperWallPoint = points[segment];
-        lowerWallPoint = points[segment + 1];
-    }
-
-    if (destination.y > start.y) {
-        dest_y = std::min(destination.y, upperWallPoint.y);
-    } else {
-        dest_y = std::max(destination.y, upperWallPoint.y);
-    }
-
-    // move linearly along the platform to dest_y
-    frac = (dest_y - lowerWallPoint.y) / (upperWallPoint.y - lowerWallPoint.y);
-    dest_x = frac * upperWallPoint.x + (1 - frac) * lowerWallPoint.x;
-
-    return Pair(dest_x, dest_y);
 }
 
 #define PLATFORM_DIR_OFFSET 0.03
@@ -126,13 +99,7 @@ void Platform::render(SDL_Renderer* r) {
     }
 }
 
-bool Platform::groundedMovement(Pair& position, Pair& velocity) {
-    Pair wsRelPos = position - points[0];
-    if (wsRelPos.x < 0) {
-        std::cerr << "grounded movement starts before platform" << std::endl;
-        return false;
-    }
-
+bool Platform::findSegment(Pair& position, PlatformSegment& out) {
     // find the segment of the platform we're on
     size_t i;
     for (i = 0; i < points.size() - 1; i++) {
@@ -144,118 +111,95 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
 
     // if we've stepped beyond the end of the platform, abandon it
     if (i == points.size()) {
-        std::cerr << "grounded movement starts off of platform (" << i << ")"
-                  << std::endl;
         return false;
     }
 
-    // std::cout << "i: " << i << std::endl;
+    out = PlatformSegment(this, i);
+    return true;
+}
 
-    // std::cout << "resting on segment " << i << std::endl;
-    // std::cout << "length is " << lengths[i] << std::endl;
-
+// move a point some distance along the given segment of a platform
+// stops when the segment is shorter than distance
+//
+// returns false when movement ends or we step off the platform
+bool Platform::stepAlongSegment(PlatformSegment& segment,
+                                Pair& position,
+                                double& distance) {
     double currentPlatformPercent =
-        (position - points[i]).euclid() / lengths[i];
-    double remainingDistance = std::abs(velocity.x);
-    int direction = velocity.x == 0 ? 1 : sign(velocity.x);
+        (position - points[segment.index]).euclid() / lengths[segment.index];
+    double remainingDistance = std::abs(distance);
 
-    // std::cout << "direction " << direction << std::endl;
-    // std::cout << "distance " << remainingDistance << std::endl;
+    int direction = distance == 0 ? 1 : sign(distance);
 
-    while (1) {
-        // std::cout << "reducing movment by remaining len of platform " << i
-        //           << std::endl;
-        // std::cout << "length: " << lengths[i]
-        //           << " percent: " << currentPlatformPercent << std::endl;
+    printf("distance request: %f\n", distance);
+    printf("distance remaining: %f\n", remainingDistance);
+    printf("direction: %d\n", direction);
+    printf("current platform percent: %f\n", currentPlatformPercent);
 
-        if (direction < 0) {
-            // leftware motion
-            remainingDistance -= lengths[i] * currentPlatformPercent;
-            currentPlatformPercent = 1;
-        } else {
-            // rightward motion
-            remainingDistance -= lengths[i] * (1 - currentPlatformPercent);
-            currentPlatformPercent = 0;
-        }
-
-        // std::cout << "remaining dist " << remainingDistance << std::endl;
-
-        // if we've gone too negative remainingDistance, then we've
-        // exhausted the requested platform motion. Undo the previous
-        // motion to get to remainingDistance of zero and resturn the
-        // corresponding position w/ 0 velocity
-        if (remainingDistance < 0) {
-            // std::cout << "ending motion" << std::endl;
-
-            currentPlatformPercent = -remainingDistance / lengths[i];
-            if (direction < 0) {
-                currentPlatformPercent = 1 - currentPlatformPercent;
-            }
-            Pair newPosition = points[i] * currentPlatformPercent +
-                               points[i + 1] * (1 - currentPlatformPercent);
-            position.x = newPosition.x;
-            position.y = newPosition.y;
-            velocity.x = 0;
-            return true;
-        }
-
-        i += direction;
-
-        // if we step off the platform, return the position of the last
-        // position on the platform with x velocity corresponding to
-        // remaining distance
-        if (i < 0 || i >= lengths.size()) {
-            // printf(
-            //     "stepping off platform %d (direction: %d, dist left:%f)\n",
-            //     i, direction, remainingDistance);
-            i -= direction;
-            velocity.x = direction * remainingDistance;
-            position.x = points[i].x;
-            position.y = points[i].y;
-            return false;
-        }
-
-        if (isWall(angles[i])) {
-            if (direction == -1) {
-                i++;
-            }
-            velocity.x = direction * remainingDistance;
-            position.x = points[i].x;
-            position.y = points[i].y;
-            return false;
-        }
+    if (direction < 0) {
+        // leftward motion
+        remainingDistance -= lengths[segment.index] * currentPlatformPercent;
+    } else {
+        // rightward motion
+        remainingDistance -=
+            lengths[segment.index] * (1 - currentPlatformPercent);
     }
+
+    // if we have stepped past distance, step back and return
+    if (remainingDistance < 0) {
+        currentPlatformPercent = -remainingDistance / lengths[segment.index];
+        if (direction < 0) {
+            currentPlatformPercent = 1 - currentPlatformPercent;
+        }
+
+        printf("remaining distance after step: %f\n", remainingDistance);
+        Pair newPosition =
+            points[segment.index] * currentPlatformPercent +
+            points[segment.index + 1] * (1 - currentPlatformPercent);
+
+        position.x = newPosition.x;
+        position.y = newPosition.y;
+        distance = 0;
+        return false;
+    }
+
+    segment.index += direction;
+
+    // we have stepped off of the platform
+    if (segment.index < 0 || segment.index >= lengths.size()) {
+        std::cout << "stepped off" << std::endl;
+        segment.index -= direction;
+        distance = direction * remainingDistance;
+        position.x = points[segment.index].x;
+        position.y = points[segment.index].y;
+        return false;
+    }
+
+    // we have walked up to a part of the platform that we can't walk past.
+    else if (isWall(angles[segment.index])) {
+        std::cout << "wall" << std::endl;
+        if (direction == -1) {
+            segment.index++;
+        }
+
+        distance = direction * remainingDistance;
+        position.x = points[segment.index].x;
+        position.y = points[segment.index].y;
+        return false;
+    }
+
+    return true;
 }
 
 bool Platform::isPassable() {
     return passable;
 }
 
+PlatformSegment Platform::getSegment(int index) {
+    return PlatformSegment(this, index);
+}
+
 void Platform::init(){};
 void Platform::preUpdate(){};
 void Platform::update(){};
 void Platform::postUpdate(){};
-
-PlatformSegment::PlatformSegment(Platform* p, int index)
-    : platform(p), index(index) {}
-
-PlatformSegment::PlatformSegment() : platform(NULL), index(0) {}
-
-Pair* PlatformSegment::firstPoint() {
-    return &(platform->points[index]);
-}
-
-Pair* PlatformSegment::secondPoint() {
-    return &(platform->points[index + 1]);
-}
-
-Pair PlatformSegment::slope() {
-    Pair first = *firstPoint();
-    Pair second = *secondPoint();
-    Pair p = (first - second);
-    return p / p.euclid();
-}
-
-Platform* PlatformSegment::getPlatform() {
-    return platform;
-}

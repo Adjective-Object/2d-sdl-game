@@ -2,197 +2,202 @@
 #include "gtest/gtest.h"
 #include "engine/pair.hpp"
 #include "terrain/platform.hpp"
+#include "terrain/platformsegment.hpp"
 
-TEST(Platform, GroundedMovement_NoMovement) {
+TEST(Platform, stepAlongSegment_NoMovement) {
     // flat surface with no movement
     Platform p = Platform({Pair(0, 0), Pair(1, 0)});
-    Pair pos = Pair(0, 0), vel = Pair(0, 0);
-    p.groundedMovement(pos, vel);
+    Pair pos = Pair(0, 0);
+    double distance = 0;
+    PlatformSegment segment = PlatformSegment(&p, 0);
+
+    p.stepAlongSegment(segment, pos, distance);
     EXPECT_EQ(Pair(0, 0), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
+    EXPECT_EQ(0, distance);
 }
 
-TEST(Platform, GroundedMovement_SingleSegmentMovement) {
-    // flat surface with minimal movement
-    Platform p = Platform({Pair(0.0, 0), Pair(1, 0)});
-    Pair pos = Pair(0.3, 0), vel = Pair(0.1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_SingleSegmentMovement) {
+//     // flat surface with minimal movement
+//     Platform p = Platform({Pair(0.0, 0), Pair(1, 0)});
+//     Pair pos = Pair(0.3, 0), vel = Pair(0.1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.4, 0), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(0.4, 0), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_SingleSegmentMovement_Left) {
-    Platform p = Platform({Pair(0.0, 0), Pair(1, 0)});
-    Pair pos = Pair(0.3, 0), vel = Pair(-0.1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_SingleSegmentMovement_Left) {
+//     Platform p = Platform({Pair(0.0, 0), Pair(1, 0)});
+//     Pair pos = Pair(0.3, 0), vel = Pair(-0.1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.2, 0), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(0.2, 0), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_MultiSegmentMovement) {
-    // flat surface with rightward movement accrss multiple surfaces
-    Platform p = Platform({Pair(0, 0), Pair(1, 0), Pair(2, 0)});
-    Pair pos = Pair(0, 0), vel = Pair(1.1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_MultiSegmentMovement) {
+//     // flat surface with rightward movement accrss multiple surfaces
+//     Platform p = Platform({Pair(0, 0), Pair(1, 0), Pair(2, 0)});
+//     Pair pos = Pair(0, 0), vel = Pair(1.1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1.1, 0), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(1.1, 0), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_DiagonalMovement) {
-    // diagonal surface with rightward movement
-    Platform p = Platform({
-        Pair(0, 0), Pair(8, 6),
-    });
-    Pair pos = Pair(0, 0), vel = Pair(5, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_DiagonalMovement) {
+//     // diagonal surface with rightward movement
+//     Platform p = Platform({
+//         Pair(0, 0), Pair(8, 6),
+//     });
+//     Pair pos = Pair(0, 0), vel = Pair(5, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(4, 3), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(4, 3), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_DiagonalMultiSegmentMovement) {
-    // segmented diagonal surface with rightward movement
-    Platform p = Platform({
-        Pair(0, 0), Pair(8, 6), Pair(10, 6),
-    });
-    Pair pos = Pair(0, 0), vel = Pair(11, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_DiagonalMultiSegmentMovement) {
+//     // segmented diagonal surface with rightward movement
+//     Platform p = Platform({
+//         Pair(0, 0), Pair(8, 6), Pair(10, 6),
+//     });
+//     Pair pos = Pair(0, 0), vel = Pair(11, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(9, 6), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(9, 6), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_Walkoff) {
-    // flat surface with walkoff
-    Platform p = Platform({
-        Pair(0, 0), Pair(1, 0),
-    });
-    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_Walkoff) {
+//     // flat surface with walkoff
+//     Platform p = Platform({
+//         Pair(0, 0), Pair(1, 0),
+//     });
+//     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1, 0), pos);
-    EXPECT_EQ(Pair(0.5, 0), vel);
+//     EXPECT_EQ(Pair(1, 0), pos);
+//     EXPECT_EQ(Pair(0.5, 0), vel);
 
-    pos = Pair(0.5, 0);
-    vel = Pair(-1, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(0.5, 0);
+//     vel = Pair(-1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0, 0), pos);
-    EXPECT_EQ(Pair(-0.5, 0), vel);
-}
+//     EXPECT_EQ(Pair(0, 0), pos);
+//     EXPECT_EQ(Pair(-0.5, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_Walkoff_Wall) {
-    // flat surface with walkoff
-    Platform p = Platform({
-        Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3),
-    });
-    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_Walkoff_Wall) {
+//     // flat surface with walkoff
+//     Platform p = Platform({
+//         Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3),
+//     });
+//     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1, 0), pos);
-    EXPECT_EQ(Pair(0.5, 0), vel);
+//     EXPECT_EQ(Pair(1, 0), pos);
+//     EXPECT_EQ(Pair(0.5, 0), vel);
 
-    pos = Pair(0.5, 0);
-    vel = Pair(-1, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(0.5, 0);
+//     vel = Pair(-1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0, 0), pos);
-    EXPECT_EQ(Pair(-0.5, 0), vel);
-}
+//     EXPECT_EQ(Pair(0, 0), pos);
+//     EXPECT_EQ(Pair(-0.5, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_Walkoff_Wall_Platform) {
-    // flat surface with walkoff
-    //
-    //     ____
-    //  __|    |__
-    //
-    Platform p = Platform({
-        Pair(-1, 3), Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3), Pair(2, 3),
-    });
-    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_Walkoff_Wall_Platform) {
+//     // flat surface with walkoff
+//     //
+//     //     ____
+//     //  __|    |__
+//     //
+//     Platform p = Platform({
+//         Pair(-1, 3), Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3), Pair(2,
+//         3),
+//     });
+//     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1, 0), pos);
-    EXPECT_EQ(Pair(0.5, 0), vel);
+//     EXPECT_EQ(Pair(1, 0), pos);
+//     EXPECT_EQ(Pair(0.5, 0), vel);
 
-    pos = Pair(0.5, 0);
-    vel = Pair(-1, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(0.5, 0);
+//     vel = Pair(-1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0, 0), pos);
-    EXPECT_EQ(Pair(-0.5, 0), vel);
-}
+//     EXPECT_EQ(Pair(0, 0), pos);
+//     EXPECT_EQ(Pair(-0.5, 0), vel);
+// }
 
-TEST(Platform, GroundedMovmeent_Flat_ConvolutedSurface) {
-    // flat surface with walkoff
-    //
-    //     _______
-    //   __\     /__
-    //
-    Platform p = Platform({
-        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
-        Pair(2, 1),
-    });
-    Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovmeent_Flat_ConvolutedSurface) {
+//     // flat surface with walkoff
+//     //
+//     //     _______
+//     //   __\     /__
+//     //
+//     Platform p = Platform({
+//         Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+//         Pair(2, 1),
+//     });
+//     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1, 0), pos);
-    EXPECT_EQ(Pair(0.5, 0), vel);
+//     EXPECT_EQ(Pair(1, 0), pos);
+//     EXPECT_EQ(Pair(0.5, 0), vel);
 
-    pos = Pair(0.5, 0);
-    vel = Pair(-1, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(0.5, 0);
+//     vel = Pair(-1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0, 0), pos);
-    EXPECT_EQ(Pair(-0.5, 0), vel);
-}
+//     EXPECT_EQ(Pair(0, 0), pos);
+//     EXPECT_EQ(Pair(-0.5, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_WalkIntoConvolutedSurface) {
-    //
-    //     _______
-    //   __\     /__
-    //
-    Platform p = Platform({
-        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
-        Pair(2, 1),
-    });
-    Pair pos = Pair(-0.5, 1), vel = Pair(1, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_WalkIntoConvolutedSurface) {
+//     //
+//     //     _______
+//     //   __\     /__
+//     //
+//     Platform p = Platform({
+//         Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+//         Pair(2, 1),
+//     });
+//     Pair pos = Pair(-0.5, 1), vel = Pair(1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.25, 1), pos);
-    EXPECT_EQ(Pair(0.25, 0), vel);
+//     EXPECT_EQ(Pair(0.25, 1), pos);
+//     EXPECT_EQ(Pair(0.25, 0), vel);
 
-    pos = Pair(1.5, 1);
-    vel = Pair(-1, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(1.5, 1);
+//     vel = Pair(-1, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.75, 1), pos);
-    EXPECT_EQ(Pair(-0.25, 0), vel);
-}
+//     EXPECT_EQ(Pair(0.75, 1), pos);
+//     EXPECT_EQ(Pair(-0.25, 0), vel);
+// }
 
-TEST(Platform, GroundedMovement_WalkFromExactEndOfSurface) {
-    //
-    //   _______
-    //
-    Platform p = Platform({
-        Pair(1, 1), Pair(3, 1),
-    });
-    Pair pos = Pair(1, 1), vel = Pair(0, 0);
-    p.groundedMovement(pos, vel);
+// TEST(Platform, GroundedMovement_WalkFromExactEndOfSurface) {
+//     //
+//     //   _______
+//     //
+//     Platform p = Platform({
+//         Pair(1, 1), Pair(3, 1),
+//     });
+//     Pair pos = Pair(1, 1), vel = Pair(0, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(1, 1), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
+//     EXPECT_EQ(Pair(1, 1), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
 
-    pos = Pair(3, 1);
-    vel = Pair(0, 0);
-    p.groundedMovement(pos, vel);
+//     pos = Pair(3, 1);
+//     vel = Pair(0, 0);
+//     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(3, 1), pos);
-    EXPECT_EQ(Pair(0, 0), vel);
-}
+//     EXPECT_EQ(Pair(3, 1), pos);
+//     EXPECT_EQ(Pair(0, 0), vel);
+// }
 
 TEST(Platform, isWall) {
     EXPECT_FALSE(Platform::isWall(0));

@@ -2,6 +2,7 @@
 #include "util.hpp"
 #include "constants.hpp"
 #include <iostream>
+#include "engine/game.hpp"
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
@@ -20,6 +21,7 @@ bool Map::getClosestCollision(Pair const& start,
 
         double distance = (collisionPoint - start).euclid();
         if (t != NO_COLLISION && distance < closestDist) {
+            closestDist = distance;
             out.type = t;
             out.segment = segment;
             out.position = collisionPoint;
@@ -68,7 +70,7 @@ bool Map::getClosestEcbCollision(Ecb const& start,
     return anyCollision;
 }
 
-void Map::updateCollision(Player& player) {
+void Map::updateCollision(Player& player, Pair& requestedDistance) {
     // grab ledges
     if (player.canGrabLedge()) {
         for (Ledge& l : ledges) {
@@ -78,92 +80,124 @@ void Map::updateCollision(Player& player) {
                 std::abs(diff.x) < LEDGEBOX_WIDTH &&
                 diff.y > -LEDGEBOX_HEIGHT && diff.y < 0) {
                 player.grabLedge(&l);
-                break;
+                return;
             }
         }
     }
 
-    Ecb currentEcb = player.previousCollision->playerModified;
-    Ecb predictedEcb = player.currentCollision->playerModified;
+    PlatformSegment segment;
+    bool continueWalking = player.isGrounded();
+    if (continueWalking) {
+        player.getCurrentPlatform()->findSegment(player.position, segment);
+    }
 
-    while (currentEcb.origin != predictedEcb.origin) {
-        // perform motion
-        if (player.isGrounded()) {
-            Pair stepVel = cVel * EnG->elapsed;
-            bool walkedOff =
-                !currentPlatform->groundedMovement(position, stepVel);
-            if (walkedOff && action->canWalkOff(*this)) {
-                currentPlatform = NULL;
-                changeAction(FALL);
-                times_jumped = 1;
-            }
-            velocity = kVel + stepVel / EnG->elapsed;
+    Ecb* currentEcb = &(player.previousCollision->postCollision);
+    Ecb* predictedEcb = &(player.currentCollision->postCollision);
+
+    Pair remainingDistance = requestedDistance;
+
+    while (remainingDistance != Pair(0, 0)) {
+        std::cout << "stepping motion.. " << remainingDistance << std::endl;
+
+        // perform motion based on if the player is grounded
+        if (continueWalking) {
+            std::cout << "walking" << std::endl;
+
+            // TODO we shouldn't do any of these transitions here,
+            // instead this should be deferred until after collision is resolved
+            Pair groundPosition = currentEcb->bottom;
+            double distance = remainingDistance.x;
+            continueWalking = segment.getPlatform()->stepAlongSegment(
+                segment, groundPosition, distance);
+
+            predictedEcb->setBottom(groundPosition);
+        } else {
+            std::cout << "not walking" << std::endl;
+            predictedEcb->setOrigin(currentEcb->origin + remainingDistance);
         }
 
         CollisionDatum collision;
-
-        if (!getClosestCollision(currentEcb.right, predictedEcb.right,
+        if (!getClosestCollision(currentEcb->bottom, predictedEcb->bottom,
                                  collision)) {
-            break;
-        }
+            std::cout << "no collision. "
+                      << (predictedEcb->origin - currentEcb->origin)
+                      << std::endl;
+            std::cout << "remaining " << remainingDistance << std::endl;
 
-        std::cout << collision.type << std::endl;
+            remainingDistance -= (predictedEcb->origin - currentEcb->origin);
+            currentEcb = predictedEcb;
+            continue;
+        }
+        std::cout << "collision of type " << collision.type << std::endl;
 
         if (collision.type == FLOOR_COLLISION) {
+            std::cout << "landing " << std::endl;
+            printf("predicted ecb is @ %p\n", predictedEcb);
+
             player.land(collision.segment.getPlatform(), collision.position);
+            predictedEcb->setBottom(collision.position);
             break;
         }
 
-        // walls clamp the x. We move the current Ecb to either the
-        // end of the wall or the y position on the wall of the predicted
-        // ecb
-        else if (collision.type == WALL_COLLISION) {
-            // moving down
-            double destination_y;
+        // // walls clamp the x. We move the current Ecb to either the
+        // // end of the wall or the y position on the wall of the predicted
+        // // ecb
+        // else if (collision.type == WALL_COLLISION) {
+        //     // moving down
+        //     double destination_y;
 
-            // move either to the end of the platform or the
-            // destination y
-            if (currentEcb.origin.y < predictedEcb.origin.y) {
-                std::cout << "move down" << std::endl;
-                destination_y =
-                    std::min(std::min(predictedEcb.origin.y,
-                                      collision.segment.firstPoint()->y),
-                             collision.segment.secondPoint()->y);
-            } else {
-                std::cout << "move up" << std::endl;
-                destination_y =
-                    std::max(std::max(predictedEcb.origin.y,
-                                      collision.segment.firstPoint()->y),
-                             collision.segment.secondPoint()->y);
-            }
+        //     // move either to the end of the platform or the
+        //     // destination y
+        //     if (currentEcb.origin.y < predictedEcb.origin.y) {
+        //         std::cout << "move down" << std::endl;
+        //         destination_y =
+        //             std::min(std::min(predictedEcb.origin.y,
+        //                               collision.segment.firstPoint()->y),
+        //                      collision.segment.secondPoint()->y);
+        //     } else {
+        //         std::cout << "move up" << std::endl;
+        //         destination_y =
+        //             std::max(std::max(predictedEcb.origin.y,
+        //                               collision.segment.firstPoint()->y),
+        //                      collision.segment.secondPoint()->y);
+        //     }
 
-            // get the old slope
-            double yDiff = (destination_y - currentEcb.origin.y);
-            double oldSlope = (predictedEcb.origin.x - currentEcb.origin.x) /
-                              (predictedEcb.origin.y - currentEcb.origin.y);
-            double oldPredictedX = predictedEcb.origin.x + yDiff * oldSlope;
+        //     // get the old slope
+        //     double yDiff = (destination_y - currentEcb.origin.y);
+        //     double oldSlope = (predictedEcb.origin.x - currentEcb.origin.x) /
+        //                       (predictedEcb.origin.y - currentEcb.origin.y);
+        //     double oldPredictedX = predictedEcb.origin.x + yDiff * oldSlope;
 
-            // move either to the end of the platform or the
-            // destination y
-            Pair destinationPoint =
-                currentEcb.origin + collision.segment.slope() * yDiff;
-            currentEcb.setOrigin(destinationPoint +
-                                 Pair(-currentEcb.widthRight, 0));
+        //     // move either to the end of the platform or the
+        //     // destination y
+        //     Pair destinationPoint =
+        //         currentEcb.origin + collision.segment.slope() * yDiff;
+        //     currentEcb.setOrigin(destinationPoint +
+        //                          Pair(-currentEcb.widthRight, 0));
 
-            // update the predictedEcb's x position
-            Pair updatedOrigin = predictedEcb.origin +
-                                 Pair(oldPredictedX - destinationPoint.x, 0);
-            predictedEcb.setOrigin(updatedOrigin);
+        //     // update the predictedEcb's x position
+        //     Pair updatedOrigin = predictedEcb.origin +
+        //                          Pair(oldPredictedX - destinationPoint.x, 0);
+        //     predictedEcb.setOrigin(updatedOrigin);
 
-        }
+        // }
 
         // ceilings clamp the y. We move the current Ecb to either the
         // end of the wall or the y position on the wall of the predicted
         // ecb
-        else if (collision.type == CEIL_COLLISION) {
-            // todo
+        // else if (collision.type == CEIL_COLLISION) {
+        //     // todo
+        // }
+
+        else {
+            std::cout << "unhandled collision" << std::endl;
+            break;
         }
-    }
+    };
+
+    // update player to moved ecb?
+    printf("______ updating location ________\n");
+    player.position = currentEcb->origin - PLAYER_ECB_OFFSET;
 }
 
 void Map::render(SDL_Renderer* r) {
@@ -174,4 +208,8 @@ void Map::render(SDL_Renderer* r) {
     for (Ledge& l : ledges) {
         l.render(r);
     }
+}
+
+Platform * Map::getPlatform(size_t index) {
+    return &(platforms[index]);
 }

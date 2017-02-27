@@ -93,7 +93,8 @@ void MainScene::init() {
 void MainScene::update() {
     // update player positions
     Scene::update();
-    map->updateCollision(*player);
+    Pair playerMotion = player->velocity * EnG->elapsed;
+    map->updateCollision(*player, playerMotion);
 
     // update action label when the player's action state updates
     ActionState newState = player->getActionState();

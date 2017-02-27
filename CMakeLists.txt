@@ -42,6 +42,8 @@ set(LIB_SRCS
     src/player/playercollision.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
+    src/terrain/platformsegment.hpp
+    src/terrain/platformsegment.cpp
     src/terrain/map.hpp
     src/terrain/map.cpp
     src/terrain/ledge.hpp

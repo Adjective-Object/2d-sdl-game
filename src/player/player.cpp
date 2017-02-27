@@ -12,8 +12,8 @@ Player::Player(std::string fpath, double x, double y)
     action = ACTIONS[FALL];
     position.x = x;
     position.y = y;
-    previousCollision->reset(position + Pair(0, -0.2));
-    currentCollision->reset(position + Pair(0, -0.2));
+    previousCollision->reset(position + PLAYER_ECB_OFFSET);
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
 }
 
 Player::~Player() {}
@@ -27,7 +27,7 @@ void Player::init() {
 
 void Player::moveTo(Pair newPos) {
     position = newPos;
-    currentCollision->reset(position + Pair(0, -0.2));
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
 }
 
 void Player::update() {
@@ -46,6 +46,7 @@ void Player::update() {
         position.y = 0.6;
         currentPlatform = NULL;
         changeAction(FALL);
+        currentCollision->reset(position + PLAYER_ECB_OFFSET);
     }
 
     // swap previous and current collision, reset the new current collision
@@ -53,7 +54,7 @@ void Player::update() {
     previousCollision = currentCollision;
     currentCollision = tmp;
     // this should be from animation data
-    currentCollision->reset(position + Pair(0, -0.2));
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
 
     // if we are currently grounded, adapt the x of cVel to
     // move along the platform
@@ -68,13 +69,14 @@ void Player::update() {
     velocity = cVel + kVel;
 
     if (action->isGrounded(*this)) {
-        currentCollision->playerModified.bottom = position;
-        currentCollision->postCollision.bottom = position;
+        currentCollision->playerModified.heightBottom = -PLAYER_ECB_OFFSET.y;
+        currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
     } else if (ecbFixedCounter > 0) {
         ecbFixedCounter--;
-        Pair newPos = position + ecbBottomFixedPosition;
-        currentCollision->playerModified.bottom = newPos;
-        currentCollision->postCollision.bottom = newPos;
+        currentCollision->playerModified.heightBottom =
+            -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
+        currentCollision->postCollision.heightBottom =
+            -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
     }
 }
 
@@ -133,7 +135,8 @@ void Player::land(Platform* p, Pair const& landPosition) {
     currentPlatform = p;
     printf("landing on %p\n", p);
 
-    currentCollision->postCollision.bottom = position;
+    printf("current->postColl %p\n", &(currentCollision->postCollision));
+    currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 
     switch (action->getLandType(*this)) {
         case NORMAL:
@@ -238,9 +241,9 @@ void Player::changeAction(ActionState state) {
     actionState = state;
 }
 
-void Player::fixEcbBottom(int frames, Pair position) {
+void Player::fixEcbBottom(int frames, double size) {
     ecbFixedCounter = frames;
-    ecbBottomFixedPosition = position;
+    ecbBottomFixedSize = size;
 }
 
 ActionState Player::getActionState() {
@@ -251,10 +254,19 @@ Action* Player::getAction() {
     return action;
 }
 
+bool Player::isGrounded() {
+    return action->isGrounded(*this);
+}
+
 double Player::getXInput(int frames) {
     return joystick->axis(frames) * face;
 }
 
 Platform* Player::getCurrentPlatform() {
     return currentPlatform;
+}
+
+void Player::setPosition(Pair newPosition) {
+    position = newPosition;
+    currentCollision->postCollision.setOrigin(position + PLAYER_ECB_OFFSET);
 }

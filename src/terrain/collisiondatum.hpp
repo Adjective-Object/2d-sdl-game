@@ -1,6 +1,8 @@
 #ifndef __GAME_COLLISIONDATUM
 #define __GAME_COLLISIONDATUM
 
+#include "./platformsegment.hpp"
+
 class CollisionDatum {
 public:
     TerrainCollisionType type;

@@ -3,7 +3,6 @@
 #include "util.hpp"
 
 TEST(Util, checkLineIntersection_Basic) {
-    // flat surface with walkoff
     Pair a1 = Pair(-1, 1), a2 = Pair(2, 1);
     Pair b1 = Pair(1, 0), b2 = Pair(1, 2);
 
@@ -15,6 +14,20 @@ TEST(Util, checkLineIntersection_Basic) {
     EXPECT_EQ(checkLineIntersection(a1, a2, b2, b1, out), -1);
     EXPECT_EQ(Pair(1, 1), out);
 }
+
+TEST(Util, checkLineIntersection_Basic_2) {
+    Pair a1 = Pair(1, 5), a2 = Pair(1, -5);
+    Pair b1 = Pair(0, 0), b2 = Pair(4, 0);
+
+    Pair out = Pair(0, 0);
+
+    EXPECT_EQ(checkLineIntersection(a1, a2, b1, b2, out), 1);
+    EXPECT_EQ(Pair(1, 0), out);
+
+    EXPECT_EQ(checkLineIntersection(a1, a2, b2, b1, out), -1);
+    EXPECT_EQ(Pair(1, 0), out);
+}
+
 
 TEST(Util, checkLineSweep_Horizontal) {
     //
@@ -165,14 +178,14 @@ TEST(Util, checkLineSweep_Horizontal_Reversed_Hit_3) {
 }
 
 TEST(Util, checkLineSweep_Cross) {
-    //
-    //  a1      b2
-    //   \  .c  /
-    //    \    /
-    //     \  /
-    //      \/
-    //      /\
-    //
+    /*
+      a1      b2
+       \  .c  /
+        \    /
+         \  /
+          \/
+          /\
+    */
 
     Pair a1 = Pair(0, 0), a2 = Pair(10, 10);
     Pair b1 = Pair(10, 0), b2 = Pair(0, 10);

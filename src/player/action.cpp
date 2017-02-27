@@ -297,7 +297,7 @@ void startGroundedJump(Player& p, bool isShort) {
     p.cVel.y -= p.config.getAttribute(isShort ? "shorthop_v_initial_velocity"
                                               : "jump_v_initial_velocity");
 
-    p.fixEcbBottom(10, Pair(0, 0));
+    p.fixEcbBottom(10, 0);
 
     double maxJumpVel = p.config.getAttribute("jump_h_max_velocity");
 
@@ -359,7 +359,7 @@ class JumpF : public Action {
 };
 
 void startDoubleJump(Player& p) {
-    p.fixEcbBottom(10, Pair(0, -0.1));
+    p.fixEcbBottom(10, -0.1);
 
     p.cVel.y = -p.config.getAttribute("jump_v_initial_velocity") *
                p.config.getAttribute("air_jump_multiplier");
@@ -634,7 +634,7 @@ class Pass : public Action {
         if (p.timer < 0)
             return;
         if (p.timer == 0) {
-            p.fixEcbBottom(10, Pair(0, 0));
+            p.fixEcbBottom(10, 0);
         }
         if (interrupt(p))
             return;
@@ -728,7 +728,7 @@ class CliffCatch : public Action {
         // character offset
         Pair target = l->position + Pair(-0.08 * p.face, 0.38);
 
-        p.position = target;
+        p.setPosition(target);
         p.cVel = Pair(0, 0);
     }
 
