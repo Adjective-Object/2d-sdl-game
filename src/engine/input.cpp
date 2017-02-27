@@ -30,7 +30,8 @@ void Input::init() {
                       << SDL_GetError() << std::endl;
             joysticks[i] = nullptr;
         } else {
-            joysticks[i] = new Joystick(gGameController);
+            joysticks[i] = new Joystick(SDL_JoystickNumButtons(gGameController),
+                                        SDL_JoystickNumAxes(gGameController));
         }
     }
 }
@@ -61,21 +62,24 @@ void Input::processEvent(SDL_Event* evt) {
 }
 
 Joystick* Input::getJoystick(unsigned int joystickId) {
+    if (joystickId >= this->num_joysticks) {
+        return NULL;
+    }
     return this->joysticks[joystickId];
 }
 
-Joystick::Joystick(SDL_Joystick* controller, int historySize) {
-    this->controller = controller;
+Joystick::Joystick(int numButtons, int numAxies, int historySize) {
     this->historySize = historySize;
 
+    num_axies = numAxies;
+
     // find out num buttons
-    if (SDL_JoystickNumButtons(controller) > 64) {
+    if (numButtons > 64) {
         std::cout << "Warning: no support for controllers with >64 buttons"
                   << std::endl;
     }
 
     // find out num axies
-    num_axies = SDL_JoystickNumAxes(controller);
     if (num_axies > 64) {
         std::cout << "Warning: no support for controllers with >64 axies"
                   << std::endl;

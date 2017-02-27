@@ -1,9 +1,6 @@
 #include "ecb.hpp"
 #include "engine/pair.hpp"
 
-#define ECB_DEFAULT_WIDTH 0.06
-#define ECB_DEFAULT_HEIGHT 0.1
-
 #define _left(length) left(origin + Pair(-length, 0))
 #define _right(length) right(origin + Pair(+length, 0))
 #define _top(length) top(origin + Pair(0, -length))
@@ -55,4 +52,20 @@ void Ecb::render(SDL_Renderer* ren, double SCALE) {
 
     SDL_RenderDrawLine(ren, (int)(SCALE * right.x), (int)(SCALE * right.y),
                        (int)(SCALE * bottom.x), (int)(SCALE * bottom.y));
+}
+
+void Ecb::setRight(Pair r) {
+    setOrigin(Pair(r.x - widthRight, r.y));
+}
+
+void Ecb::setLeft(Pair l) {
+    setOrigin(Pair(l.x + widthLeft, l.y));
+}
+
+void Ecb::setBottom(Pair b) {
+    setOrigin(Pair(b.x, b.y - heightBottom));
+}
+
+void Ecb::setTop(Pair t) {
+    setOrigin(Pair(t.x, t.y + heightTop));
 }

@@ -1,8 +1,4 @@
 #include "gtest/gtest.h"
-#include "./platform.cpp"
-#include "./player.cpp"
-#include "./util.cpp"
-#include "./ecb.cpp"
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

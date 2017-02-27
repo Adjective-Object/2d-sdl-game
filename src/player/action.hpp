@@ -4,9 +4,9 @@ class Player;
 class Platform;
 
 typedef enum LandType {
-    NORMAL,
-    KNOCKDOWN,
-    SPECIAL,
+    NORMAL_LANDING,
+    KNOCKDOWN_LANDING,
+    SPECIAL_LANDING,
 } LandType;
 
 typedef enum JumpType {

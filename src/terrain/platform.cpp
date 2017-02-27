@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "engine/pair.hpp"
 #include "platform.hpp"
+#include "platformsegment.hpp"
 #include "constants.hpp"
 #include "util.hpp"
 #include "./collisiontype.hpp"
@@ -46,9 +47,10 @@ bool Platform::isWall(double angle) {
 }
 
 #define PLATFORM_LAND_EPSILON 0.000001
-TerrainCollisionType Platform::checkCollision(Pair& previous,
-                                              Pair& next,
-                                              Pair& out) {
+TerrainCollisionType Platform::checkCollision(Pair const& previous,
+                                              Pair const& next,
+                                              Pair& out,
+                                              PlatformSegment& segment) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -63,6 +65,7 @@ TerrainCollisionType Platform::checkCollision(Pair& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
+            segment = PlatformSegment(this, i);
             return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
@@ -95,7 +98,6 @@ void Platform::render(SDL_Renderer* r) {
             (int)(q2.x * PLAYER_SCALE), (int)(q2.y * PLAYER_SCALE));
     }
 }
-
 bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     Pair wsRelPos = position - points[0];
     if (wsRelPos.x < 0) {
@@ -199,6 +201,10 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
 
 bool Platform::isPassable() {
     return passable;
+}
+
+PlatformSegment Platform::getSegment(int index) {
+    return PlatformSegment(this, index);
 }
 
 void Platform::init(){};

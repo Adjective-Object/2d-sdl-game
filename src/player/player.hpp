@@ -10,6 +10,7 @@
 #include "animationbank.hpp"
 #include "playerconfig.hpp"
 #include "playercollision.hpp"
+#include "inputhandler.hpp"
 
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
@@ -24,12 +25,12 @@ class Player : public Sprite {
     PlayerCollision* previousCollision = new PlayerCollision();
     PlayerCollision* currentCollision = new PlayerCollision();
 
-    Joystick* joystick;
-    PlayerConfig config;
+    InputMapping::InputHandler* input;
+    PlayerConfig* config;
 
     int ecbFixedCounter = 0;
     int ledgeRegrabCounter = 0;
-    Pair ecbBottomFixedPosition = Pair(0, 0);
+    double ecbBottomFixedSize = 0;
 
     Pair cVel = Pair(0, 0);
     Pair kVel = Pair(0, 0);
@@ -53,20 +54,29 @@ class Player : public Sprite {
 
     void fall(bool fast = false);
     void aerialDrift();
-    bool canGrabLedge();
     void grabLedge(Ledge* l);
     void land(Platform* p, Pair const& y);
-    void fixEcbBottom(int frames, Pair position);
+    void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
 
-    Player(std::string attributeFile, double x, double y);
+    Player(PlayerConfig* config,
+           InputMapping::InputHandler* input,
+           AnimationBank* animationBank,
+           Pair initialPosition);
     ~Player();
+
+    bool canGrabLedge();
+    bool isGrounded();
+    bool canFallOff();
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);
     Platform* getCurrentPlatform();
     ActionState getActionState();
     Action* getAction();
+
+    void setPosition(Pair newPosition);
+    double getAttribute(char const* name);
 };
 
 #endif

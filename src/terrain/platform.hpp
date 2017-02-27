@@ -5,9 +5,12 @@
 #include <vector>
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
+#include "./platformsegment.hpp"
 #include "./collisiontype.hpp"
+#include "./collisiondatum.hpp"
 
 class Platform : public Entity {
+    friend class PlatformSegment;
     std::vector<Pair> points;
     std::vector<double> angles;
     std::vector<double> lengths;
@@ -21,8 +24,12 @@ class Platform : public Entity {
                                         double platformAngle,
                                         Pair& otherPair);
 
-    TerrainCollisionType checkCollision(Pair& previous, Pair& next, Pair& out);
-    bool groundedMovement(Pair& position, Pair& velocity);
+    TerrainCollisionType checkCollision(Pair const& previous,
+                                        Pair const& next,
+                                        Pair& out,
+                                        PlatformSegment& segment);
+
+    bool groundedMovement(Pair& position, Pair& distance);
 
     void init();
     void preUpdate();
@@ -30,6 +37,8 @@ class Platform : public Entity {
     void postUpdate();
     void render(SDL_Renderer* r);
     bool isPassable();
+    PlatformSegment getSegment(int index);
+
     static bool isWall(double angle);
 };
 

@@ -4,6 +4,7 @@
 typedef enum TerrainCollisionType {
     NO_COLLISION,
     FLOOR_COLLISION,
+    CEIL_COLLISION,
     WALL_COLLISION,
 } TerrainCollisionType;
 

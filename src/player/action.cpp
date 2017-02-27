@@ -3,17 +3,20 @@
 #include "util.hpp"
 #include "terrain/ledge.hpp"
 #include "./player.hpp"
+#include "inputhandler.hpp"
 
-JumpType checkJumpInput(Joystick& j) {
-    if (j.down(1) || j.down(2))
+using namespace InputMapping;
+
+JumpType checkJumpInput(InputHandler& i) {
+    if (i.down(JUMP))
         return JUMP_BUTTON;
-    if (j.axis(1) < -0.66 && j.axis(1, 1) > -0.2)
+    if (i.axis(MOVEMENT_AXIS_Y) < -0.66 && i.axis(MOVEMENT_AXIS_Y, 1) > -0.2)
         return JUMP_STICK;
     return NO_JUMP;
 }
 
 bool interruptWithJump(Player& p) {
-    JumpType jump = checkJumpInput(*(p.joystick));
+    JumpType jump = checkJumpInput(*(p.input));
     if (jump != NO_JUMP) {
         p.jumpType = jump;
         p.changeAction(KNEEBEND);
@@ -23,11 +26,11 @@ bool interruptWithJump(Player& p) {
 }
 
 bool interruptWithDJump(Player& p) {
-    JumpType jump = checkJumpInput(*(p.joystick));
-    if (jump != NO_JUMP &&
-        p.times_jumped < p.config.getAttribute("number_of_jumps")) {
-        p.changeAction((sign(p.joystick->axis(0)) == sign(p.face)) ? JUMPAIRF
-                                                                   : JUMPAIRB);
+    JumpType jump = checkJumpInput(*(p.input));
+    if (jump != NO_JUMP && p.times_jumped < p.getAttribute("number_of_jumps")) {
+        p.changeAction((sign(p.input->axis(MOVEMENT_AXIS_X)) == sign(p.face))
+                           ? JUMPAIRF
+                           : JUMPAIRB);
         p.fastfalled = false;
         return true;
     }
@@ -35,7 +38,7 @@ bool interruptWithDJump(Player& p) {
 }
 
 bool interruptWithAirdodge(Player& p) {
-    if (p.joystick->down(4) || p.joystick->down(5)) {
+    if (p.input->down(SHIELD_BUTTON)) {
         p.changeAction(ESCAPEAIR);
         return true;
     }
@@ -45,7 +48,7 @@ bool interruptWithAirdodge(Player& p) {
 bool interruptWithDash(Player& p) {
     if (p.getXInput() > 0.79) {
         // std::cout << "initiating dash "
-        //     << p.joystick->axis(0) << " "
+        //     << p.input->axis(MOVEMENT_AXIS_X) << " "
         //     << p.face << std::endl;
 
         p.changeAction(DASH);
@@ -55,7 +58,8 @@ bool interruptWithDash(Player& p) {
 }
 
 bool interruptWithSmashTurn(Player& p) {
-    if (p.getXInput() < -0.79 && p.joystick->axis(0, 2) * p.face > -0.3) {
+    if (p.getXInput() < -0.79 &&
+        p.input->axis(MOVEMENT_AXIS_X, 2) * p.face > -0.3) {
         p.changeAction(SMASHTURN);
         return true;
     }
@@ -71,7 +75,7 @@ bool interruptWithTiltTurn(Player& p) {
 }
 
 bool interruptWithRunBrake(Player& p) {
-    if (std::abs(p.joystick->axis(0)) < 0.62) {
+    if (std::abs(p.input->axis(MOVEMENT_AXIS_X)) < 0.62) {
         p.changeAction(RUNBRAKE);
         return true;
     }
@@ -95,7 +99,7 @@ bool interruptWithWalk(Player& p) {
 }
 
 bool interruptWithWait(Player& p) {
-    if (std::abs(p.joystick->axis(0)) < 0.1) {
+    if (std::abs(p.input->axis(MOVEMENT_AXIS_X)) < 0.1) {
         p.changeAction(WAIT);
         return true;
     }
@@ -103,9 +107,11 @@ bool interruptWithWait(Player& p) {
 }
 
 bool interruptWithPass(Player& p) {
-    if ((p.joystick->axis(1) > 0.65 || p.joystick->axis(1, 1) > 0.65 ||
-         p.joystick->axis(1, 2) > 0.65) &&
-        p.joystick->axis(1, 6) < 0.3 && p.getCurrentPlatform()->isPassable()) {
+    if ((p.input->axis(MOVEMENT_AXIS_Y) > 0.65 ||
+         p.input->axis(MOVEMENT_AXIS_Y, 1) > 0.65 ||
+         p.input->axis(MOVEMENT_AXIS_Y, 2) > 0.65) &&
+        p.input->axis(MOVEMENT_AXIS_Y, 6) < 0.3 &&
+        p.getCurrentPlatform()->isPassable()) {
         p.changeAction(PASS);
         return true;
     }
@@ -113,7 +119,7 @@ bool interruptWithPass(Player& p) {
 }
 
 bool interruptWithSquat(Player& p) {
-    if (p.joystick->axis(1) > 0.69) {
+    if (p.input->axis(MOVEMENT_AXIS_Y) > 0.69) {
         p.changeAction(SQUAT);
         return true;
     }
@@ -121,7 +127,7 @@ bool interruptWithSquat(Player& p) {
 }
 
 bool interruptWithSquatRv(Player& p) {
-    if (p.joystick->axis(1) < 0.69) {
+    if (p.input->axis(MOVEMENT_AXIS_Y) < 0.69) {
         p.changeAction(SQUATRV);
         return true;
     }
@@ -129,7 +135,7 @@ bool interruptWithSquatRv(Player& p) {
 }
 
 void applyTraction(Player& p, double multiplier = 1.0) {
-    double friction = p.config.getAttribute("friction");
+    double friction = p.getAttribute("friction");
     if (p.cVel.x > 0) {
         p.cVel.x = std::max(0.0, p.cVel.x - friction * multiplier);
     } else {
@@ -138,7 +144,7 @@ void applyTraction(Player& p, double multiplier = 1.0) {
 }
 
 LandType Action::getLandType(Player&) {
-    return NORMAL;
+    return NORMAL_LANDING;
 }
 
 void Action::onLanding(Player&) {
@@ -164,8 +170,7 @@ bool Action::canGrabLedge(Player&) {
 class Walk : public Action {
     void step(Player& p) override {
         if (p.timer == 0) {
-            float walkInitialVelocity =
-                p.config.getAttribute("walk_initial_velocity");
+            float walkInitialVelocity = p.getAttribute("walk_initial_velocity");
             float initialWalk = walkInitialVelocity * p.face;
             if ((initialWalk > 0 && p.cVel.x < initialWalk) ||
                 (initialWalk < 0 && p.cVel.x > initialWalk)) {
@@ -179,10 +184,11 @@ class Walk : public Action {
         // Current Walk Acceleration = ((MaxWalkVel * Xinput) -
         // PreviousFrameVelocity) * (1/(MaxWalkVel * 2)) * (InitWalkVel *
         // WalkAcc)
-        float walkSpeedMax = p.config.getAttribute("walk_maximum_velocity");
-        float walkAcc = p.config.getAttribute("walk_acceleration");
+        float walkSpeedMax = p.getAttribute("walk_maximum_velocity");
+        float walkAcc = p.getAttribute("walk_acceleration");
 
-        float requestedWalkSpeed = walkSpeedMax * p.joystick->axis(0);
+        float requestedWalkSpeed =
+            walkSpeedMax * p.input->axis(MOVEMENT_AXIS_X);
         if (std::abs(p.cVel.x) > std::abs(requestedWalkSpeed)) {
             applyTraction(p, 2);
         } else {
@@ -273,15 +279,16 @@ class KneeBend : public Action {
             p.isShortHop = false;
         }
 
-        if (p.jumpType == JUMP_STICK && p.joystick->axis(1) > -0.67) {
+        if (p.jumpType == JUMP_STICK &&
+            p.input->axis(MOVEMENT_AXIS_Y) > -0.67) {
             p.isShortHop = true;
         } else if (p.jumpType == JUMP_BUTTON &&
-                   !(p.joystick->held(1) || p.joystick->held(2))) {
+                   !(p.input->held(JUMP) || p.input->held(JUMP))) {
             std::cout << "breaking short hopt" << std::endl;
             p.isShortHop = true;
         }
 
-        if (p.timer > p.config.getAttribute("jump_startup_lag")) {
+        if (p.timer > p.getAttribute("jump_startup_lag")) {
             if (p.getXInput() > -0.2) {
                 p.changeAction(JUMPF);
             } else {
@@ -294,15 +301,14 @@ class KneeBend : public Action {
 };
 
 void startGroundedJump(Player& p, bool isShort) {
-    p.cVel.y -= p.config.getAttribute(isShort ? "shorthop_v_initial_velocity"
-                                              : "jump_v_initial_velocity");
+    p.cVel.y -= p.getAttribute(isShort ? "shorthop_v_initial_velocity"
+                                       : "jump_v_initial_velocity");
 
-    p.fixEcbBottom(10, Pair(0, 0));
+    p.fixEcbBottom(10, 0);
 
-    double maxJumpVel = p.config.getAttribute("jump_h_max_velocity");
+    double maxJumpVel = p.getAttribute("jump_h_max_velocity");
 
-    p.cVel.x =
-        p.cVel.x * p.config.getAttribute("ground_air_jump_momentum_mult");
+    p.cVel.x = p.cVel.x * p.getAttribute("ground_air_jump_momentum_mult");
     if (std::abs(p.cVel.x) > maxJumpVel) {
         p.cVel.x = sign(p.cVel.x) * maxJumpVel;
     }
@@ -359,18 +365,17 @@ class JumpF : public Action {
 };
 
 void startDoubleJump(Player& p) {
-    p.fixEcbBottom(10, Pair(0, -0.1));
+    p.fixEcbBottom(10, -0.1);
 
-    p.cVel.y = -p.config.getAttribute("jump_v_initial_velocity") *
-               p.config.getAttribute("air_jump_multiplier");
-
-    p.cVel.x =
-        p.joystick->axis(0) * p.config.getAttribute("air_jump_h_momentum");
-
-    double maxJumpVel = p.config.getAttribute("jump_h_max_velocity");
+    p.cVel.y = -p.getAttribute("jump_v_initial_velocity") *
+               p.getAttribute("air_jump_multiplier");
 
     p.cVel.x =
-        p.cVel.x * p.config.getAttribute("ground_air_jump_momentum_mult");
+        p.input->axis(MOVEMENT_AXIS_X) * p.getAttribute("air_jump_h_momentum");
+
+    double maxJumpVel = p.getAttribute("jump_h_max_velocity");
+
+    p.cVel.x = p.cVel.x * p.getAttribute("ground_air_jump_momentum_mult");
     if (std::abs(p.cVel.x) > maxJumpVel) {
         p.cVel.x = sign(p.cVel.x) * maxJumpVel;
     }
@@ -412,7 +417,7 @@ class Turn : public Action {
         if (interrupt(p))
             return;
 
-        if (p.timer == p.config.getAttribute("turn_duration")) {
+        if (p.timer == p.getAttribute("turn_duration")) {
             std::cout << "rolling back, p.timer=" << p.timer << std::endl;
             p.changeAction(WAIT);
         }
@@ -446,8 +451,8 @@ class EscapeAir : public Action {
     }
 
     void dodgeVelocity(Player& p) {
-        double x = p.joystick->axis(0);
-        double y = p.joystick->axis(1);
+        double x = p.input->axis(MOVEMENT_AXIS_X);
+        double y = p.input->axis(MOVEMENT_AXIS_Y);
 
         if (std::abs(x) > 0.3 || std::abs(y) > 0.3) {
             double ang = atan2(y, x);
@@ -470,22 +475,22 @@ class Dash : public Action {
     void step(Player& p) override {
         if (interrupt(p))
             return;
-        double dMaxV = p.config.getAttribute("run_max_velocity");
-        double dAccA = p.config.getAttribute("stopturn_initial_velocity");
+        double dMaxV = p.getAttribute("run_max_velocity");
+        double dAccA = p.getAttribute("stopturn_initial_velocity");
 
         if (p.timer == 1) {
-            p.cVel.x += p.face * p.config.getAttribute("dash_initial_velocity");
+            p.cVel.x += p.face * p.getAttribute("dash_initial_velocity");
             if (std::abs(p.cVel.x) > std::abs(dMaxV)) {
                 p.cVel.x = dMaxV * p.face;
             }
         }
 
         if (p.timer > 0) {
-            if (std::abs(p.joystick->axis(0)) < 0.3) {
+            if (std::abs(p.input->axis(MOVEMENT_AXIS_X)) < 0.3) {
                 applyTraction(p);
             } else {
-                double tempMax = p.joystick->axis(0) * dMaxV;
-                double tempAcc = p.joystick->axis(0) * dAccA;
+                double tempMax = p.input->axis(MOVEMENT_AXIS_X) * dMaxV;
+                double tempAcc = p.input->axis(MOVEMENT_AXIS_X) * dAccA;
 
                 p.cVel.x += tempAcc;
                 // if the player is moving too fast, slow them down
@@ -536,10 +541,10 @@ class Run : public Action {
         if (interrupt(p))
             return;
         // TODO RUNBRAKE and RUNTURN
-        double rMaxV = p.config.getAttribute("run_max_velocity");
-        double rAccA = p.config.getAttribute("stopturn_initial_velocity");
-        double rAccB = p.config.getAttribute("walk_acceleration");
-        double xInput = p.joystick->axis(0);
+        double rMaxV = p.getAttribute("run_max_velocity");
+        double rAccA = p.getAttribute("stopturn_initial_velocity");
+        double rAccB = p.getAttribute("walk_acceleration");
+        double xInput = p.input->axis(MOVEMENT_AXIS_X);
 
         double tempMax = xInput * rMaxV;
 
@@ -588,18 +593,20 @@ class RunTurn : public Action {
         }
 
         // behavior in turn
-        int breakPoint = p.config.getAttribute("runturn_break_point");
+        int breakPoint = p.getAttribute("runturn_break_point");
         if (p.timer == breakPoint) {
             p.face *= -1;
         }
 
         if (p.timer < breakPoint && p.getXInput() < -0.3) {
-            double dAccA = p.config.getAttribute("stopturn_initial_velocity");
-            double tempAcc = p.face * dAccA * std::abs(p.joystick->axis(0));
+            double dAccA = p.getAttribute("stopturn_initial_velocity");
+            double tempAcc =
+                p.face * dAccA * std::abs(p.input->axis(MOVEMENT_AXIS_X));
             p.cVel.x -= tempAcc;
         } else if (p.timer >= breakPoint && p.getXInput() < 0.3) {
-            double dAccA = p.config.getAttribute("stopturn_initial_velocity");
-            double tempAcc = p.face * dAccA * std::abs(p.joystick->axis(0));
+            double dAccA = p.getAttribute("stopturn_initial_velocity");
+            double tempAcc =
+                p.face * dAccA * std::abs(p.input->axis(MOVEMENT_AXIS_X));
             p.cVel.x += tempAcc;
         } else {
             applyTraction(p, 2.0);
@@ -634,18 +641,19 @@ class Pass : public Action {
         if (p.timer < 0)
             return;
         if (p.timer == 0) {
-            p.fixEcbBottom(10, Pair(0, 0));
+            p.fixEcbBottom(10, 0);
         }
         if (interrupt(p))
             return;
 
         if (p.fastfalled) {
         } else {
-            p.cVel.y += p.config.getAttribute("gravity");
-            if (p.cVel.y > p.config.getAttribute("terminal_velocity")) {
-                p.cVel.y = p.config.getAttribute("terminal_velocity");
+            p.cVel.y += p.getAttribute("gravity");
+            if (p.cVel.y > p.getAttribute("terminal_velocity")) {
+                p.cVel.y = p.getAttribute("terminal_velocity");
             }
-            if (p.joystick->axis(1) > 0.67 && p.joystick->axis(1, 5) < 0.3) {
+            if (p.input->axis(MOVEMENT_AXIS_Y) > 0.67 &&
+                p.input->axis(MOVEMENT_AXIS_Y, 5) < 0.3) {
                 p.fall(true);
             }
         }
@@ -728,7 +736,7 @@ class CliffCatch : public Action {
         // character offset
         Pair target = l->position + Pair(-0.08 * p.face, 0.38);
 
-        p.position = target;
+        p.setPosition(target);
         p.cVel = Pair(0, 0);
     }
 
@@ -744,7 +752,8 @@ class CliffWait : public Action {
 
     bool interrupt(Player& p) {
         if ((p.getXInput() < -0.2 && p.getXInput(1) >= -0.2) ||
-            (p.joystick->axis(1) > 0.2 && p.joystick->axis(1, 1) >= -0.2)) {
+            (p.input->axis(MOVEMENT_AXIS_Y) > 0.2 &&
+             p.input->axis(MOVEMENT_AXIS_Y, 1) >= -0.2)) {
             p.times_jumped++;
             p.ledgeRegrabCounter = 30;
             p.changeAction(FALL);

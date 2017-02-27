@@ -4,30 +4,30 @@
 #include "constants.hpp"
 #include "action.hpp"
 #include "playerconfig.hpp"
+#include "inputhandler.hpp"
 #include <algorithm>
 #include <iostream>
 
-Player::Player(std::string fpath, double x, double y)
-    : config(PlayerConfig(fpath)), previousPosition(x, y) {
-    action = ACTIONS[FALL];
-    position.x = x;
-    position.y = y;
-    previousCollision->reset(position + Pair(0, -0.2));
-    currentCollision->reset(position + Pair(0, -0.2));
+using namespace InputMapping;
+
+Player::Player(PlayerConfig* config,
+               InputHandler* input,
+               AnimationBank* animationBank,
+               Pair initialPosition)
+    : bank(animationBank), input(input), config(config) {
+    position = initialPosition;
+    previousCollision->reset(position + PLAYER_ECB_OFFSET);
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
+    changeAction(FALL);
 }
 
 Player::~Player() {}
 
-void Player::init() {
-    std::cout << "init player" << std::endl;
-    joystick = EnG->input.getJoystick(0);
-    bank = new AnimationBank();
-    changeAction(FALL);
-}
+void Player::init() {}
 
 void Player::moveTo(Pair newPos) {
     position = newPos;
-    currentCollision->reset(position + Pair(0, -0.2));
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
 }
 
 void Player::update() {
@@ -41,11 +41,12 @@ void Player::update() {
     action->step(*this);
 
     // reset position when player presses START.
-    if (joystick->down(7)) {
+    if (input->down(START)) {
         position.x = 1.15;
         position.y = 0.6;
         currentPlatform = NULL;
         changeAction(FALL);
+        currentCollision->reset(position + PLAYER_ECB_OFFSET);
     }
 
     // swap previous and current collision, reset the new current collision
@@ -53,39 +54,29 @@ void Player::update() {
     previousCollision = currentCollision;
     currentCollision = tmp;
     // this should be from animation data
-    currentCollision->reset(position + Pair(0, -0.2));
+    currentCollision->reset(position + PLAYER_ECB_OFFSET);
 
     // if we are currently grounded, adapt the x of cVel to
     // move along the platform
-    if (action->isGrounded(*this) && currentPlatform != NULL) {
-        Pair stepVel = cVel * EnG->elapsed;
-        bool walkedOff = !currentPlatform->groundedMovement(position, stepVel);
-        if (walkedOff && action->canWalkOff(*this)) {
-            currentPlatform = NULL;
-            changeAction(FALL);
-            times_jumped = 1;
-        }
-        velocity = kVel + stepVel / EnG->elapsed;
-
-    } else {
+    if (!action->isGrounded(*this)) {
         if (actionState != ESCAPEAIR) {
-            cVel.x = sign(cVel.x) *
-                     std::min(std::abs(cVel.x),
-                              config.getAttribute("max_aerial_h_velocity"));
+            cVel.x =
+                sign(cVel.x) * std::min(std::abs(cVel.x),
+                                        getAttribute("max_aerial_h_velocity"));
         }
-        velocity = cVel + kVel;
     }
 
-    Sprite::updateMotion();
+    velocity = cVel + kVel;
 
     if (action->isGrounded(*this)) {
-        currentCollision->playerModified.bottom = position;
-        currentCollision->postCollision.bottom = position;
+        currentCollision->playerModified.heightBottom = -PLAYER_ECB_OFFSET.y;
+        currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
     } else if (ecbFixedCounter > 0) {
         ecbFixedCounter--;
-        Pair newPos = position + ecbBottomFixedPosition;
-        currentCollision->playerModified.bottom = newPos;
-        currentCollision->postCollision.bottom = newPos;
+        currentCollision->playerModified.heightBottom =
+            -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
+        currentCollision->postCollision.heightBottom =
+            -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
     }
 }
 
@@ -107,14 +98,14 @@ void Player::update() {
 void Player::fall(bool fast) {
     if (fastfalled)
         return;
-    cVel.y += config.getAttribute("gravity");
-    cVel.y = std::min(cVel.y, config.getAttribute("terminal_velocity"));
+    cVel.y += getAttribute("gravity");
+    cVel.y = std::min(cVel.y, getAttribute("terminal_velocity"));
 
-    if (fast || (joystick->axis(1) > 0.65 && joystick->axis(1, 3) < 0.1 &&
-                 cVel.y > 0)) {
+    if (fast || (input->axis(MOVEMENT_AXIS_X) > 0.65 &&
+                 input->axis(MOVEMENT_AXIS_X, 3) < 0.1 && cVel.y > 0)) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
-        cVel.y = config.getAttribute("fast_fall_terminal_velocity");
+        cVel.y = getAttribute("fast_fall_terminal_velocity");
     }
 }
 
@@ -130,7 +121,8 @@ bool Player::canGrabLedge() {
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
 void Player::land(Platform* p, Pair const& landPosition) {
-    if (p->isPassable() && actionState == FALL && joystick->axis(1) > 0.67)
+    if (p->isPassable() && actionState == FALL &&
+        input->axis(MOVEMENT_AXIS_X) > 0.67)
         return;
 
     double yvel = cVel.y;
@@ -144,18 +136,19 @@ void Player::land(Platform* p, Pair const& landPosition) {
     currentPlatform = p;
     printf("landing on %p\n", p);
 
-    currentCollision->postCollision.bottom = position;
+    printf("current->postColl %p\n", &(currentCollision->postCollision));
+    currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 
     switch (action->getLandType(*this)) {
-        case NORMAL:
+        case NORMAL_LANDING:
             // Trigger landing when velocity > 1
             std::cout << "cVel : " << yvel << std::endl;
             changeAction(yvel > 1 ? LANDING : WAIT);
             break;
-        case KNOCKDOWN:
+        case KNOCKDOWN_LANDING:
             // TODO check the tech buffer
             break;
-        case SPECIAL:
+        case SPECIAL_LANDING:
             action->onLanding(*this);
             break;
     }
@@ -163,11 +156,11 @@ void Player::land(Platform* p, Pair const& landPosition) {
 
 /** Move the player horizontally when they are in the air */
 void Player::aerialDrift() {
-    bool joystickMoving = std::abs(joystick->axis(0)) > 0.3;
-    float inputDrift =
-        (joystickMoving)
-            ? joystick->axis(0) * config.getAttribute("max_aerial_h_velocity")
-            : 0;
+    bool joystickMoving = std::abs(input->axis(MOVEMENT_AXIS_X)) > 0.3;
+    float inputDrift = (joystickMoving)
+                           ? input->axis(MOVEMENT_AXIS_X) *
+                                 getAttribute("max_aerial_h_velocity")
+                           : 0;
 
     // std::cout << inputDrift << " ";
 
@@ -175,31 +168,28 @@ void Player::aerialDrift() {
     if (abs(inputDrift) > abs(cVel.x) && sign(cVel.x) == sign(inputDrift)) {
         // std::cout << "too fast, dragging";
         if (cVel.x > 0) {
-            cVel.x =
-                std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
+            cVel.x = std::max(cVel.x - getAttribute("air_friction"), 0.0);
         } else {
-            cVel.x =
-                std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
+            cVel.x = std::min(cVel.x + getAttribute("air_friction"), 0.0);
         }
     }
 
     // otherwise, move them according to their aerial mobility
     else if (joystickMoving) {
         // std::cout << "moving according to mobility";
-        cVel.x += joystick->axis(0) * config.getAttribute("aerial_mobility") +
-                  sign(joystick->axis(0)) *
-                      config.getAttribute("aerial_stopping_mobility");
+        cVel.x +=
+            input->axis(MOVEMENT_AXIS_X) * getAttribute("aerial_mobility") +
+            sign(input->axis(MOVEMENT_AXIS_X)) *
+                getAttribute("aerial_stopping_mobility");
     }
 
     // if the joystick is not moving, slow the player down with aerial friciton
     if (!joystickMoving) {
         // std::cout << "not moving, slowing with friction";
         if (cVel.x > 0) {
-            cVel.x =
-                std::max(cVel.x - config.getAttribute("air_friction"), 0.0);
+            cVel.x = std::max(cVel.x - getAttribute("air_friction"), 0.0);
         } else {
-            cVel.x =
-                std::min(cVel.x + config.getAttribute("air_friction"), 0.0);
+            cVel.x = std::min(cVel.x + getAttribute("air_friction"), 0.0);
         }
     }
     // std::cout << std::endl;
@@ -249,9 +239,9 @@ void Player::changeAction(ActionState state) {
     actionState = state;
 }
 
-void Player::fixEcbBottom(int frames, Pair position) {
+void Player::fixEcbBottom(int frames, double size) {
     ecbFixedCounter = frames;
-    ecbBottomFixedPosition = position;
+    ecbBottomFixedSize = size;
 }
 
 ActionState Player::getActionState() {
@@ -262,10 +252,23 @@ Action* Player::getAction() {
     return action;
 }
 
+bool Player::isGrounded() {
+    return action->isGrounded(*this);
+}
+
 double Player::getXInput(int frames) {
-    return joystick->axis(frames) * face;
+    return input->axis(MOVEMENT_AXIS_X, frames) * face;
 }
 
 Platform* Player::getCurrentPlatform() {
     return currentPlatform;
+}
+
+void Player::setPosition(Pair newPosition) {
+    position = newPosition;
+    currentCollision->postCollision.setOrigin(position + PLAYER_ECB_OFFSET);
+}
+
+double Player::getAttribute(char const* name) {
+    return config->getAttribute(name);
 }

@@ -17,8 +17,7 @@ class Text : public Entity {
     SDL_Renderer* ren;
     Text(SDL_Renderer* r,
          Pair position,
-         const char* fontName,
-         int fontsize,
+         TTF_Font* font,
          SDL_Color color,
          const char* initialText);
     ~Text();

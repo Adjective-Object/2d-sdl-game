@@ -2,12 +2,107 @@
 #include "util.hpp"
 #include "constants.hpp"
 #include <iostream>
+#include "engine/game.hpp"
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
 
-void Map::updateCollision(Player& player) {
-    // grab ledges
+bool Map::getClosestCollision(Pair const& start,
+                              Pair const& end,
+                              CollisionDatum& out) {
+    double closestDist = DOUBLE_INFINITY;
+    PlatformSegment segment;
+    Pair collisionPoint;
+    bool anyCollision = false;
+
+    for (Platform& p : platforms) {
+        TerrainCollisionType t =
+            p.checkCollision(start, end, collisionPoint, segment);
+
+        double distance = (collisionPoint - start).euclid();
+        if (t != NO_COLLISION && distance < closestDist) {
+            closestDist = distance;
+            out.type = t;
+            out.segment = segment;
+            out.position = collisionPoint;
+            anyCollision = true;
+        }
+    }
+
+    return anyCollision;
+}
+
+bool Map::getClosestEcbCollision(Ecb const& start,
+                                 Ecb const& end,
+                                 CollisionDatum& closestCollision) {
+    double closestDist = DOUBLE_INFINITY;
+    CollisionDatum collision;
+    bool anyCollision = false;
+
+    getClosestCollision(start.left, end.left, collision);
+    if ((collision.position - start.left).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.x -= start.widthLeft;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.right, end.right, collision);
+    if ((collision.position - start.right).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.x += start.widthRight;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.top, end.top, collision);
+    if ((collision.position - start.top).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.y -= start.heightTop;
+        anyCollision = true;
+    }
+
+    getClosestCollision(start.bottom, end.bottom, collision);
+    if ((collision.position - start.bottom).euclid() < closestDist) {
+        closestCollision = collision;
+        closestCollision.position.y += start.heightBottom;
+        anyCollision = true;
+    }
+
+    return anyCollision;
+}
+
+void Map::movePlayer(Player& player, Pair& requestedDistance) {
+    grabLedges(player);
+
+    // if the player is grounded, move them along the platform
+    Pair projectedPosition;
+    if (player.isGrounded()) {
+        // move player along platform
+        projectedPosition = player.position;
+        player.getCurrentPlatform()->groundedMovement(projectedPosition,
+                                                      requestedDistance);
+
+        // add remaining distnace (for falling)
+        projectedPosition += requestedDistance;
+    }
+
+    // if the player is not grounded, just move them according to requested
+    // movement
+    else {
+        projectedPosition = player.position + requestedDistance;
+    }
+
+    CollisionDatum collision;
+    if (getClosestCollision(player.position, projectedPosition, collision)) {
+        // if there is a collision with the floor, land
+        if (collision.type == FLOOR_COLLISION) {
+            player.land(collision.segment.getPlatform(), collision.position);
+        }
+    } else {
+        player.moveTo(projectedPosition);
+    }
+}
+
+void Map::grabLedges(Player& player) {
     if (player.canGrabLedge()) {
         for (Ledge& l : ledges) {
             Pair ledgebox_position = player.position + Pair(0, -LEDGEBOX_BASE);
@@ -16,44 +111,8 @@ void Map::updateCollision(Player& player) {
                 std::abs(diff.x) < LEDGEBOX_WIDTH &&
                 diff.y > -LEDGEBOX_HEIGHT && diff.y < 0) {
                 player.grabLedge(&l);
-                break;
+                return;
             }
-        }
-    }
-
-    // perform land and wall collisions
-    for (Platform& p : platforms) {
-        Pair collPos = Pair(0, 0);
-        TerrainCollisionType collisionType;
-
-        Ecb* oldEcb = &(player.previousCollision->postCollision);
-        Ecb* newEcb = &(player.currentCollision->postCollision);
-
-        collisionType =
-            p.checkCollision(oldEcb->bottom, newEcb->bottom, collPos);
-
-        if (player.velocity.y > 0 &&
-            player.getAction()->isLandable(player, &p) &&
-            collisionType == FLOOR_COLLISION) {
-            player.land(&p, collPos);
-        }
-
-        collisionType =
-            p.checkCollision(oldEcb->origin, newEcb->right, collPos);
-
-        if (collisionType == WALL_COLLISION) {
-            std::cout << "wall on right" << std::endl;
-
-            std::cout << "player moving at " << player.cVel << std::endl;
-            std::cout << "player at " << player.position << std::endl;
-            std::cout << "right ecb at " << newEcb->right << std::endl;
-            std::cout << "collision at " << collPos << std::endl;
-            std::cout << (newEcb->right - collPos) << std::endl;
-            player.moveTo(player.position - (newEcb->right - collPos));
-            std::cout << "player ends at " << player.position << std::endl;
-            std::cout << "right ecb end sat "
-                      << player.currentCollision->postCollision.right
-                      << std::endl;
         }
     }
 }
@@ -66,4 +125,8 @@ void Map::render(SDL_Renderer* r) {
     for (Ledge& l : ledges) {
         l.render(r);
     }
+}
+
+Platform* Map::getPlatform(size_t index) {
+    return &(platforms[index]);
 }

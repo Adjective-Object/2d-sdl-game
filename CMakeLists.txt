@@ -1,4 +1,5 @@
 cmake_minimum_required (VERSION 3.4)
+include(cmake/common.cmake)
 
 project (sdl_game)
 set (sdl_game_VERSION_MAJOR 0)
@@ -17,22 +18,19 @@ PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
-set(GTEST_DIR $ENV{GTEST_DIR})
-find_library(GTEST_LIBRARY 
-                NAMES gtest 
-                      libgtest 
-                      libgtest.a 
-                PATHS "${GTEST_DIR}/lib")
-find_library(GTEST_LIBRARY_MAIN 
-                NAMES gtest_main 
-                      libgtest_main 
-                      libgtest.a 
-                PATHS "${GTEST_DIR}/lib")
-set(GTEST_INCLUDE_DIR "${GTEST_DIR}/include")
+include(cmake/gtest.cmake)
 
 ##########################
 # project source objects #
 ##########################
+SET(ALL_INCLUDE_DIRS 
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2IMAGE_INCLUDE_DIRS}
+    ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
+    "src")
+
 set(LIB_SRCS 
     src/scenes/mainscene.hpp
     src/scenes/mainscene.cpp
@@ -50,8 +48,12 @@ set(LIB_SRCS
     src/player/ecb.cpp
     src/player/playercollision.hpp
     src/player/playercollision.cpp
+    src/player/inputhandler.hpp
+    src/player/inputhandler.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
+    src/terrain/platformsegment.hpp
+    src/terrain/platformsegment.cpp
     src/terrain/map.hpp
     src/terrain/map.cpp
     src/terrain/ledge.hpp
@@ -76,38 +78,34 @@ set(LIB_SRCS
     src/engine/scene.cpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_INCLUDE_DIRS}
-    ${YAML_CPP_INCLUDE_DIRS}
-    "src"
+    ${ALL_INCLUDE_DIRS}
 )
 
 set(TEST_SRCS
     tests/platform.cpp
     tests/player.cpp
     tests/ecb.cpp
-    tests/util.cpp)
+    tests/map.cpp
+    tests/util.cpp
+
+    tests/lib/mock-player.cpp
+    tests/lib/mock-player.hpp
+    )
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_INCLUDE_DIRS}
-    ${YAML_CPP_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIR}
-    "src"
-    )
+    ${ALL_INCLUDE_DIRS}
+    "tests"
+)
 
 set(ALL_SRCS ${LIB_SRCS} ${TEST_SRCS} src/main.cpp tests/main.cpp)
+PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})
 
 #####################
 # output executable #
 #####################
 add_executable(ctest
     tests/main.cpp
-    # $<TARGET_OBJECTS:TEST_LIB>
+    $<TARGET_OBJECTS:TEST_LIB>
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
 target_link_libraries(ctest
     ${SDL2_LIBRARIES}
@@ -117,6 +115,8 @@ target_link_libraries(ctest
     ${YAML_CPP_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
+    ${TEST_LIB}
+    ${SDL_GAME_LIB}
     )
 target_include_directories(ctest PUBLIC
     ${SDL2_INCLUDE_DIRS}
@@ -137,6 +137,7 @@ target_link_libraries(sdl_game
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC
     ${SDL2_INCLUDE_DIRS}
@@ -147,6 +148,8 @@ target_include_directories(sdl_game PUBLIC
     "src"
     )
 
+copy_files(sdl_game ${PROJECT_SOURCE_DIR}/assets/* ${CMAKE_BINARY_DIR}/assets)
+
 ########################################
 # Code formatting and linting commands #
 ########################################
@@ -156,10 +159,10 @@ add_custom_target(lint
         --enable=warning
         --enable=missingInclude
         --enable=performance
-        src/sdl_game.cpp ${ALL_SRCS})
+        src/sdl_game.cpp ${ABSOLUTE_ALL_SRCS})
 
 add_custom_target(format
-    COMMAND clang-format -i ${ALL_SRCS})
+    COMMAND clang-format -i ${ABSOLUTE_ALL_SRCS})
 
 add_custom_target(run_tests
     COMMAND ./ctest

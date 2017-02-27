@@ -9,7 +9,9 @@ AnimationBank::AnimationBank() {
     for (size_t i = 0; i < __NUM_ACTION_STATES; i++) {
         images[i] = NULL;
     }
+}
 
+void AnimationBank::loadImages() {
     images[WALK] = EnG->loadPNG("./assets/walk.png");
     images[WAIT] = EnG->loadPNG("./assets/wait.png");
 
