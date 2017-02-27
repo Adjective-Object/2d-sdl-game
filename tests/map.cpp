@@ -41,22 +41,7 @@ TEST(Map, getClosestCollision_Miss) {
     EXPECT_FALSE(m.getClosestCollision(Pair(0, 0), Pair(10, 0), collision));
 }
 
-// TEST(Map, getClosestEcbCollision) {
-//     Map m = Map({Platform({Pair(1, -5), Pair(1, 5)}),
-//                  Platform({Pair(2, -5), Pair(2, 5)}),
-//                  Platform({Pair(3, -5), Pair(3, 5)}),
-//                  Platform({Pair(4, -5), Pair(4, 5)})},
-//                 {});
-
-//     CollisionDatum collision;
-
-//     Ecb start = Ecb(0, 0, 0.3, 0.3);
-//     Ecb finish = Ecb(0, 0, 0.3, 0.3);
-
-//     EXPECT_TRUE(true);
-// }
-
-TEST(MAP, movePlayer_NoCollisions) {
+TEST(Map, movePlayer_NoCollisions) {
     // setup scene
     Player p = makeMockPlayer(Pair(10, 10));
     Map m = Map({}, {});
@@ -67,15 +52,15 @@ TEST(MAP, movePlayer_NoCollisions) {
     EXPECT_EQ(Pair(15, 8), p.position);
 }
 
-TEST(MAP, movePlayer_Grounded_Flat) {
-    // setup scene
-    Player p = makeMockPlayer(Pair(10, 10));
-    p.init();
-    Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
+// TEST(Map, movePlayer_Grounded_Flat) {
+//     // setup scene
+//     Player p = makeMockPlayer(Pair(10, 10));
+//     p.init();
+//     Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
 
-    p.land(m.getPlatform(0), Pair(10, 10));
-    Pair requestedMotion = Pair(5, 0);
-    m.movePlayer(p, requestedMotion);
+//     p.land(m.getPlatform(0), Pair(10, 10));
+//     Pair requestedMotion = Pair(5, 0);
+//     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(Pair(15, 10), p.position);
-}
+//     EXPECT_EQ(Pair(15, 10), p.position);
+// }

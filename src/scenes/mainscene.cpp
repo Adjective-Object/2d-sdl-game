@@ -103,7 +103,7 @@ void MainScene::update() {
     // update player positions
     Scene::update();
     Pair playerMotion = player->velocity * EnG->elapsed;
-    map->movePlayerDumb(*player, playerMotion);
+    map->movePlayer(*player, playerMotion);
 
     Joystick* j = EnG->input.getJoystick(0);
     if (j) {

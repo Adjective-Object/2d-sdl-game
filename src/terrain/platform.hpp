@@ -28,10 +28,8 @@ class Platform : public Entity {
                                         Pair const& next,
                                         Pair& out,
                                         PlatformSegment& segment);
-    bool findSegment(Pair& position, PlatformSegment& out);
-    bool stepAlongSegment(PlatformSegment& segment,
-                          Pair& position,
-                          double& distance);
+
+    bool groundedMovement(Pair& position, Pair& distance);
 
     void init();
     void preUpdate();
