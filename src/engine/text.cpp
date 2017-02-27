@@ -4,12 +4,10 @@
 
 Text::Text(SDL_Renderer* ren,
            Pair position,
-           const char* fontName,
-           int fontsize,
+           TTF_Font* font,
            SDL_Color color,
            const char* text)
-    : ren(ren), color(color), position(position) {
-    font = TTF_OpenFont(fontName, fontsize);
+    : ren(ren), color(color), position(position), font(font) {
     this->updateText(text);
 }
 

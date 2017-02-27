@@ -11,9 +11,12 @@ class Map {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
 
+    void grabLedges(Player& player);
+
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
     void movePlayer(Player& player, Pair& requestedDistance);
+    void movePlayerDumb(Player& player, Pair& requestedDistance);
     void render(SDL_Renderer* r);
 
     bool getClosestCollision(Pair const& start,

@@ -70,8 +70,39 @@ bool Map::getClosestEcbCollision(Ecb const& start,
     return anyCollision;
 }
 
-void Map::movePlayer(Player& player, Pair& requestedDistance) {
-    // grab ledges
+void Map::movePlayerDumb(Player& player, Pair& requestedDistance) {
+    grabLedges(player);
+
+    // if the player is grounded, move them along the platform
+    Pair projectedPosition;
+    if (player.isGrounded()) {
+        PlatformSegment segment;
+        player.getCurrentPlatform()->findSegment(player.position, segment);
+        projectedPosition = player.position;
+        while (segment.getPlatform()->stepAlongSegment(
+            segment, projectedPosition, requestedDistance.x)) {
+        }
+        projectedPosition += requestedDistance;
+    }
+
+    // if the player is not grounded, just move them according to requested
+    // movement
+    else {
+        projectedPosition = player.position + requestedDistance;
+    }
+
+    CollisionDatum collision;
+    if (getClosestCollision(player.position, projectedPosition, collision)) {
+        // if there is a collision with the floor, land
+        if (collision.type == FLOOR_COLLISION) {
+            player.land(collision.segment.getPlatform(), collision.position);
+        }
+    } else {
+        player.moveTo(projectedPosition);
+    }
+}
+
+void Map::grabLedges(Player& player) {
     if (player.canGrabLedge()) {
         for (Ledge& l : ledges) {
             Pair ledgebox_position = player.position + Pair(0, -LEDGEBOX_BASE);
@@ -84,6 +115,11 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
             }
         }
     }
+}
+
+void Map::movePlayer(Player& player, Pair& requestedDistance) {
+    // grab ledges
+    grabLedges(player);
 
     PlatformSegment segment;
     bool continueWalking = player.isGrounded();

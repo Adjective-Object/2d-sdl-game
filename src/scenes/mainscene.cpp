@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <vector>
 #include <iostream>
+#include <SDL_ttf.h>
 
 #include "engine/game.hpp"
 #include "engine/joystickindicator.hpp"
@@ -77,19 +78,22 @@ void MainScene::init() {
     player =
         new Player(marthConfig, playerInput, animationBank, Pair(0.5, 0.5));
 
+    TTF_Font* fontMonaco = TTF_OpenFont("assets/monaco.ttf", 20);
+
     SDL_Renderer* r = EnG->getRenderer();
-    stateText = new Text(r, Pair(130, 10), "assets/monaco.ttf", 20,
+    stateText = new Text(r, Pair(130, 10), fontMonaco,
                          {
                              .r = 255, .g = 255, .b = 255, .a = 255,
                          },
                          "???");
 
-    posText = new Text(r, Pair(130, 40), "assets/monaco.ttf", 20,
+    posText = new Text(r, Pair(130, 40), fontMonaco,
                        {
                            .r = 255, .g = 255, .b = 255, .a = 255,
                        },
                        ".");
 
+    entities.push_back(player);
     entities.push_back(stateText);
     entities.push_back(posText);
     Scene::init();
@@ -99,7 +103,7 @@ void MainScene::update() {
     // update player positions
     Scene::update();
     Pair playerMotion = player->velocity * EnG->elapsed;
-    map->movePlayer(*player, playerMotion);
+    map->movePlayerDumb(*player, playerMotion);
 
     Joystick* j = EnG->input.getJoystick(0);
     if (j) {

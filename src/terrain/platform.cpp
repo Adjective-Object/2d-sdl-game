@@ -131,11 +131,6 @@ bool Platform::stepAlongSegment(PlatformSegment& segment,
 
     int direction = distance == 0 ? 1 : sign(distance);
 
-    printf("distance request: %f\n", distance);
-    printf("distance remaining: %f\n", remainingDistance);
-    printf("direction: %d\n", direction);
-    printf("current platform percent: %f\n", currentPlatformPercent);
-
     if (direction < 0) {
         // leftward motion
         remainingDistance -= lengths[segment.index] * currentPlatformPercent;
@@ -152,7 +147,6 @@ bool Platform::stepAlongSegment(PlatformSegment& segment,
             currentPlatformPercent = 1 - currentPlatformPercent;
         }
 
-        printf("remaining distance after step: %f\n", remainingDistance);
         Pair newPosition =
             points[segment.index] * currentPlatformPercent +
             points[segment.index + 1] * (1 - currentPlatformPercent);
