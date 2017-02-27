@@ -5,6 +5,7 @@
 #include "player/player.hpp"
 #include "./platform.hpp"
 #include "./ledge.hpp"
+#include "./collisiondatum.hpp"
 
 class Map {
     std::vector<Platform> platforms;

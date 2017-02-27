@@ -85,53 +85,74 @@ void Map::updateCollision(Player& player) {
 
     Ecb currentEcb = player.previousCollision->playerModified;
     Ecb predictedEcb = player.currentCollision->playerModified;
-    Pair direction = predictedEcb.origin - currentEcb.origin;
 
     while (currentEcb.origin != predictedEcb.origin) {
+        // perform motion
+        if (player.isGrounded()) {
+            Pair stepVel = cVel * EnG->elapsed;
+            bool walkedOff =
+                !currentPlatform->groundedMovement(position, stepVel);
+            if (walkedOff && action->canWalkOff(*this)) {
+                currentPlatform = NULL;
+                changeAction(FALL);
+                times_jumped = 1;
+            }
+            velocity = kVel + stepVel / EnG->elapsed;
+        }
+
         CollisionDatum collision;
 
-        getClosestCollision(currentEcb.right, predictedEcb.right, collision);
+        if (!getClosestCollision(currentEcb.right, predictedEcb.right,
+                                 collision)) {
+            break;
+        }
 
-        std::cout << collision << std::endl;
+        std::cout << collision.type << std::endl;
+
+        if (collision.type == FLOOR_COLLISION) {
+            player.land(collision.segment.getPlatform(), collision.position);
+            break;
+        }
 
         // walls clamp the x. We move the current Ecb to either the
         // end of the wall or the y position on the wall of the predicted
         // ecb
-        if (collision.type == WALL_COLLISION) {
+        else if (collision.type == WALL_COLLISION) {
             // moving down
             double destination_y;
 
             // move either to the end of the platform or the
             // destination y
-            if (currentEcb.origin.y < predicted.origin.y) {
+            if (currentEcb.origin.y < predictedEcb.origin.y) {
+                std::cout << "move down" << std::endl;
                 destination_y =
-                    std::min(
-                        predictedEcb.origin.y,
-                        collision.segment.firstPoint().y,
-                        collision.segment.secondPoint().y
-                        );
+                    std::min(std::min(predictedEcb.origin.y,
+                                      collision.segment.firstPoint()->y),
+                             collision.segment.secondPoint()->y);
             } else {
+                std::cout << "move up" << std::endl;
                 destination_y =
-                    std::max(
-                        predictedEcb.origin.y,
-                        collision.segment.firstPoint().y,
-                        collision.segment.secondPoint().y
-                        );
+                    std::max(std::max(predictedEcb.origin.y,
+                                      collision.segment.firstPoint()->y),
+                             collision.segment.secondPoint()->y);
             }
 
             // get the old slope
-            double yDiff = (destination_y - currentEcb.position.y);
+            double yDiff = (destination_y - currentEcb.origin.y);
             double oldSlope = (predictedEcb.origin.x - currentEcb.origin.x) /
-                (predictedEcb.origin.y - currentEcb.origin.y) 
-            double oldPredictedX = yDiff * oldSlope; 
+                              (predictedEcb.origin.y - currentEcb.origin.y);
+            double oldPredictedX = predictedEcb.origin.x + yDiff * oldSlope;
 
             // move either to the end of the platform or the
             // destination y
-            Pair destinationPoint = currentEcb.origin + collision.segment.slope() * yDiff;
-            currentEcb.setOrigin(destinationPoint + Pair(- currentEcb.widthRight, 0));
+            Pair destinationPoint =
+                currentEcb.origin + collision.segment.slope() * yDiff;
+            currentEcb.setOrigin(destinationPoint +
+                                 Pair(-currentEcb.widthRight, 0));
 
             // update the predictedEcb's x position
-            Pair updatedOrigin = predictedEcb.origin + Pair(oldPredictedX - destinationPoint.x, 0);
+            Pair updatedOrigin = predictedEcb.origin +
+                                 Pair(oldPredictedX - destinationPoint.x, 0);
             predictedEcb.setOrigin(updatedOrigin);
 
         }
@@ -140,40 +161,7 @@ void Map::updateCollision(Player& player) {
         // end of the wall or the y position on the wall of the predicted
         // ecb
         else if (collision.type == CEIL_COLLISION) {
-            double destination_x;
-
-            // move either to the end of the platform or the
-            // destination x
-            if (currentEcb.origin.x < predicted.origin.x) {
-                destination_x =
-                    std::min(
-                        predictedEcb.origin.x,
-                        collision.segment.firstPoint().x,
-                        collision.segment.secondPoint().x
-                        );
-            } else {
-                destination_x =
-                    std::max(
-                        predictedEcb.origin.x,
-                        collision.segment.firstPoint().x,
-                        collision.segment.secondPoint().x
-                        );
-            }
-
-            // get the old slope
-            double xDiff = (destination_x - currentEcb.position.x);
-            double oldSlope = (predictedEcb.origin.x - currentEcb.origin.x) /
-                (predictedEcb.origin.x - currentEcb.origin.x) 
-            double oldPredictedY = xDiff * oldSlope; 
-
-            // move either to the end of the platform or the
-            // destination x
-            Pair destinationPoint = currentEcb.origin + collision.segment.slope() * xDiff;
-            currentEcb.setOrigin(destinationPoint + Pair(0, - currentEcb.heightTop));
-
-            // update the predictedEcb's x position
-            Pair updatedOrigin = predictedEcb.origin + Pair(0, oldPredictedY - destinationPoint.x);
-            predictedEcb.setOrigin(updatedOrigin);
+            // todo
         }
     }
 }

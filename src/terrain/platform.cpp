@@ -64,8 +64,7 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
             previous, next, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
         if (direction < 0) {
             out = intersectionPoint;
-            segment.platform = this;
-            segment.index = i;
+            segmentOut = PlatformSegment(this, i);
             return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
         }
     }
@@ -238,19 +237,25 @@ void Platform::update(){};
 void Platform::postUpdate(){};
 
 PlatformSegment::PlatformSegment(Platform* p, int index)
-    : platform(platform), index(index) {}
+    : platform(p), index(index) {}
+
+PlatformSegment::PlatformSegment() : platform(NULL), index(0) {}
 
 Pair* PlatformSegment::firstPoint() {
-    return platform->points[index];
+    return &(platform->points[index]);
 }
 
 Pair* PlatformSegment::secondPoint() {
-    return platform->points[index + 1];
+    return &(platform->points[index + 1]);
 }
 
 Pair PlatformSegment::slope() {
-    Pair p;
-    p = (firstPoint() - secondPoint());
+    Pair first = *firstPoint();
+    Pair second = *secondPoint();
+    Pair p = (first - second);
     return p / p.euclid();
 }
 
+Platform* PlatformSegment::getPlatform() {
+    return platform;
+}

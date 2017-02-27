@@ -57,26 +57,15 @@ void Player::update() {
 
     // if we are currently grounded, adapt the x of cVel to
     // move along the platform
-    if (action->isGrounded(*this) && currentPlatform != NULL) {
-        Pair stepVel = cVel * EnG->elapsed;
-        bool walkedOff = !currentPlatform->groundedMovement(position, stepVel);
-        if (walkedOff && action->canWalkOff(*this)) {
-            currentPlatform = NULL;
-            changeAction(FALL);
-            times_jumped = 1;
-        }
-        velocity = kVel + stepVel / EnG->elapsed;
-
-    } else {
+    if (!action->isGrounded(*this)) {
         if (actionState != ESCAPEAIR) {
             cVel.x = sign(cVel.x) *
                      std::min(std::abs(cVel.x),
                               config.getAttribute("max_aerial_h_velocity"));
         }
-        velocity = cVel + kVel;
     }
 
-    Sprite::updateMotion();
+    velocity = cVel + kVel;
 
     if (action->isGrounded(*this)) {
         currentCollision->playerModified.bottom = position;

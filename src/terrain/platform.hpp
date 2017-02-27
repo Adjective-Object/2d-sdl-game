@@ -46,15 +46,17 @@ class Platform : public Entity {
     static bool isWall(double angle);
 };
 
-class PlatformSegment : {
+class PlatformSegment {
     Platform* platform;
     int index;
 
    public:
-    PlatformSegment(platform, index);
+    PlatformSegment();
+    PlatformSegment(Platform* platform, int index);
     Pair* firstPoint();
     Pair* secondPoint();
     Pair slope();
-}
+    Platform* getPlatform();
+};
 
 #endif
