@@ -52,15 +52,54 @@ TEST(Map, movePlayer_NoCollisions) {
     EXPECT_EQ(Pair(15, 8), p.position);
 }
 
-// TEST(Map, movePlayer_Grounded_Flat) {
-//     // setup scene
-//     Player p = makeMockPlayer(Pair(10, 10));
-//     p.init();
-//     Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
+TEST(Map, movePlayer_Grounded_Flat) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
 
-//     p.land(m.getPlatform(0), Pair(10, 10));
-//     Pair requestedMotion = Pair(5, 0);
-//     m.movePlayer(p, requestedMotion);
+    p.land(m.getPlatform(0), Pair(10, 10));
+    Pair requestedMotion = Pair(5, 0);
+    m.movePlayer(p, requestedMotion);
 
-//     EXPECT_EQ(Pair(15, 10), p.position);
-// }
+    EXPECT_EQ(Pair(15, 10), p.position);
+}
+
+TEST(Map, movePlayer_Grounded_Flat_Left) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
+
+    p.land(m.getPlatform(0), Pair(10, 10));
+    Pair requestedMotion = Pair(-5, 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(Pair(5, 10), p.position);
+}
+
+TEST(Map, movePlayer_Grounded_Slant_Down_Right) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map({Platform({Pair(0, -9), Pair(20, 11)})}, {});
+
+    p.land(m.getPlatform(0), Pair(10, 1));
+    Pair requestedMotion = Pair(5 * sqrt(2.0), 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(Pair(15, 6), p.position);
+}
+
+TEST(Map, movePlayer_Grounded_Slant_Down_Left) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map({Platform({Pair(0, 11), Pair(20, -9)})}, {});
+
+    p.land(m.getPlatform(0), Pair(10, 1));
+    Pair requestedMotion = Pair(5 * sqrt(2.0), 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(Pair(15, -4), p.position);
+}
