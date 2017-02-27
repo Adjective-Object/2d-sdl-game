@@ -28,8 +28,8 @@ bool PlatformSegment::operator==(const PlatformSegment& p) const {
 }
 
 std::ostream& operator<<(std::ostream& strm, const PlatformSegment& p) {
-    strm << "PlatformSegment { "
-         << "platform = "   << p.platform << ", "
-         << "index = "      << p.index    << ", "
-         << "}";
+    return strm << "PlatformSegment { "
+                << "platform = " << p.platform << ", "
+                << "index = " << p.index << ", "
+                << "}";
 }

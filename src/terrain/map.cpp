@@ -70,7 +70,7 @@ bool Map::getClosestEcbCollision(Ecb const& start,
     return anyCollision;
 }
 
-void Map::updateCollision(Player& player, Pair& requestedDistance) {
+void Map::movePlayer(Player& player, Pair& requestedDistance) {
     // grab ledges
     if (player.canGrabLedge()) {
         for (Ledge& l : ledges) {
@@ -210,6 +210,6 @@ void Map::render(SDL_Renderer* r) {
     }
 }
 
-Platform * Map::getPlatform(size_t index) {
+Platform* Map::getPlatform(size_t index) {
     return &(platforms[index]);
 }

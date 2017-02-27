@@ -28,7 +28,6 @@ TEST(Util, checkLineIntersection_Basic_2) {
     EXPECT_EQ(Pair(1, 0), out);
 }
 
-
 TEST(Util, checkLineSweep_Horizontal) {
     //
     // a1      b1

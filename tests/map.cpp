@@ -3,6 +3,7 @@
 #include "engine/pair.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/map.hpp"
+#include "lib/mock-player.hpp"
 
 // void Map::getClosestCollision(
 //             Pair const& start,
@@ -55,12 +56,26 @@ TEST(Map, getClosestCollision_Miss) {
 //     EXPECT_TRUE(true);
 // }
 
-TEST(MAP, updateCollision_Grounded_Flat) {
+TEST(MAP, movePlayer_NoCollisions) {
     // setup scene
-    Player p = Player("assets/attributes.yaml", 10, 10);
-    Map m = Map({Platform({Pair(1, 15), Pair(20, 15)})}, {});
+    Player p = makeMockPlayer(Pair(10, 10));
+    Map m = Map({}, {});
+
+    Pair requestedMotion = Pair(5, -2);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(Pair(15, 8), p.position);
+}
+
+TEST(MAP, movePlayer_Grounded_Flat) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map({Platform({Pair(1, 10), Pair(20, 10)})}, {});
+
+    p.land(m.getPlatform(0), Pair(10, 10));
     Pair requestedMotion = Pair(5, 0);
-    m.updateCollision(p, requestedMotion);
+    m.movePlayer(p, requestedMotion);
 
     EXPECT_EQ(Pair(15, 10), p.position);
 }

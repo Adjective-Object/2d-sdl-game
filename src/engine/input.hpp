@@ -41,13 +41,13 @@ class Joystick {
     double** axies;
     AxisCalibration* axisCalibrations;
 
+   public:
     void setDown(unsigned int buttonId);
     void setUp(unsigned int buttonId);
     void clear();
     void setAxis(unsigned int axisId, double value);
 
-   public:
-    Joystick(SDL_Joystick*, int historySize = 10);
+    Joystick(int numButtons, int numAxies, int historySize = 10);
     ~Joystick();
     void calibrateAxis(unsigned int axisId,
                        double lower,

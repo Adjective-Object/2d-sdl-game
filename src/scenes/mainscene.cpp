@@ -60,14 +60,22 @@ MainScene::~MainScene() {}
 
 void MainScene::init() {
     Joystick* joystick = EnG->input.getJoystick(0);
+    if (joystick) {
+        joystick->calibrateAxis(0, -30000, 32800, 450);
+        joystick->calibrateAxis(1, -32000, 32000, 450);
+        joystick->calibrateAxis(3, -29100, 32000, 450);
+        joystick->calibrateAxis(4, -32000, 30000, 450);
 
-    joystick->calibrateAxis(0, -30000, 32800, 450);
-    joystick->calibrateAxis(1, -32000, 32000, 450);
-    joystick->calibrateAxis(3, -29100, 32000, 450);
-    joystick->calibrateAxis(4, -32000, 30000, 450);
+        entities.push_back(new JoystickIndicator(0, 1, 10, 10, 50, 50));
+        entities.push_back(new JoystickIndicator(3, 4, 70, 10, 50, 50));
+    }
 
-    player = new Player("assets/attributes.yaml", 0.5, 0.5);
-    entities.push_back(player);
+    playerInput = new InputMapping::JoystickInputHandler();
+    PlayerConfig* marthConfig = new PlayerConfig("assets/attributes.yaml");
+    AnimationBank* animationBank = new AnimationBank();
+    animationBank->loadImages();
+    player =
+        new Player(marthConfig, playerInput, animationBank, Pair(0.5, 0.5));
 
     SDL_Renderer* r = EnG->getRenderer();
     stateText = new Text(r, Pair(130, 10), "assets/monaco.ttf", 20,
@@ -84,9 +92,6 @@ void MainScene::init() {
 
     entities.push_back(stateText);
     entities.push_back(posText);
-
-    entities.push_back(new JoystickIndicator(0, 1, 10, 10, 50, 50));
-    entities.push_back(new JoystickIndicator(3, 4, 70, 10, 50, 50));
     Scene::init();
 }
 
@@ -94,7 +99,12 @@ void MainScene::update() {
     // update player positions
     Scene::update();
     Pair playerMotion = player->velocity * EnG->elapsed;
-    map->updateCollision(*player, playerMotion);
+    map->movePlayer(*player, playerMotion);
+
+    Joystick* j = EnG->input.getJoystick(0);
+    if (j) {
+        playerInput->step(j);
+    }
 
     // update action label when the player's action state updates
     ActionState newState = player->getActionState();

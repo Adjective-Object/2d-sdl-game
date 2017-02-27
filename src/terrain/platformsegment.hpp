@@ -17,9 +17,9 @@ class PlatformSegment {
     Pair slope();
     Platform* getPlatform();
 
-
     bool operator==(const PlatformSegment& p) const;
-    friend std::ostream& operator<<(std::ostream& strm, const PlatformSegment& p);
+    friend std::ostream& operator<<(std::ostream& strm,
+                                    const PlatformSegment& p);
 };
 
 std::ostream& operator<<(std::ostream& strm, const PlatformSegment& p);

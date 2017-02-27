@@ -10,6 +10,7 @@
 #include "animationbank.hpp"
 #include "playerconfig.hpp"
 #include "playercollision.hpp"
+#include "inputhandler.hpp"
 
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
@@ -24,8 +25,8 @@ class Player : public Sprite {
     PlayerCollision* previousCollision = new PlayerCollision();
     PlayerCollision* currentCollision = new PlayerCollision();
 
-    Joystick* joystick;
-    PlayerConfig config;
+    InputMapping::InputHandler* input;
+    PlayerConfig* config;
 
     int ecbFixedCounter = 0;
     int ledgeRegrabCounter = 0;
@@ -58,7 +59,10 @@ class Player : public Sprite {
     void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
 
-    Player(std::string attributeFile, double x, double y);
+    Player(PlayerConfig* config,
+           InputMapping::InputHandler* input,
+           AnimationBank* animationBank,
+           Pair initialPosition);
     ~Player();
 
     bool canGrabLedge();
@@ -72,6 +76,7 @@ class Player : public Sprite {
     Action* getAction();
 
     void setPosition(Pair newPosition);
+    double getAttribute(char const* name);
 };
 
 #endif

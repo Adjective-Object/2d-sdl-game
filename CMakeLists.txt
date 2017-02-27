@@ -23,6 +23,14 @@ include(cmake/gtest.cmake)
 ##########################
 # project source objects #
 ##########################
+SET(ALL_INCLUDE_DIRS 
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2IMAGE_INCLUDE_DIRS}
+    ${SDL2TTF_INCLUDE_DIRS}
+    ${SDL2GFX_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
+    "src")
+
 set(LIB_SRCS 
     src/scenes/mainscene.hpp
     src/scenes/mainscene.cpp
@@ -40,6 +48,8 @@ set(LIB_SRCS
     src/player/ecb.cpp
     src/player/playercollision.hpp
     src/player/playercollision.cpp
+    src/player/inputhandler.hpp
+    src/player/inputhandler.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
     src/terrain/platformsegment.hpp
@@ -68,12 +78,7 @@ set(LIB_SRCS
     src/engine/scene.cpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_INCLUDE_DIRS}
-    ${YAML_CPP_INCLUDE_DIRS}
-    "src"
+    ${ALL_INCLUDE_DIRS}
 )
 
 set(TEST_SRCS
@@ -81,7 +86,16 @@ set(TEST_SRCS
     tests/player.cpp
     tests/ecb.cpp
     tests/map.cpp
-    tests/util.cpp)
+    tests/util.cpp
+
+    tests/lib/mock-player.cpp
+    tests/lib/mock-player.hpp
+    )
+add_library(TEST_LIB OBJECT ${TEST_SRCS})
+target_include_directories(TEST_LIB PUBLIC
+    ${ALL_INCLUDE_DIRS}
+    "tests"
+)
 
 set(ALL_SRCS ${LIB_SRCS} ${TEST_SRCS} src/main.cpp tests/main.cpp)
 PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})
@@ -91,7 +105,7 @@ PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})
 #####################
 add_executable(ctest
     tests/main.cpp
-    # $<TARGET_OBJECTS:TEST_LIB>
+    $<TARGET_OBJECTS:TEST_LIB>
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
 target_link_libraries(ctest
     ${SDL2_LIBRARIES}
@@ -101,6 +115,8 @@ target_link_libraries(ctest
     ${YAML_CPP_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
+    ${TEST_LIB}
+    ${SDL_GAME_LIB}
     )
 target_include_directories(ctest PUBLIC
     ${SDL2_INCLUDE_DIRS}
@@ -121,6 +137,7 @@ target_link_libraries(sdl_game
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC
     ${SDL2_INCLUDE_DIRS}

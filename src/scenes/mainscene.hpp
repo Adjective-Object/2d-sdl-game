@@ -8,14 +8,15 @@
 #include "engine/scene.hpp"
 #include "engine/text.hpp"
 #include "player/player.hpp"
+#include "player/inputhandler.hpp"
 #include "terrain/map.hpp"
 
 class MainScene : public Scene {
-    Joystick* joystick;
     Player* player;
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;
     Map* map;
+    InputMapping::JoystickInputHandler* playerInput;
 
    public:
     MainScene();

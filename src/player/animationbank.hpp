@@ -9,6 +9,7 @@ class AnimationBank {
     SDL_Texture** images;
     AnimationBank();
     ~AnimationBank();
+    void loadImages();
     void playAnimation(ActionState action);
     SDL_Texture* getCurrentTexture(Player& p);
 };
