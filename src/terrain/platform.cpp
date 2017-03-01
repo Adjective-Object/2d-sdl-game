@@ -46,6 +46,10 @@ bool Platform::isWall(double angle) {
     return (std::abs(angle) > M_PI * 3.0 / 8.0);
 }
 
+bool Platform::isCeil(double angle) {
+    return (std::abs(angle - M_PI) < M_PI * 1.0 / 8.0);
+}
+
 #define PLATFORM_LAND_EPSILON 0.000001
 TerrainCollisionType Platform::checkCollision(Pair const& previous,
                                               Pair const& next,
@@ -66,7 +70,13 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
         if (direction < 0) {
             out = intersectionPoint;
             segment = PlatformSegment(this, i);
-            return isWall(angles[i]) ? WALL_COLLISION : FLOOR_COLLISION;
+
+            if (isCeil(angles[i])) {
+                return CEIL_COLLISION;
+            } else if (isWall(angles[i])) {
+                return WALL_COLLISION;
+            }
+            return FLOOR_COLLISION;
         }
     }
 
@@ -78,6 +88,8 @@ void Platform::render(SDL_Renderer* r) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         if (passable) {
             SDL_SetRenderDrawColor(r, 100, 100, 255, 255);
+        } else if (isCeil(angles[i])) {
+            SDL_SetRenderDrawColor(r, 200, 30, 30, 255);
         } else if (isWall(angles[i])) {
             SDL_SetRenderDrawColor(r, 0, 200, 255, 255);
         } else {

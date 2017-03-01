@@ -40,6 +40,7 @@ class Platform : public Entity {
     PlatformSegment getSegment(int index);
 
     static bool isWall(double angle);
+    static bool isCeil(double angle);
 };
 
 #endif
