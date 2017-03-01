@@ -30,6 +30,11 @@ void Player::moveTo(Pair newPos) {
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
 }
 
+void Player::moveTo(Ecb& ecb) {
+    position = ecb.origin - PLAYER_ECB_OFFSET;
+    currentCollision->reset(ecb);
+}
+
 void Player::update() {
     previousPosition.x = position.x;
     previousPosition.y = position.y;
@@ -53,7 +58,12 @@ void Player::update() {
     PlayerCollision* tmp = previousCollision;
     previousCollision = currentCollision;
     currentCollision = tmp;
-    // this should be from animation data
+
+    // here we _would_ get the ecb from the animation
+    currentCollision->root.widthLeft = ECB_DEFAULT_WIDTH;
+    currentCollision->root.widthRight = ECB_DEFAULT_WIDTH;
+    currentCollision->root.heightTop = ECB_DEFAULT_HEIGHT;
+    currentCollision->root.heightBottom = ECB_DEFAULT_HEIGHT;
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
 
     // if we are currently grounded, adapt the x of cVel to
@@ -101,12 +111,17 @@ void Player::fall(bool fast) {
     cVel.y += getAttribute("gravity");
     cVel.y = std::min(cVel.y, getAttribute("terminal_velocity"));
 
-    if (fast || (input->axis(MOVEMENT_AXIS_X) > 0.65 &&
-                 input->axis(MOVEMENT_AXIS_X, 3) < 0.1 && cVel.y > 0)) {
+    if (fast || (input->axis(MOVEMENT_AXIS_Y) > 0.65 &&
+                 input->axis(MOVEMENT_AXIS_Y, 3) < 0.1 && cVel.y > 0)) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
         cVel.y = getAttribute("fast_fall_terminal_velocity");
     }
+}
+
+void Player::fallOffPlatform() {
+    currentPlatform = NULL;
+    changeAction(FALL);
 }
 
 void Player::grabLedge(Ledge* l) {
@@ -118,16 +133,14 @@ bool Player::canGrabLedge() {
     return ledgeRegrabCounter <= 0 && action->canGrabLedge(*this);
 }
 
+bool Player::canLand(Platform* p) {
+    return action->isLandable(*this, p);
+};
+
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(Platform* p, Pair const& landPosition) {
-    if (p->isPassable() && actionState == FALL &&
-        input->axis(MOVEMENT_AXIS_X) > 0.67)
-        return;
-
+void Player::land(Platform* p) {
     double yvel = cVel.y;
-    position.y = landPosition.y;
-    position.x = landPosition.x;
     cVel.y = 0;
     grounded = true;
     fastfalled = false;
@@ -136,7 +149,6 @@ void Player::land(Platform* p, Pair const& landPosition) {
     currentPlatform = p;
     printf("landing on %p\n", p);
 
-    printf("current->postColl %p\n", &(currentCollision->postCollision));
     currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 
     switch (action->getLandType(*this)) {
@@ -146,9 +158,11 @@ void Player::land(Platform* p, Pair const& landPosition) {
             changeAction(yvel > 1 ? LANDING : WAIT);
             break;
         case KNOCKDOWN_LANDING:
+            std::cout << "knockdown_landing not handled!" << std::endl;
             // TODO check the tech buffer
             break;
         case SPECIAL_LANDING:
+            std::cout << "special landing.." << std::endl;
             action->onLanding(*this);
             break;
     }

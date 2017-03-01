@@ -24,5 +24,6 @@ bool checkLineSweep(Pair& a1,
                     double epsilon = 0);
 
 #define M_PI 3.14159265358979323846 /* pi */
+bool onLine(Pair const& l1, Pair const& l2, Pair const& point);
 
 #endif

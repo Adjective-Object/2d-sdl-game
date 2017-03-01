@@ -10,4 +10,6 @@
 
 #define PLAYER_ECB_OFFSET Pair(0, -0.2)
 
+#define COLLISION_EPSILON 0.00001
+
 #endif

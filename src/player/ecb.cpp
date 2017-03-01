@@ -69,3 +69,11 @@ void Ecb::setBottom(Pair b) {
 void Ecb::setTop(Pair t) {
     setOrigin(Pair(t.x, t.y + heightTop));
 }
+
+std::ostream& operator<<(std::ostream& strm, const Ecb& e) {
+    return strm << "Ecb{"
+                << "origin=" << e.origin << ", heightTop=" << e.heightTop
+                << ", heightBottom=" << e.heightBottom
+                << ", widthLeft=" << e.widthLeft
+                << ", widthRight=" << e.widthRight << "}";
+}

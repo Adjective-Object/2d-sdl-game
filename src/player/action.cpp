@@ -241,6 +241,10 @@ class Fall : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
+    bool isLandable(Player& p, Platform* plat) {
+        return !(plat->isPassable() && p.input->axis(MOVEMENT_AXIS_Y) > 0.67);
+    }
+
     bool isGrounded(Player& p) override { return false; }
     bool canGrabLedge(Player& p) override { return true; }
 };
