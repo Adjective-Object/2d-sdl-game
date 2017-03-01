@@ -140,10 +140,6 @@ bool Player::canLand(Platform* p) {
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
 void Player::land(Platform* p) {
-    if (p->isPassable() && actionState == FALL &&
-        input->axis(MOVEMENT_AXIS_X) > 0.67)
-        return;
-
     double yvel = cVel.y;
     cVel.y = 0;
     grounded = true;
@@ -162,9 +158,11 @@ void Player::land(Platform* p) {
             changeAction(yvel > 1 ? LANDING : WAIT);
             break;
         case KNOCKDOWN_LANDING:
+            std::cout << "knockdown_landing not handled!" << std::endl;
             // TODO check the tech buffer
             break;
         case SPECIAL_LANDING:
+            std::cout << "special landing.." << std::endl;
             action->onLanding(*this);
             break;
     }
