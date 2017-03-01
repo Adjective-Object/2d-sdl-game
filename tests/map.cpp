@@ -242,5 +242,26 @@ TEST(Map, movePlayer_Airborne_Slanted_Down_Into_Wall_Slip_Off) {
     Pair requestedMotion = Pair(10, 20);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(20, 29));
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(19.5, 20));
+}
+
+TEST(Map, movePlayer_Airborne_Slanted_Up_Into_Wall_Slip_Off) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(10, 1), Pair(10, -1)}),
+        },
+        {});
+
+    // reset ECB so we are resting exactly on the wall
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.setRight(Pair(10, 0));
+    p.moveTo(tmpCollision);
+
+    Pair requestedMotion = Pair(10, -20);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(19.5, -20));
 }
