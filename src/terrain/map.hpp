@@ -13,12 +13,13 @@ class Map {
 
     void grabLedges(Player& player);
 
-    template <Pair& (*getEcbSide)(Ecb*),
+    template <TerrainCollisionType expectedType,
+              Pair& (*getEcbSide)(Ecb*),
               void (*setEcbSide)(Ecb*, Pair pos),
               double (*getBlockingAxis)(Pair& pos),
               double (*getNonblockingAxis)(Pair& pos),
               void (*setNonblockingAxis)(Pair& pos, double value)>
-    void performWallCollision(Player& player,
+    bool performWallCollision(Player& player,
                               Ecb*& currentEcb,
                               Ecb*& projectedEcb);
 
