@@ -116,8 +116,6 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         }
     }
 
-    std::cout << "grounded movement on " << i << std::endl;
-
     // if we've stepped beyond the end of the platform, abandon it
     if (i == points.size()) {
         std::cerr << "grounded movement starts off of platform (" << i << ")"
