@@ -11,6 +11,7 @@ class PlayerCollision {
     Ecb postCollision;
 
     void reset(Pair origin);
+    void reset(Ecb& ecb);
 };
 
 #endif

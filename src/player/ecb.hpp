@@ -38,4 +38,6 @@ class Ecb {
     void render(SDL_Renderer* r, double scale);
 };
 
+std::ostream& operator<<(std::ostream& strm, const Ecb& p);
+
 #endif

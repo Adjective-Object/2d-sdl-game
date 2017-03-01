@@ -30,6 +30,11 @@ void Player::moveTo(Pair newPos) {
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
 }
 
+void Player::moveTo(Ecb& ecb) {
+    position = ecb.origin - PLAYER_ECB_OFFSET;
+    currentCollision->reset(ecb);
+}
+
 void Player::update() {
     previousPosition.x = position.x;
     previousPosition.y = position.y;
@@ -125,14 +130,12 @@ bool Player::canGrabLedge() {
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(Platform* p, Pair const& landPosition) {
+void Player::land(Platform* p) {
     if (p->isPassable() && actionState == FALL &&
         input->axis(MOVEMENT_AXIS_X) > 0.67)
         return;
 
     double yvel = cVel.y;
-    position.y = landPosition.y;
-    position.x = landPosition.x;
     cVel.y = 0;
     grounded = true;
     fastfalled = false;
@@ -141,7 +144,6 @@ void Player::land(Platform* p, Pair const& landPosition) {
     currentPlatform = p;
     printf("landing on %p\n", p);
 
-    printf("current->postColl %p\n", &(currentCollision->postCollision));
     currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 
     switch (action->getLandType(*this)) {

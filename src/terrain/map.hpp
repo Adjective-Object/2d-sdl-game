@@ -20,7 +20,8 @@ class Map {
 
     bool getClosestCollision(Pair const& start,
                              Pair const& end,
-                             CollisionDatum& out);
+                             CollisionDatum& out,
+                             Platform* ignoredPlatform = NULL);
 
     bool getClosestEcbCollision(Ecb const& start,
                                 Ecb const& end,

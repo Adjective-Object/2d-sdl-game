@@ -9,13 +9,17 @@ Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
 
 bool Map::getClosestCollision(Pair const& start,
                               Pair const& end,
-                              CollisionDatum& out) {
+                              CollisionDatum& out,
+                              Platform* ignoredCollision) {
     double closestDist = DOUBLE_INFINITY;
     PlatformSegment segment;
     Pair collisionPoint;
     bool anyCollision = false;
 
     for (Platform& p : platforms) {
+        if (&p == ignoredCollision)
+            continue;
+
         TerrainCollisionType t =
             p.checkCollision(start, end, collisionPoint, segment);
 
@@ -73,6 +77,8 @@ bool Map::getClosestEcbCollision(Ecb const& start,
 void Map::movePlayer(Player& player, Pair& requestedDistance) {
     grabLedges(player);
 
+    std::cout << "movePlayer " << requestedDistance << std::endl;
+
     // if the player is grounded, move them along the platform
     Pair projectedPosition;
     if (player.isGrounded()) {
@@ -95,15 +101,46 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
         projectedPosition = player.position + requestedDistance;
     }
 
+    std::cout << "projected position " << projectedPosition << std::endl;
+
+    Ecb* currentEcb = &(player.currentCollision->playerModified);
+    Ecb* projectedEcb = &(player.currentCollision->postCollision);
+    projectedEcb->setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
+
+    Platform* currentPlatform = player.getCurrentPlatform();
+
     CollisionDatum collision;
-    if (getClosestCollision(player.position, projectedPosition, collision)) {
+    if (getClosestCollision(currentEcb->bottom, projectedEcb->bottom, collision,
+                            currentPlatform)) {
         // if there is a collision with the floor, land
+        std::cout << "collision bottom" << std::endl;
         if (collision.type == FLOOR_COLLISION) {
-            player.land(collision.segment.getPlatform(), collision.position);
+            std::cout << "triggering landing "
+                      << collision.segment.getPlatform() << std::endl;
+
+            player.land(collision.segment.getPlatform());
+            projectedEcb->setBottom(collision.position);
         }
-    } else {
-        player.moveTo(projectedPosition);
     }
+
+    if (getClosestCollision(currentEcb->right, projectedEcb->right, collision,
+                            currentPlatform)) {
+        std::cout << "collision right" << std::endl;
+        if (collision.type == WALL_COLLISION) {
+            std::cout << "colliding with wall "
+                      << collision.segment.getPlatform() << " at "
+                      << collision.position << std::endl;
+
+            projectedEcb->setRight(collision.position);
+
+            if (!player.isGrounded()) {
+                // TODO perform sliding
+            }
+        }
+    }
+
+    // reset plyer position to the projected Ecb
+    player.moveTo(*projectedEcb);
 }
 
 void Map::grabLedges(Player& player) {

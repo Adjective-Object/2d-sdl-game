@@ -55,9 +55,10 @@ class Player : public Sprite {
     void fall(bool fast = false);
     void aerialDrift();
     void grabLedge(Ledge* l);
-    void land(Platform* p, Pair const& y);
+    void land(Platform* p);
     void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
+    void moveTo(Ecb& ecb);
 
     Player(PlayerConfig* config,
            InputMapping::InputHandler* input,

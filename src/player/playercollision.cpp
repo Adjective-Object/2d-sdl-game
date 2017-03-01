@@ -6,3 +6,9 @@ void PlayerCollision::reset(Pair origin) {
     playerModified = root;
     postCollision = root;
 }
+
+void PlayerCollision::reset(Ecb& ecb) {
+    root = ecb;
+    playerModified = ecb;
+    postCollision = ecb;
+}
