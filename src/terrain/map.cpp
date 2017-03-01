@@ -102,20 +102,19 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
     // TODO think about ledge grabbing
     grabLedges(player);
 
-    std::cout << "movePlayer " << requestedDistance << std::endl;
-
     // if the player is grounded, move them along the platform
     Pair projectedPosition;
     basicProjection(player, requestedDistance, projectedPosition);
-
-    std::cout << "projected position " << projectedPosition << std::endl;
 
     Ecb* currentEcb = &(player.currentCollision->playerModified);
     Ecb* projectedEcb = &(player.currentCollision->postCollision);
     projectedEcb->setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
 
     do {
-        Platform* currentPlatform = player.getCurrentPlatform();
+        Platform* currentPlatform = NULL;
+        if (player.isGrounded()) {
+            currentPlatform = player.getCurrentPlatform();
+        }
 
         CollisionDatum collision;
         if (getClosestCollision(currentEcb->bottom, projectedEcb->bottom,
