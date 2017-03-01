@@ -109,6 +109,11 @@ void Player::fall(bool fast) {
     }
 }
 
+void Player::fallOffPlatform() {
+    currentPlatform = NULL;
+    changeAction(FALL);
+}
+
 void Player::grabLedge(Ledge* l) {
     currentLedge = l;
     changeAction(CLIFFCATCH);

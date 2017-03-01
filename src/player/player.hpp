@@ -68,6 +68,7 @@ class Player : public Sprite {
     bool canGrabLedge();
     bool isGrounded();
     bool canFallOff();
+    void fallOffPlatform();
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);

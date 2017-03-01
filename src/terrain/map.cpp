@@ -81,6 +81,10 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
         player.getCurrentPlatform()->groundedMovement(projectedPosition,
                                                       requestedDistance);
 
+        if (requestedDistance.euclidSquared() > 0) {
+            player.fallOffPlatform();
+        }
+
         // add remaining distnace (for falling)
         projectedPosition += requestedDistance;
     }
