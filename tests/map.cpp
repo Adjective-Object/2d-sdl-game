@@ -4,6 +4,7 @@
 #include "terrain/platform.hpp"
 #include "terrain/map.hpp"
 #include "lib/mock-player.hpp"
+#include "lib/on-line.hpp"
 
 // void Map::getClosestCollision(
 //             Pair const& start,
@@ -119,6 +120,52 @@ TEST(Map, movePlayer_Grounded_Flat_Into_Wall) {
     Pair requestedMotion = Pair(10, 0);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.00001);
-    EXPECT_NEAR(10, p.currentCollision->postCollision.bottom.y, 0.00001);
+    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
+    EXPECT_NEAR(10, p.currentCollision->postCollision.bottom.y, 0.000001);
+}
+
+TEST(Map, movePlayer_Grounded_Slant_Down_Left_Into_Wall) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(0, 5), Pair(20, 15)}),
+            Platform({Pair(15, 20), Pair(15, -20)}),
+        },
+        {});
+
+    p.land(m.getPlatform(0));
+
+    Pair requestedMotion = Pair(5 * sqrt(2.0), 0);
+    m.movePlayer(p, requestedMotion);
+
+    PlatformSegment segment = m.getPlatform(0)->getSegment(0);
+
+    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
+    EXPECT_TRUE(on_line(*segment.firstPoint(), *segment.secondPoint(),
+                        p.currentCollision->postCollision.bottom));
+}
+
+TEST(Map, movePlayer_Grounded_Slant_Down_Right_Into_Wall) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(0, 15), Pair(20, 5)}),
+            Platform({Pair(15, 20), Pair(15, -20)}),
+        },
+        {});
+
+    p.land(m.getPlatform(0));
+
+    Pair requestedMotion = Pair(5 * sqrt(2.0), 0);
+    m.movePlayer(p, requestedMotion);
+
+    PlatformSegment segment = m.getPlatform(0)->getSegment(0);
+
+    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
+    EXPECT_TRUE(on_line(*segment.firstPoint(), *segment.secondPoint(),
+                        p.currentCollision->postCollision.bottom));
 }
