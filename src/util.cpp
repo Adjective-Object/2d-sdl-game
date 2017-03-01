@@ -193,3 +193,20 @@ bool checkLineSweep(Pair& a1,
 
     return true;
 };
+
+#define EPSILON 0.000001
+bool onLine(Pair const& l1, Pair const& l2, Pair const& point) {
+    if (std::abs(l1.x - l2.x) < EPSILON) {
+        return std::abs(point.x - l1.x) < EPSILON &&
+               std::min(l1.y, l2.y) < point.y && std::max(l1.y, l2.y) > point.y;
+    }
+
+    Pair slope = l2 - l1;
+    double xdiff = point.x - l1.x;
+    double ratio = (xdiff / slope.x);
+    if (ratio < 0 || ratio > 1)
+        return false;
+    Pair predictedPoint = l1 + slope * ratio;
+
+    return (predictedPoint - point).euclid() < EPSILON;
+}

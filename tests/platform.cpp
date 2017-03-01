@@ -163,15 +163,15 @@ TEST(Platform, GroundedMovement_WalkIntoConvolutedSurface) {
     Pair pos = Pair(-0.5, 1), vel = Pair(1, 0);
     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.25, 1), pos);
-    EXPECT_EQ(Pair(0.25, 0), vel);
+    EXPECT_EQ(pos, Pair(0.25, 1));
+    EXPECT_EQ(vel, Pair(0.25, 0));
 
     pos = Pair(1.5, 1);
     vel = Pair(-1, 0);
     p.groundedMovement(pos, vel);
 
-    EXPECT_EQ(Pair(0.75, 1), pos);
-    EXPECT_EQ(Pair(-0.25, 0), vel);
+    EXPECT_EQ(pos, Pair(0.75, 1));
+    EXPECT_EQ(vel, Pair(-0.25, 0));
 }
 
 TEST(Platform, GroundedMovement_WalkFromExactEndOfSurface) {

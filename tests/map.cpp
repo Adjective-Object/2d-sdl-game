@@ -4,7 +4,7 @@
 #include "terrain/platform.hpp"
 #include "terrain/map.hpp"
 #include "lib/mock-player.hpp"
-#include "lib/on-line.hpp"
+#include "util.hpp"
 
 // void Map::getClosestCollision(
 //             Pair const& start,
@@ -143,8 +143,8 @@ TEST(Map, movePlayer_Grounded_Slant_Down_Left_Into_Wall) {
     PlatformSegment segment = m.getPlatform(0)->getSegment(0);
 
     EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
-    EXPECT_TRUE(on_line(*segment.firstPoint(), *segment.secondPoint(),
-                        p.currentCollision->postCollision.bottom));
+    EXPECT_TRUE(onLine(*segment.firstPoint(), *segment.secondPoint(),
+                       p.currentCollision->postCollision.bottom));
 }
 
 TEST(Map, movePlayer_Grounded_Slant_Down_Right_Into_Wall) {
@@ -166,8 +166,8 @@ TEST(Map, movePlayer_Grounded_Slant_Down_Right_Into_Wall) {
     PlatformSegment segment = m.getPlatform(0)->getSegment(0);
 
     EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
-    EXPECT_TRUE(on_line(*segment.firstPoint(), *segment.secondPoint(),
-                        p.currentCollision->postCollision.bottom));
+    EXPECT_TRUE(onLine(*segment.firstPoint(), *segment.secondPoint(),
+                       p.currentCollision->postCollision.bottom));
 }
 
 TEST(Map, movePlayer_Airborne_Flat_Into_Wall) {

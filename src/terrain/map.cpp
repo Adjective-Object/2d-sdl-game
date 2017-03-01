@@ -125,6 +125,7 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
                     std::cout << "triggering landing "
                               << collision.segment.getPlatform() << std::endl;
 
+                    // player landing alters ECB as well
                     player.land(collision.segment.getPlatform());
                     projectedEcb->setBottom(collision.position);
                 }
@@ -132,7 +133,8 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
         }
 
         if (getClosestCollision(currentEcb->right, projectedEcb->right,
-                                collision, currentPlatform)) {
+                                collision, NULL)) {
+            std::cout << "collision with wall!" << std::endl;
             if (collision.type == WALL_COLLISION) {
                 std::cout << "colliding with wall "
                           << collision.segment.getPlatform() << " at "
@@ -190,7 +192,7 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
                     // walls only effect the X axis, so if the Y axis is
                     // similar enough, the player will get stuck on the wall.
                     // Do nothing then.
-                    player.moveTo(tmpEcb);
+                    projectedEcb->setRight(wallSlidePosition);
                 }
             }
         }

@@ -90,8 +90,6 @@ set(TEST_SRCS
 
     tests/lib/mock-player.cpp
     tests/lib/mock-player.hpp
-    tests/lib/on-line.cpp
-    tests/lib/on-line.hpp
     )
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC

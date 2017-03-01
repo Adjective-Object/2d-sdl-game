@@ -78,6 +78,8 @@ void Platform::render(SDL_Renderer* r) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         if (passable) {
             SDL_SetRenderDrawColor(r, 100, 100, 255, 255);
+        } else if (isWall(angles[i])) {
+            SDL_SetRenderDrawColor(r, 0, 200, 255, 255);
         } else {
             SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
         }
@@ -109,10 +111,12 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     size_t i;
     for (i = 0; i < points.size() - 1; i++) {
         if (!isWall(angles[i]) && points[i].x <= position.x &&
-            position.x <= points[i + 1].x) {
+            onLine(points[i], points[i + 1], position)) {
             break;
         }
     }
+
+    std::cout << "grounded movement on " << i << std::endl;
 
     // if we've stepped beyond the end of the platform, abandon it
     if (i == points.size()) {
