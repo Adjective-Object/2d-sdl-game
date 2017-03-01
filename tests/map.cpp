@@ -169,3 +169,57 @@ TEST(Map, movePlayer_Grounded_Slant_Down_Right_Into_Wall) {
     EXPECT_TRUE(on_line(*segment.firstPoint(), *segment.secondPoint(),
                         p.currentCollision->postCollision.bottom));
 }
+
+TEST(Map, movePlayer_Airborne_Flat_Into_Wall) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(15, 20), Pair(15, -20)}),
+        },
+        {});
+
+    Pair requestedMotion = Pair(10, 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
+    EXPECT_NEAR(p.currentCollision->playerModified.origin.y,
+                p.currentCollision->postCollision.origin.y, 0.000001);
+}
+
+TEST(Map, movePlayer_Airborne_Slanted_Up_Into_Wall) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(11, 20), Pair(11, -20)}),
+        },
+        {});
+
+    Pair requestedMotion = Pair(10, -5);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_NEAR(p.currentCollision->postCollision.right.x, 11, 0.000001);
+
+    EXPECT_NEAR(p.position.y, 5, 0.000001);
+}
+
+TEST(Map, movePlayer_Airborne_Slanted_Down_Into_Wall) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 10));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(11, 20), Pair(11, -20)}),
+        },
+        {});
+
+    Pair requestedMotion = Pair(10, 5);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_NEAR(p.currentCollision->postCollision.right.x, 11, 0.000001);
+
+    EXPECT_NEAR(p.position.y, 15, 0.000001);
+}

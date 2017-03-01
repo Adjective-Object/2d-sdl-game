@@ -113,7 +113,6 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
     if (getClosestCollision(currentEcb->bottom, projectedEcb->bottom, collision,
                             currentPlatform)) {
         // if there is a collision with the floor, land
-        std::cout << "collision bottom" << std::endl;
         if (collision.type == FLOOR_COLLISION) {
             std::cout << "triggering landing "
                       << collision.segment.getPlatform() << std::endl;
@@ -125,17 +124,27 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
 
     if (getClosestCollision(currentEcb->right, projectedEcb->right, collision,
                             currentPlatform)) {
-        std::cout << "collision right" << std::endl;
         if (collision.type == WALL_COLLISION) {
             std::cout << "colliding with wall "
                       << collision.segment.getPlatform() << " at "
                       << collision.position << std::endl;
 
-            projectedEcb->setRight(collision.position);
+            Pair position = collision.position;
 
             if (!player.isGrounded()) {
-                // TODO perform sliding
+                double directionY =
+                    projectedEcb->origin.y - currentEcb->origin.y;
+                position.y =
+                    (directionY > 0)
+                        ? std::min(std::max(collision.segment.secondPoint()->y,
+                                            collision.segment.firstPoint()->y),
+                                   projectedEcb->right.y)
+                        : std::max(std::min(collision.segment.secondPoint()->y,
+                                            collision.segment.firstPoint()->y),
+                                   projectedEcb->right.y);
             }
+
+            projectedEcb->setRight(position);
         }
     }
 
