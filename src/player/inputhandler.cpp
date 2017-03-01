@@ -4,8 +4,8 @@
 using namespace InputMapping;
 
 BUTTON_MAPPING buttonMap[] = {
-    {0, ATTACK}, {3, JUMP},           {4, JUMP},
-    {7, START},  {11, SHIELD_BUTTON}, {12, SHIELD_BUTTON},
+    {0, ATTACK},        {1, JUMP},          {2, JUMP},    {7, START},
+    {4, SHIELD_BUTTON}, {5, SHIELD_BUTTON}, {3, SPECIAL},
 };
 
 AXIS_MAPPING axisMap[] = {
@@ -22,6 +22,7 @@ JoystickInputHandler::JoystickInputHandler() {
 }
 
 void JoystickInputHandler::step(Joystick* j) {
+    virtualJoystick.clear();
     for (size_t i = 0; i < sizeof(buttonMap) / sizeof(BUTTON_MAPPING); i++) {
         BUTTON_MAPPING mapping = buttonMap[i];
         if (j->down(mapping.physicalButtonId)) {
