@@ -121,11 +121,13 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
                                 collision, currentPlatform)) {
             // if there is a collision with the floor, land
             if (collision.type == FLOOR_COLLISION) {
-                std::cout << "triggering landing "
-                          << collision.segment.getPlatform() << std::endl;
+                if (player.canLand(collision.segment.getPlatform())) {
+                    std::cout << "triggering landing "
+                              << collision.segment.getPlatform() << std::endl;
 
-                player.land(collision.segment.getPlatform());
-                projectedEcb->setBottom(collision.position);
+                    player.land(collision.segment.getPlatform());
+                    projectedEcb->setBottom(collision.position);
+                }
             }
         }
 

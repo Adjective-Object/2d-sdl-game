@@ -58,7 +58,12 @@ void Player::update() {
     PlayerCollision* tmp = previousCollision;
     previousCollision = currentCollision;
     currentCollision = tmp;
-    // this should be from animation data
+
+    // here we _would_ get the ecb from the animation
+    currentCollision->root.widthLeft = ECB_DEFAULT_WIDTH;
+    currentCollision->root.widthRight = ECB_DEFAULT_WIDTH;
+    currentCollision->root.heightTop = ECB_DEFAULT_HEIGHT;
+    currentCollision->root.heightBottom = ECB_DEFAULT_HEIGHT;
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
 
     // if we are currently grounded, adapt the x of cVel to
@@ -127,6 +132,10 @@ void Player::grabLedge(Ledge* l) {
 bool Player::canGrabLedge() {
     return ledgeRegrabCounter <= 0 && action->canGrabLedge(*this);
 }
+
+bool Player::canLand(Platform* p) {
+    return action->isLandable(*this, p);
+};
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */

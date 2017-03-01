@@ -70,6 +70,7 @@ class Player : public Sprite {
     bool isGrounded();
     bool canFallOff();
     void fallOffPlatform();
+    bool canLand(Platform* p);
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);
