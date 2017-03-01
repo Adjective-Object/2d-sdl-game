@@ -98,6 +98,93 @@ void basicProjection(Player& player,
     }
 }
 
+template <Pair& (*getEcbSide)(Ecb*), void (*setEcbSide)(Ecb*, Pair pos)>
+void Map::performWallCollision(Player& player,
+                               Ecb*& currentEcb,
+                               Ecb*& projectedEcb) {
+    CollisionDatum collision;
+
+    if (getClosestCollision(getEcbSide(currentEcb), getEcbSide(projectedEcb),
+                            collision, NULL)) {
+        std::cout << "collision with wall!" << std::endl;
+        if (collision.type == WALL_COLLISION) {
+            std::cout << "colliding with wall "
+                      << collision.segment.getPlatform() << " at "
+                      << collision.position << std::endl;
+
+            Pair wallSlidePosition = collision.position;
+
+            if (!player.isGrounded()) {
+                double directionY =
+                    projectedEcb->origin.y - currentEcb->origin.y;
+                wallSlidePosition.y =
+                    (directionY > 0)
+                        ? std::min(std::max(collision.segment.secondPoint()->y,
+                                            collision.segment.firstPoint()->y),
+                                   getEcbSide(projectedEcb).y)
+                        : std::max(std::min(collision.segment.secondPoint()->y,
+                                            collision.segment.firstPoint()->y),
+                                   getEcbSide(projectedEcb).y);
+            }
+
+            std::cout << "position after sliding " << wallSlidePosition
+                      << std::endl;
+
+            // slide the ecb along the wall
+            Ecb tmpEcb = *projectedEcb;
+            setEcbSide(&tmpEcb, wallSlidePosition);
+
+            std::cout << "ecbs " << currentEcb->origin << ".."
+                      << projectedEcb->origin << std::endl;
+
+            if (!player.isGrounded() &&
+                std::abs(getEcbSide(projectedEcb).y - wallSlidePosition.y) >
+                    COLLISION_EPSILON) {
+                // move the goal back by taking the X difference between the
+                // position without collision at the new Y and the position
+                // after wall sliding
+
+                // get the relative positions of the destination with and
+                // without collision
+                Pair relPosNoColl =
+                    getEcbSide(projectedEcb) - getEcbSide(currentEcb);
+                Pair relPosColl = wallSlidePosition - getEcbSide(currentEcb);
+                relPosNoColl *= relPosColl.y / relPosNoColl.y;
+
+                double noCollisionDistance = relPosColl.x - relPosNoColl.x;
+                Pair rollbackPosition =
+                    getEcbSide(projectedEcb) + Pair(noCollisionDistance, 0);
+
+                // update the player position and projected ECB
+                player.moveTo(tmpEcb);
+                setEcbSide(projectedEcb, rollbackPosition);
+
+            } else {
+                // walls only effect the X axis, so if the Y axis is
+                // similar enough, the player will get stuck on the wall.
+                // Do nothing then.
+                setEcbSide(projectedEcb, wallSlidePosition);
+            }
+        }
+    }
+}
+
+inline Pair& getEcbSideRight(Ecb* e) {
+    return e->right;
+}
+
+inline void setEcbSideRight(Ecb* e, Pair pos) {
+    return e->setRight(pos);
+}
+
+inline Pair& getEcbSideLeft(Ecb* e) {
+    return e->left;
+}
+
+inline void setEcbSideLeft(Ecb* e, Pair pos) {
+    return e->setLeft(pos);
+}
+
 void Map::movePlayer(Player& player, Pair& requestedDistance) {
     // TODO think about ledge grabbing
     grabLedges(player);
@@ -132,70 +219,13 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
             }
         }
 
-        if (getClosestCollision(currentEcb->right, projectedEcb->right,
-                                collision, NULL)) {
-            std::cout << "collision with wall!" << std::endl;
-            if (collision.type == WALL_COLLISION) {
-                std::cout << "colliding with wall "
-                          << collision.segment.getPlatform() << " at "
-                          << collision.position << std::endl;
+        // perform right wall collision
+        performWallCollision<getEcbSideRight, setEcbSideRight>(
+            player, currentEcb, projectedEcb);
 
-                Pair wallSlidePosition = collision.position;
-
-                if (!player.isGrounded()) {
-                    double directionY =
-                        projectedEcb->origin.y - currentEcb->origin.y;
-                    wallSlidePosition.y =
-                        (directionY > 0)
-                            ? std::min(
-                                  std::max(collision.segment.secondPoint()->y,
-                                           collision.segment.firstPoint()->y),
-                                  projectedEcb->right.y)
-                            : std::max(
-                                  std::min(collision.segment.secondPoint()->y,
-                                           collision.segment.firstPoint()->y),
-                                  projectedEcb->right.y);
-                }
-
-                std::cout << "position after sliding " << wallSlidePosition
-                          << std::endl;
-
-                // slide the ecb along the wall
-                Ecb tmpEcb = *projectedEcb;
-                tmpEcb.setRight(wallSlidePosition);
-
-                std::cout << "ecbs " << currentEcb->origin << ".."
-                          << projectedEcb->origin << std::endl;
-
-                if (!player.isGrounded() &&
-                    std::abs(projectedEcb->right.y - wallSlidePosition.y) >
-                        COLLISION_EPSILON) {
-                    // move the goal back by taking the X difference between the
-                    // position without collision at the new Y and the position
-                    // after wall sliding
-
-                    // get the relative positions of the destination with and
-                    // without collision
-                    Pair relPosNoColl = projectedEcb->right - currentEcb->right;
-                    Pair relPosColl = wallSlidePosition - currentEcb->right;
-                    relPosNoColl *= relPosColl.y / relPosNoColl.y;
-
-                    double noCollisionDistance = relPosColl.x - relPosNoColl.x;
-                    Pair rollbackPosition =
-                        projectedEcb->origin + Pair(noCollisionDistance, 0);
-
-                    // update the player position and projected ECB
-                    player.moveTo(tmpEcb);
-                    projectedEcb->setOrigin(rollbackPosition);
-
-                } else {
-                    // walls only effect the X axis, so if the Y axis is
-                    // similar enough, the player will get stuck on the wall.
-                    // Do nothing then.
-                    projectedEcb->setRight(wallSlidePosition);
-                }
-            }
-        }
+        // perform right wall collision
+        performWallCollision<getEcbSideLeft, setEcbSideLeft>(player, currentEcb,
+                                                             projectedEcb);
 
         // reset plyer position to the projected Ecb
         player.moveTo(*projectedEcb);

@@ -111,8 +111,8 @@ void Player::fall(bool fast) {
     cVel.y += getAttribute("gravity");
     cVel.y = std::min(cVel.y, getAttribute("terminal_velocity"));
 
-    if (fast || (input->axis(MOVEMENT_AXIS_X) > 0.65 &&
-                 input->axis(MOVEMENT_AXIS_X, 3) < 0.1 && cVel.y > 0)) {
+    if (fast || (input->axis(MOVEMENT_AXIS_Y) > 0.65 &&
+                 input->axis(MOVEMENT_AXIS_Y, 3) < 0.1 && cVel.y > 0)) {
         std::cout << "fastfalling" << std::endl;
         fastfalled = true;
         cVel.y = getAttribute("fast_fall_terminal_velocity");

@@ -13,6 +13,11 @@ class Map {
 
     void grabLedges(Player& player);
 
+    template <Pair& (*getEcbSide)(Ecb*), void (*setEcbSide)(Ecb*, Pair pos)>
+    void performWallCollision(Player& player,
+                              Ecb*& currentEcb,
+                              Ecb*& projectedEcb);
+
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
     void movePlayer(Player& player, Pair& requestedDistance);
