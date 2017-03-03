@@ -83,6 +83,25 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
     return NO_COLLISION;
 }
 
+bool Platform::checkEdgeCollision(Pair const& a1,
+                                  Pair const& a2,
+                                  Pair const& b1,
+                                  Pair const& b2,
+                                  Pair& collidedPoint,
+                                  Pair& collidedLine1,
+                                  Pair& collidedLine2) {
+    for (size_t i = 0; i < points.size() - 1; i++) {
+        // TODO compare if multiple colls happen same frame?
+        if (checkLineSweep(a1, a2, b1, b2, points[i], collidedLine1,
+                           collidedLine2)) {
+            collidedPoint = points[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
 #define PLATFORM_DIR_OFFSET 0.03
 void Platform::render(SDL_Renderer* r) {
     for (size_t i = 0; i < points.size() - 1; i++) {

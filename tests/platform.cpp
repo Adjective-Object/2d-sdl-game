@@ -265,9 +265,9 @@ TEST(Platform, checkCollision_Basic_Floor) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               FLOOR_COLLISION);
-    EXPECT_EQ(Pair(1, 1), out);
+    ASSERT_EQ(Pair(1, 1), out);
     EXPECT_EQ(Pair(-1, 1), *segment.firstPoint());
     EXPECT_EQ(Pair(2, 1), *segment.secondPoint());
 }
@@ -281,7 +281,7 @@ TEST(Platform, checkCollision_Reverse_Floor) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(newPosition, lastPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(newPosition, lastPosition, out, segment),
               NO_COLLISION);
 }
 
@@ -294,7 +294,7 @@ TEST(Platform, checkCollision_Basic_Wall) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               WALL_COLLISION);
     EXPECT_EQ(Pair(1, 1), out);
 
@@ -311,7 +311,7 @@ TEST(Platform, checkCollision_Reverse_Wall) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(newPosition, lastPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(newPosition, lastPosition, out, segment),
               NO_COLLISION);
 }
 
@@ -324,7 +324,7 @@ TEST(Platform, checkCollision_Diagonal_Floor) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               FLOOR_COLLISION);
     EXPECT_EQ(Pair(1, 1), out);
 
@@ -338,7 +338,7 @@ TEST(Platform, checkCollision_Diagonal_Floor) {
     newPosition = Pair(2, 0);
     out = Pair(0, 0);
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               FLOOR_COLLISION);
     EXPECT_EQ(out, Pair(1, -1));
 
@@ -356,7 +356,7 @@ TEST(Platform, checkCollision_Diagonal_Floor_Miss) {
     Pair out = Pair(0, 0);
     PlatformSegment segment;
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               NO_COLLISION);
     EXPECT_EQ(out, Pair(0, 0));
 
@@ -367,7 +367,7 @@ TEST(Platform, checkCollision_Diagonal_Floor_Miss) {
     newPosition = Pair(-3, -4);
     out = Pair(0, 0);
 
-    EXPECT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
+    ASSERT_EQ(p.checkCollision(lastPosition, newPosition, out, segment),
               NO_COLLISION);
     EXPECT_EQ(out, Pair(0, 0));
 }

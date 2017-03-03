@@ -29,6 +29,14 @@ class Platform : public Entity {
                                         Pair& out,
                                         PlatformSegment& segment);
 
+    bool checkEdgeCollision(Pair const& a1,
+                            Pair const& a2,
+                            Pair const& b1,
+                            Pair const& b2,
+                            Pair& collidedPoint,
+                            Pair& collidedLine1,
+                            Pair& collidedLine2);
+
     bool groundedMovement(Pair& position, Pair& distance);
 
     void init();

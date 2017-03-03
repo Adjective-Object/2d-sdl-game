@@ -265,3 +265,55 @@ TEST(Map, movePlayer_Airborne_Slanted_Up_Into_Wall_Slip_Off) {
 
     EXPECT_EQ(p.currentCollision->postCollision.right, Pair(19.5, -20));
 }
+
+TEST(Map, movePlayer_Airborne_Flat_Into_Corner_TopRight) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(10, -0.1), Pair(11, -0.1)}),
+        },
+        {});
+
+    // reset ECB so we are resting exactly on the wall
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.widthLeft = 1;
+    tmpCollision.heightBottom = 1;
+    tmpCollision.setRight(Pair(9, 0));
+    p.moveTo(tmpCollision);
+
+    Pair requestedMotion = Pair(10, 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(10.1, 0));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.1, -1));
+}
+
+TEST(Map, movePlayer_Airborne_Diagonal_Down_Corner_TopRight) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(10, 0), Pair(11, 0)}),
+        },
+        {});
+
+    // reset ECB so we are resting exactly on the wall
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.widthLeft = 1;
+    tmpCollision.heightBottom = 1;
+    tmpCollision.setRight(Pair(9.99, -0.01));
+    p.moveTo(tmpCollision);
+
+    Pair requestedMotion = Pair(10, -1);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(6, -2));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(5, 0));
+}

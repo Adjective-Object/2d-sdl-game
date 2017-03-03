@@ -33,9 +33,21 @@ class Map {
                              CollisionDatum& out,
                              Platform* ignoredPlatform = NULL);
 
+    bool getClosestEdgeCollision(Pair const& a1,
+                                 Pair const& a2,
+                                 Pair const& b1,
+                                 Pair const& b2,
+                                 Pair& out,
+                                 Pair& collidedLine1,
+                                 Pair& collidedLine2);
+
     bool getClosestEcbCollision(Ecb const& start,
                                 Ecb const& end,
                                 CollisionDatum& out);
+
+    bool performWallEdgeCollision(Player& player,
+                                  Ecb*& currentEcb,
+                                  Ecb*& projectedEcb);
 
     Platform* getPlatform(size_t index);
 };
