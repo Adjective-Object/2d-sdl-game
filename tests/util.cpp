@@ -240,6 +240,6 @@ TEST(Util, checkLineSweep_Specific) {
     Pair out1, out2;
 
     ASSERT_TRUE(checkLineSweep(a1, a2, b1, b2, c, out1, out2));
-    EXPECT_EQ(out1, Pair(9.1, -1));
-    EXPECT_EQ(out2, Pair(10.1, 0));
+    EXPECT_EQ(out1, Pair(10.1, 0));
+    EXPECT_EQ(out2, Pair(9.1, -1));
 }

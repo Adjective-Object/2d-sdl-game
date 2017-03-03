@@ -4,9 +4,9 @@
 
 #include <iostream>
 
-// #define _debug(__VA_ARGS__)
-#define _debug(...) \
-    { __VA_ARGS__; }
+#define _debug(__VA_ARGS__)
+// #define _debug(...) \
+//     { __VA_ARGS__; }
 
 inline double Dot(const Pair& a, const Pair& b) {
     return (a.x * b.x) + (a.y * b.y);
@@ -81,27 +81,27 @@ bool checkLineSweep(Pair const& a1,
                     Pair& out1,
                     Pair& out2,
                     double epsilon) {
-    std::cout << "a1: " << a1 << std::endl;
-    std::cout << "a2: " << a2 << std::endl;
-    std::cout << "b1: " << b1 << std::endl;
-    std::cout << "b2: " << b2 << std::endl;
-    std::cout << "c:  " << c << std::endl;
+    _debug(std::cout << "a1: " << a1 << std::endl;
+           std::cout << "a2: " << a2 << std::endl;
+           std::cout << "b1: " << b1 << std::endl;
+           std::cout << "b2: " << b2 << std::endl;
+           std::cout << "c:  " << c << std::endl;)
 
-    Pair intersectionA, intersectionB;
+        Pair intersectionA,
+        intersectionB;
     Pair diff1 = b1 - a1;
     Pair diff2 = b2 - a2;
 
-    std::cout << "diff1: " << diff1 << std::endl;
-    std::cout << "diff2: " << diff2 << std::endl;
-    std::cout << "diff1 len^2: " << diff1.euclidSquared() << std::endl;
-    std::cout << "diff2 len^2: " << diff2.euclidSquared() << std::endl;
+    _debug(std::cout << "diff1: " << diff1 << std::endl;
+           std::cout << "diff2: " << diff2 << std::endl;
+           std::cout << "diff1 len^2: " << diff1.euclidSquared() << std::endl;
+           std::cout << "diff2 len^2: " << diff2.euclidSquared() << std::endl;)
 
-    double biggestLen = std::max(diff1.euclidSquared(), diff2.euclidSquared());
-
-    std::cout << diff1.euclid() << std::endl;
+        double biggestLen =
+            std::max(diff1.euclidSquared(), diff2.euclidSquared());
 
     if (biggestLen == 0) {
-        std::cout << "biggestLen = 0" << std::endl;
+        _debug(std::cout << "biggestLen = 0" << std::endl;);
         out1 = a1;
         out2 = a2;
         return true;
@@ -109,15 +109,13 @@ bool checkLineSweep(Pair const& a1,
 
     Pair biggestDiff = diff1 * (biggestLen / diff1.euclid());
 
-    std::cout << "biggest diff " << biggestDiff << std::endl;
+    _debug(std::cout << "biggest diff " << biggestDiff << std::endl);
 
     int wasIntersection1 =
         checkLineIntersection(a1, a2, c, c - biggestDiff, intersectionA);
 
     int wasIntersection2 =
         checkLineIntersection(b1, b2, c, c + biggestDiff, intersectionB);
-
-    std::cout << wasIntersection1 << " " << wasIntersection2 << std::endl;
 
     if (wasIntersection1 == 0 || wasIntersection2 == 0)
         return false;
@@ -127,7 +125,7 @@ bool checkLineSweep(Pair const& a1,
     double diffDist = pointADist + pointBDist;
 
     if (diffDist == 0) {
-        std::cout << "diffDist = 0" << std::endl;
+        _debug(std::cout << "diffDist = 0" << std::endl);
         ;
         out1 = c;
         out2 = c;
@@ -135,15 +133,16 @@ bool checkLineSweep(Pair const& a1,
     };
 
     double rC = pointADist / diffDist;
-    std::cout << "rC" << rC << std::endl;
 
-    std::cout << "b1 - a1: " << (b1 - a1) << std::endl;
-    std::cout << "b2 - a2: " << (b2 - a2) << std::endl;
+    _debug(std::cout << "rC" << rC << std::endl;
 
-    std::cout << "(b1 - a1) * rC: " << (b1 - a1) * rC << std::endl;
-    std::cout << "(b2 - a2) * rC: " << (b2 - a2) * rC << std::endl;
+           std::cout << "b1 - a1: " << (b1 - a1) << std::endl;
+           std::cout << "b2 - a2: " << (b2 - a2) << std::endl;
 
-    out1 = a1 + ((b1 - a1) * rC);
+           std::cout << "(b1 - a1) * rC: " << (b1 - a1) * rC << std::endl;
+           std::cout << "(b2 - a2) * rC: " << (b2 - a2) * rC << std::endl;)
+
+        out1 = a1 + ((b1 - a1) * rC);
     out2 = a2 + ((b2 - a2) * rC);
     return true;
 };

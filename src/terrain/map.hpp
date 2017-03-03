@@ -23,6 +23,13 @@ class Map {
                               Ecb*& currentEcb,
                               Ecb*& projectedEcb);
 
+    template <Pair& (*getForwardEdge)(Ecb*),
+              Pair& (*getBackEdge)(Ecb*),
+              void (*setForwardEdge)(Ecb*, Pair pos)>
+    bool performWallEdgeCollision(Player& player,
+                                  Ecb*& currentEcb,
+                                  Ecb*& projectedEcb);
+
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
     void movePlayer(Player& player, Pair& requestedDistance);
@@ -44,10 +51,6 @@ class Map {
     bool getClosestEcbCollision(Ecb const& start,
                                 Ecb const& end,
                                 CollisionDatum& out);
-
-    bool performWallEdgeCollision(Player& player,
-                                  Ecb*& currentEcb,
-                                  Ecb*& projectedEcb);
 
     Platform* getPlatform(size_t index);
 };

@@ -115,6 +115,38 @@ void basicProjection(Player& player,
     }
 }
 
+void rollback(Player& player,
+              Ecb& tmpEcb,
+              Ecb*& currentEcb,
+              Ecb*& projectedEcb) {
+    double collisionVerticalDifference =
+        std::abs(projectedEcb->origin.y) - tmpEcb.origin.y;
+
+    if (!player.isGrounded() &&
+        collisionVerticalDifference > COLLISION_EPSILON) {
+        // move the goal back by taking the X difference between the
+        // position without collision at the new Y and the position
+        // after wall sliding
+
+        // get the relative positions of the destination with and
+        // without collision
+        Pair relPosNoColl = projectedEcb->origin - currentEcb->origin;
+        Pair relPosColl = tmpEcb.origin - currentEcb->origin;
+        relPosNoColl *= relPosColl.y / relPosNoColl.y;
+
+        double noCollisionDistance = relPosColl.x - relPosNoColl.x;
+
+        Pair rollbackPosition =
+            projectedEcb->origin + Pair(noCollisionDistance, 0);
+
+        // update the player position and projected ECB
+        player.moveTo(tmpEcb);
+        projectedEcb->setOrigin(rollbackPosition);
+    } else {
+        player.moveTo(tmpEcb);
+    }
+}
+
 template <TerrainCollisionType expectedType,
           Pair& (*getEcbSide)(Ecb*),
           void (*setEcbSide)(Ecb*, Pair pos),
@@ -164,63 +196,55 @@ bool Map::performWallCollision(Player& player,
     std::cout << "ecbs " << currentEcb->origin << ".." << projectedEcb->origin
               << std::endl;
 
-    double collisionVerticalDifference =
-        std::abs(y(getEcbSide(projectedEcb)) - y(wallSlidePosition));
-
-    if (!player.isGrounded() &&
-        collisionVerticalDifference > COLLISION_EPSILON) {
-        // move the goal back by taking the X difference between the
-        // position without collision at the new Y and the position
-        // after wall sliding
-
-        // get the relative positions of the destination with and
-        // without collision
-        Pair relPosNoColl = getEcbSide(projectedEcb) - getEcbSide(currentEcb);
-        Pair relPosColl = wallSlidePosition - getEcbSide(currentEcb);
-        relPosNoColl *= y(relPosColl) / y(relPosNoColl);
-
-        double noCollisionDistance = x(relPosColl) - x(relPosNoColl);
-
-        Pair rollbackPosition =
-            getEcbSide(projectedEcb) + Pair(noCollisionDistance, 0);
-
-        // update the player position and projected ECB
-        player.moveTo(tmpEcb);
-        setEcbSide(projectedEcb, rollbackPosition);
-    } else {
-        setEcbSide(projectedEcb, wallSlidePosition);
-    }
+    rollback(player, tmpEcb, currentEcb, projectedEcb);
 
     return true;
 }
-
+template <Pair& (*getForwardEdge)(Ecb*),
+          Pair& (*getBackEdge)(Ecb*),
+          void (*setForwardEdge)(Ecb*, Pair pos)>
 bool Map::performWallEdgeCollision(Player& player,
                                    Ecb*& currentEcb,
                                    Ecb*& projectedEcb) {
     Pair collisionPoint;
     Pair collisionLine1, collisionLine2;
 
-    if (!getClosestEdgeCollision(currentEcb->top, currentEcb->right,
-                                 projectedEcb->top, projectedEcb->right,
-                                 collisionPoint, collisionLine1,
-                                 collisionLine2)) {
+    Pair currentForward = getForwardEdge(currentEcb);
+    Pair currentBack = getBackEdge(currentEcb);
+
+    Pair projectedForward = getForwardEdge(projectedEcb);
+    Pair projectedBack = getBackEdge(projectedEcb);
+
+    Pair line = currentForward - currentBack;
+    Pair move = projectedForward - currentForward;
+
+    // std::cout << "current ecb: " << *currentEcb << std::endl;
+    // std::cout << "projected ecb: " << *projectedEcb << std::endl;
+
+    // std::cout << "currentForward: " << currentForward << std::endl;
+    // std::cout << "currentBack: " << currentBack << std::endl;
+    // std::cout << "projectedForward: " << projectedForward << std::endl;
+    // std::cout << "projectedBack: " << projectedBack << std::endl;
+
+    // std::cout << "line: " << line << std::endl;
+    // std::cout << "move: " << move << std::endl;
+
+    if (sign(line.x) == -sign(move.x))
+        return false;
+    if (move == Pair(0, 0))
+        return false;
+
+    if (!getClosestEdgeCollision(currentBack, currentForward, projectedBack,
+                                 projectedForward, collisionPoint,
+                                 collisionLine1, collisionLine2)) {
         return false;
     }
 
-    std::cout << "colliding with corner at " << collisionPoint << std::endl;
-    std::cout << "  " << currentEcb->right << "  " << currentEcb->top << "  "
-              << projectedEcb->right << "  " << projectedEcb->top << std::endl;
+    std::cout << "collide with corner " << collisionPoint << std::endl;
 
     // slide the ecb along the wall
     Ecb tmpEcb = *projectedEcb;
-
-    // move tmpEcb to the point of initial collision
-    std::cout << "line at collision is " << collisionLine1 << ".."
-              << collisionLine2 << std::endl;
-
-    tmpEcb.setRight(collisionLine2);
-
-    std::cout << tmpEcb << std::endl;
+    setForwardEdge(&tmpEcb, collisionLine2);
 
     // perform vertical sliding if the player is not grounded
     if (!player.isGrounded()) {
@@ -228,57 +252,39 @@ bool Map::performWallEdgeCollision(Player& player,
         // either the full length of the ecb, or slide along the ecb until a
         // dimension of the projected point is the same as the dimension of
         // the slid point
-        double maxXSlide =
-            std::min(projectedEcb->right.x - projectedEcb->top.x,
-                     projectedEcb->right.x - currentEcb->right.x);
-        double maxYSlide = std::min(projectedEcb->right.y - projectedEcb->top.y,
-                                    projectedEcb->top.y - currentEcb->top.y);
+        double maxXSlide = std::min(projectedForward.x - projectedBack.x,
+                                    projectedForward.x - currentForward.x);
 
-        std::cout << "max x slide " << maxXSlide << std::endl;
+        double maxYSlide =
+            sign(move.y) *
+            std::min(std::abs(projectedForward.y - projectedBack.y),
+                     std::abs(projectedBack.y - currentBack.y));
 
-        std::cout << "max y slide " << maxYSlide << std::endl;
+        double heightBack = projectedEcb->origin.y - projectedBack.y;
+        double widthForward = projectedForward.x - projectedEcb->origin.x;
 
-        double slope = projectedEcb->heightTop / projectedEcb->widthRight;
+        double slope = heightBack / widthForward;
         Pair slide = Pair(maxXSlide, 0);
 
         if (std::abs(slope - 0) > COLLISION_EPSILON) {
             double maxSlideDistanceX =
-                std::min((maxXSlide * slope), (maxYSlide * 1 / slope));
+                sign(move.x) * std::min(std::abs(maxXSlide * slope),
+                                        std::abs(maxYSlide / slope));
 
             slide = Pair(maxSlideDistanceX, maxSlideDistanceX * slope);
         }
 
+        std::cout << "heightBack " << heightBack << std::endl;
+        std::cout << "widthForward " << widthForward << std::endl;
+        std::cout << "max x slide " << maxXSlide << std::endl;
+        std::cout << "max y slide " << maxYSlide << std::endl;
+        std::cout << "slope " << slope << std::endl;
         std::cout << "slide for " << slide << std::endl;
 
         tmpEcb.setOrigin(tmpEcb.origin + slide);
     }
 
-    double collisionVerticalDifference =
-        std::abs(projectedEcb->origin.y) - tmpEcb.origin.y;
-
-    if (!player.isGrounded() &&
-        collisionVerticalDifference > COLLISION_EPSILON) {
-        // move the goal back by taking the X difference between the
-        // position without collision at the new Y and the position
-        // after wall sliding
-
-        // get the relative positions of the destination with and
-        // without collision
-        Pair relPosNoColl = projectedEcb->origin - currentEcb->origin;
-        Pair relPosColl = tmpEcb.origin - currentEcb->origin;
-        relPosNoColl *= relPosColl.y / relPosNoColl.y;
-
-        double noCollisionDistance = relPosColl.x - relPosNoColl.x;
-
-        Pair rollbackPosition =
-            projectedEcb->origin + Pair(noCollisionDistance, 0);
-
-        // update the player position and projected ECB
-        player.moveTo(tmpEcb);
-        projectedEcb->setOrigin(rollbackPosition);
-    } else {
-        player.moveTo(tmpEcb);
-    }
+    rollback(player, tmpEcb, currentEcb, projectedEcb);
 
     return true;
 }
@@ -297,6 +303,10 @@ inline Pair& getEcbSideLeft(Ecb* e) {
 
 inline void setEcbSideLeft(Ecb* e, Pair pos) {
     return e->setLeft(pos);
+}
+
+inline Pair& getEcbBottom(Ecb* e) {
+    return e->bottom;
 }
 
 inline Pair& getEcbTop(Ecb* e) {
@@ -371,9 +381,12 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
         performWallCollision<CEIL_COLLISION, getEcbTop, setEcbTop, getY, getX,
                              setX>(player, currentEcb, projectedEcb);
 
-        if (performWallEdgeCollision(player, currentEcb, projectedEcb)) {
-            return;
-        }
+        performWallEdgeCollision<getEcbSideRight, getEcbTop, setEcbSideRight>(
+            player, currentEcb, projectedEcb);
+
+        performWallEdgeCollision<getEcbSideRight, getEcbBottom,
+                                 setEcbSideRight>(player, currentEcb,
+                                                  projectedEcb);
 
         // reset player position to the projected Ecb
         player.moveTo(*projectedEcb);
