@@ -6,7 +6,7 @@
 
 #define LEDGEBOX_WIDTH 0.18
 #define LEDGEBOX_HEIGHT 0.18
-#define LEDGEBOX_BASE 0.19
+#define LEDGEBOX_BASE 0.24
 
 #define PLAYER_ECB_OFFSET Pair(0, -0.2)
 

@@ -310,6 +310,10 @@ bool Map::performWallEdgeCollision(Player& player,
         Pair slide = (dot < 0) ? collisionPoint - collisionLine2
                                : collisionPoint - collisionLine1;
 
+        if (slide.y == 0) {
+            return false;
+        }
+
         // scale the slide back if the destination Y is less than the
         // destination slide
 
@@ -388,18 +392,75 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
     // TODO think about ledge grabbing
     grabLedges(player);
 
+    std::cout << "=========" << std::endl;
+    std::cout << "requested distance: " << requestedDistance << std::endl;
+    std::cout << "grounded? " << player.isGrounded() << std::endl;
+
     // if the player is grounded, move them along the platform
     Pair projectedPosition;
     basicProjection(player, requestedDistance, projectedPosition);
+
+    std::cout << "requested distance: " << requestedDistance << std::endl;
 
     Ecb* currentEcb = &(player.currentCollision->playerModified);
     Ecb* projectedEcb = &(player.currentCollision->postCollision);
     projectedEcb->setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
 
+    std::cout << "requested distance: " << requestedDistance << std::endl;
+    std::cout << "projected pos:      " << projectedPosition << std::endl;
+
+    int iterationCount = 0;
     do {
+        iterationCount++;
+        if (iterationCount > 20) {
+            exit(1);
+        }
+
+        std::cout << "current   Ecb: " << *currentEcb << std::endl;
+        std::cout << "projected Ecb: " << *projectedEcb << std::endl;
+
         Platform* currentPlatform = NULL;
         if (player.isGrounded()) {
             currentPlatform = player.getCurrentPlatform();
+        }
+
+        // if (performWallEdgeCollision<getEcbSideRight, getEcbTop,
+        // setEcbSideRight>(
+        //     player, currentEcb, projectedEcb)) {
+        //     std::cout << "Top Right Edge Collision" std::endl;
+        // }
+
+        if (performWallEdgeCollision<getEcbSideRight, getEcbBottom,
+                                     setEcbSideRight>(player, currentEcb,
+                                                      projectedEcb)) {
+            std::cout << "Bottom Right Edge Collision" << std::endl;
+        }
+
+        if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
+                                     setEcbSideLeft>(player, currentEcb,
+                                                     projectedEcb)) {
+            std::cout << "Bottom Left Edge Collision" << std::endl;
+        }
+
+        // perform right wall collision
+        if (performWallCollision<WALL_COLLISION, getEcbSideRight,
+                                 setEcbSideRight, getX, getY, setY>(
+                player, currentEcb, projectedEcb)) {
+            std::cout << "Right wall collision" << std::endl;
+        }
+
+        // perform left wall collision
+        if (performWallCollision<WALL_COLLISION, getEcbSideLeft, setEcbSideLeft,
+                                 getX, getY, setY>(player, currentEcb,
+                                                   projectedEcb)) {
+            std::cout << "left side wall collision" << std::endl;
+        }
+
+        // // perform ceiling collision
+        if (performWallCollision<CEIL_COLLISION, getEcbTop, setEcbTop, getY,
+                                 getX, setX>(player, currentEcb,
+                                             projectedEcb)) {
+            std::cout << "ceiling wall collision" << std::endl;
         }
 
         CollisionDatum collision;
@@ -417,31 +478,6 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) {
                 }
             }
         }
-
-        // perform right wall collision
-        performWallCollision<WALL_COLLISION, getEcbSideRight, setEcbSideRight,
-                             getX, getY, setY>(player, currentEcb,
-                                               projectedEcb);
-
-        // perform left wall collision
-        performWallCollision<WALL_COLLISION, getEcbSideLeft, setEcbSideLeft,
-                             getX, getY, setY>(player, currentEcb,
-                                               projectedEcb);
-
-        // // perform ceiling collision
-        performWallCollision<CEIL_COLLISION, getEcbTop, setEcbTop, getY, getX,
-                             setX>(player, currentEcb, projectedEcb);
-
-        // instead of doing this, we need to get the closest collision
-        // and only perform the check on that side. either that or work
-        // line directionality into checkLineSweep and use that?
-
-        performWallEdgeCollision<getEcbSideRight, getEcbTop, setEcbSideRight>(
-            player, currentEcb, projectedEcb);
-
-        performWallEdgeCollision<getEcbSideRight, getEcbBottom,
-                                 setEcbSideRight>(player, currentEcb,
-                                                  projectedEcb);
 
         // reset player position to the projected Ecb
         player.moveTo(*projectedEcb);

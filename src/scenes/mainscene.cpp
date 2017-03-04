@@ -16,7 +16,7 @@ Map mainSceneMap = Map(
         // left passable platform
         Platform(
             {
-                Pair(0.4, 1), Pair(0.8, 1),
+                Pair(0.4, 0.5), Pair(0.8, 0.5),
             },
             true),
 
@@ -44,7 +44,8 @@ Map mainSceneMap = Map(
         Platform({
             Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
             Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
-            Pair(2.0, 2.0), Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+            Pair(2.2, 2.0), Pair(2.4, 2.0), Pair(3, 1.5), Pair(3.4, 1.5),
+            Pair(3.4, 1.1), Pair(3.5, 1.1),
 
         }),
     },

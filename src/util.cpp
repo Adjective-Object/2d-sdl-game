@@ -5,8 +5,7 @@
 #include <iostream>
 
 #define _debug(__VA_ARGS__)
-// #define _debug(...) \
-//     { __VA_ARGS__; }
+// #define _debug(...) { __VA_ARGS__; }
 
 double Dot(const Pair& a, const Pair& b) {
     return (a.x * b.x) + (a.y * b.y);
@@ -108,7 +107,7 @@ int checkLineSweep(Pair const& a1,
         return 1;
     }
 
-    Pair biggestDiff = diff1 * (biggestLen / diff1.euclid());
+    Pair biggestDiff = diff1 * (std::sqrt(biggestLen) / diff1.euclid());
 
     _debug(std::cout << "biggest diff " << biggestDiff << std::endl);
 

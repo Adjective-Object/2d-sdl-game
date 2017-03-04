@@ -371,3 +371,25 @@ TEST(Platform, checkCollision_Diagonal_Floor_Miss) {
               NO_COLLISION);
     EXPECT_EQ(out, Pair(0, 0));
 }
+
+TEST(Platform, checkCollision_Testing_Case) {
+    // convoluted floor surface
+    Platform p = Platform({
+        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
+        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
+        Pair(2.0, 2.0), Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+
+    });
+
+    Pair a1 = Pair(0.737943, 1.13575);
+    Pair a2 = Pair(0.677943, 1.23575);
+    Pair b1 = Pair(0.737943, 1.16833);
+    Pair b2 = Pair(0.677943, 1.26833);
+
+    Pair collidedPoint;
+    Pair collidedLine1;
+    Pair collidedLine2;
+
+    ASSERT_TRUE(p.checkEdgeCollision(a1, a2, b1, b2, collidedPoint,
+                                     collidedLine1, collidedLine2));
+}

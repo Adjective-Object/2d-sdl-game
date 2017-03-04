@@ -94,6 +94,11 @@ bool Platform::checkEdgeCollision(Pair const& a1,
         // TODO compare if multiple colls happen same frame?
         int direction = checkLineSweep(a1, a2, b1, b2, points[i], collidedLine1,
                                        collidedLine2);
+        if (direction != 0) {
+            std::cout << "nonzero collision direction" << direction
+                      << " with point " << i << " (" << points[i] << ")"
+                      << std::endl;
+        }
         if (direction == -1) {
             collidedPoint = points[i];
             return true;
@@ -132,6 +137,7 @@ void Platform::render(SDL_Renderer* r) {
             (int)(q2.x * PLAYER_SCALE), (int)(q2.y * PLAYER_SCALE));
     }
 }
+
 bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     Pair wsRelPos = position - points[0];
     if (wsRelPos.x < 0) {
