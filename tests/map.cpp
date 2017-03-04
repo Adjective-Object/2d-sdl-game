@@ -277,7 +277,7 @@ TEST(Map, movePlayer_Airborne_Diagonal_Down_Corner_TopRight) {
     p.init();
     Map m = Map(
         {
-            Platform({Pair(10, 0), Pair(11, 0)}),
+            Platform({Pair(9.9, -0.1), Pair(11, -0.1)}),
         },
         {});
 
@@ -290,19 +290,34 @@ TEST(Map, movePlayer_Airborne_Diagonal_Down_Corner_TopRight) {
     tmpCollision.setRight(Pair(10, 0));
     p.moveTo(tmpCollision);
 
-    Pair requestedMotion = Pair(10, 1);
+    // exact //
+
+    Pair requestedMotion = Pair(10, 0.9);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(11, 1));
-    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(10, 0));
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(10.9, 0.9));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.9, -0.1));
+
+    // overshoot //
 
     p.moveTo(tmpCollision);
 
-    requestedMotion = Pair(10, 2);
+    requestedMotion = Pair(10, 1.8);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(16, 2));
-    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(15, 1));
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(15.9, 1.8));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(14.9, 0.8));
+
+    // undershoot //
+
+    p.moveTo(tmpCollision);
+
+    requestedMotion = Pair(0.1, 0.1);
+    m.movePlayer(p, requestedMotion);
+
+    // TODO is this right?
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(10.1, 0.1));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.1, -0.9));
 }
 
 TEST(Map, movePlayer_Airborne_Diagonal_Up_Corner_BottomRight) {
@@ -311,7 +326,7 @@ TEST(Map, movePlayer_Airborne_Diagonal_Up_Corner_BottomRight) {
     p.init();
     Map m = Map(
         {
-            Platform({Pair(10, 0), Pair(11, 0)}),
+            Platform({Pair(9.9, 0.1), Pair(11, 0.1)}),
         },
         {});
 
@@ -324,17 +339,110 @@ TEST(Map, movePlayer_Airborne_Diagonal_Up_Corner_BottomRight) {
     tmpCollision.setRight(Pair(10, 0));
     p.moveTo(tmpCollision);
 
-    Pair requestedMotion = Pair(10, -1);
+    Pair requestedMotion = Pair(10, -0.9);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(11, -1));
-    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(10, -2));
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(10.9, -0.9));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.9, -1.9));
+
+    // overshoot //
 
     p.moveTo(tmpCollision);
 
-    requestedMotion = Pair(10, -2);
+    requestedMotion = Pair(10, -1.8);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(16, -2));
-    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(15, -3));
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(15.9, -1.8));
+    EXPECT_EQ(p.currentCollision->postCollision.bottom, Pair(14.9, -0.8));
+
+    // undershoot //
+
+    p.moveTo(tmpCollision);
+
+    requestedMotion = Pair(0.1, -0.1);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(10.1, -0.1));
+    EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.1, -1.1));
+}
+
+TEST(Map, movePlayer_Airborne_DownY_BottomRight) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(0.1, 5), Pair(0.1, 10)}),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.widthLeft = 1;
+    tmpCollision.heightBottom = 1;
+    tmpCollision.setOrigin(Pair(0, 0));
+    p.moveTo(tmpCollision);
+
+    // move down and try to slide off the point to the left.
+    // Y should be unaffected, should slide to the left.
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0, 10);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(0.1, 10));
+}
+
+TEST(Map, movePlayer_Airborne_UpY_TopRight) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(0.1, -5), Pair(0.1, -10)}),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.widthLeft = 1;
+    tmpCollision.heightBottom = 1;
+    tmpCollision.setOrigin(Pair(0, 0));
+    p.moveTo(tmpCollision);
+
+    // move down and try to slide off the point to the left.
+    // Y should be unaffected, should slide to the left.
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0, -10);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(0.1, -10));
+}
+
+TEST(Map, movePlayer_Airborne_DownY_BottomRight_SecondSegment) {
+    // setup scene
+    Player p = makeMockPlayer(Pair(10, 0));
+    p.init();
+    Map m = Map(
+        {
+            Platform({Pair(0.1, 10), Pair(0.1, 5)}),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.widthLeft = 1;
+    tmpCollision.heightBottom = 1;
+    tmpCollision.setOrigin(Pair(0, 0));
+    p.moveTo(tmpCollision);
+
+    // move down and try to slide off the point to the left.
+    // Y should be unaffected, should slide to the left.
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0, 10);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.right, Pair(0.1, 10));
 }

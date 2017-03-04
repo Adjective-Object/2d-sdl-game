@@ -288,7 +288,6 @@ class KneeBend : public Action {
             p.isShortHop = true;
         } else if (p.jumpType == JUMP_BUTTON &&
                    !(p.input->held(JUMP) || p.input->held(JUMP))) {
-            std::cout << "breaking short hopt" << std::endl;
             p.isShortHop = true;
         }
 

@@ -42,7 +42,7 @@ Map mainSceneMap = Map(
 
         // convoluted floor surface
         Platform({
-            Pair(0.1, 2.0), Pair(0.1, 1.4), Pair(0.7, 1.4), Pair(0.7, 1.2),
+            Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
             Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
             Pair(2.0, 2.0), Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
 

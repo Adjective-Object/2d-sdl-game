@@ -8,10 +8,11 @@
 // #define _debug(...) \
 //     { __VA_ARGS__; }
 
-inline double Dot(const Pair& a, const Pair& b) {
+double Dot(const Pair& a, const Pair& b) {
     return (a.x * b.x) + (a.y * b.y);
 }
-inline double PerpDot(const Pair& a, const Pair& b) {
+
+double PerpDot(const Pair& a, const Pair& b) {
     return (a.y * b.x) - (a.x * b.y);
 }
 
@@ -73,14 +74,14 @@ int checkLineIntersection(Pair const& p0,
         y = -tmp;     \
     }
 
-bool checkLineSweep(Pair const& a1,
-                    Pair const& a2,
-                    Pair const& b1,
-                    Pair const& b2,
-                    Pair const& c,
-                    Pair& out1,
-                    Pair& out2,
-                    double epsilon) {
+int checkLineSweep(Pair const& a1,
+                   Pair const& a2,
+                   Pair const& b1,
+                   Pair const& b2,
+                   Pair const& c,
+                   Pair& out1,
+                   Pair& out2,
+                   double epsilon) {
     _debug(std::cout << "a1: " << a1 << std::endl;
            std::cout << "a2: " << a2 << std::endl;
            std::cout << "b1: " << b1 << std::endl;
@@ -104,7 +105,7 @@ bool checkLineSweep(Pair const& a1,
         _debug(std::cout << "biggestLen = 0" << std::endl;);
         out1 = a1;
         out2 = a2;
-        return true;
+        return 1;
     }
 
     Pair biggestDiff = diff1 * (biggestLen / diff1.euclid());
@@ -118,7 +119,7 @@ bool checkLineSweep(Pair const& a1,
         checkLineIntersection(b1, b2, c, c + biggestDiff, intersectionB);
 
     if (wasIntersection1 == 0 || wasIntersection2 == 0)
-        return false;
+        return 0;
 
     double pointADist = (intersectionA - c).euclid();
     double pointBDist = (intersectionB - c).euclid();
@@ -129,7 +130,7 @@ bool checkLineSweep(Pair const& a1,
         ;
         out1 = c;
         out2 = c;
-        return true;
+        return -wasIntersection1;
     };
 
     double rC = pointADist / diffDist;
@@ -144,7 +145,8 @@ bool checkLineSweep(Pair const& a1,
 
         out1 = a1 + ((b1 - a1) * rC);
     out2 = a2 + ((b2 - a2) * rC);
-    return true;
+
+    return -wasIntersection1;
 };
 
 #define EPSILON 0.000001

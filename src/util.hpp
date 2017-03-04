@@ -14,16 +14,19 @@ int checkLineIntersection(Pair const& p0,
                           Pair& out,
                           double epsilon = 0.00001);
 
-bool checkLineSweep(Pair const& a1,
-                    Pair const& a2,
-                    Pair const& b1,
-                    Pair const& b2,
-                    Pair const& c,
-                    Pair& out1,
-                    Pair& out2,
-                    double epsilon = 0.001);
+int checkLineSweep(Pair const& a1,
+                   Pair const& a2,
+                   Pair const& b1,
+                   Pair const& b2,
+                   Pair const& c,
+                   Pair& out1,
+                   Pair& out2,
+                   double epsilon = 0.001);
 
 #define M_PI 3.14159265358979323846 /* pi */
 bool onLine(Pair const& l1, Pair const& l2, Pair const& point);
+
+double Dot(const Pair& a, const Pair& b);
+double PerpDot(const Pair& a, const Pair& b);
 
 #endif

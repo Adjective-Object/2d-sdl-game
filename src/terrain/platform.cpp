@@ -92,8 +92,9 @@ bool Platform::checkEdgeCollision(Pair const& a1,
                                   Pair& collidedLine2) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         // TODO compare if multiple colls happen same frame?
-        if (checkLineSweep(a1, a2, b1, b2, points[i], collidedLine1,
-                           collidedLine2)) {
+        int direction = checkLineSweep(a1, a2, b1, b2, points[i], collidedLine1,
+                                       collidedLine2);
+        if (direction == -1) {
             collidedPoint = points[i];
             return true;
         }
