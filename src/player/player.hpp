@@ -75,6 +75,7 @@ class Player : public Sprite {
 
     void fallOffPlatform();
     void land(Platform* p);
+    Ecb getLandedEcb(Platform*) const;
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);

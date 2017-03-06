@@ -30,7 +30,7 @@ class Map {
               void (*setNonblockingAxis)(Pair& pos, double value)>
     bool performWallCollision(Player const& player,
                               const Pair expectedDirection,
-                              Ecb const& currentEcb,
+                              Ecb& currentEcb,
                               Ecb& nextStepEcb,
                               Ecb& projectedEcb,
                               double& distance);
@@ -39,13 +39,13 @@ class Map {
               Pair const& (*getBackEdge)(Ecb const&),
               void (*setForwardEdge)(Ecb&, Pair const pos)>
     bool performWallEdgeCollision(Player const& player,
-                                  Ecb const& currentEcb,
+                                  Ecb& currentEcb,
                                   Ecb& nextStepEcb,
                                   Ecb& projectedEcb,
                                   double& distance);
 
     bool performFloorCollision(Player& player,
-                               Ecb const& currentEcb,
+                               Ecb& currentEcb,
                                Ecb& nextStepEcb,
                                Ecb& projectedEcb,
                                Platform*& collidedPlatform,
@@ -54,6 +54,7 @@ class Map {
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
     void movePlayer(Player& player, Pair& requestedDistance);
+    void moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb);
     void render(SDL_Renderer* r);
 
     bool getClosestCollision(Pair const& start,

@@ -495,3 +495,55 @@ TEST(Map, movePlayer_Upward_Partial_Ledge_Collision) {
 
     EXPECT_EQ(p.currentCollision->postCollision.origin, Pair(3.34225, 1.09625));
 }
+
+TEST(Map, movePlayer_Interrupt_Collision_Motion) {
+    /*
+        Test that we can resolve complex motions during multiple collisions
+
+        in this exaple, we collide with a wall. If unobstructed, we are moving
+        fast enough that we would slide off the wall. Instead, we want to
+        interrupt that motion with a floor collision
+
+
+             ╱╲│
+             ╲╱│ moving down at do the right
+               │
+           ────┘
+
+               │
+               │
+               │
+           ────┘
+             ╱╲  projected position after sliding
+             ╲╱
+
+    */
+
+    // setup scene
+    Player p = makeMockPlayer(Pair(3.34, 1.1));
+    p.init();
+    Map m = Map(
+        {
+            Platform({
+                Pair(0, 5), Pair(5, 5), Pair(5, 0),
+            }),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.setOrigin(Pair(3.5, 0));
+    tmpCollision.widthLeft = 1;
+    tmpCollision.widthRight = 1;
+    tmpCollision.heightTop = 1;
+    tmpCollision.heightBottom = 1;
+
+    // move down and try to slide off the point to the left.
+    // Y should be unaffected, should slide to the left.
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(4, 6);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_NEAR(p.currentCollision->postCollision.origin.x, 4, 0.0001);
+    EXPECT_NEAR(p.currentCollision->postCollision.right.x, 5, 0.0001);
+    EXPECT_NEAR(p.currentCollision->postCollision.bottom.y, 5, 0.0001);
+}

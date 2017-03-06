@@ -168,6 +168,12 @@ void Player::land(Platform* p) {
     }
 }
 
+Ecb Player::getLandedEcb(Platform* p) const {
+    Ecb tmp = currentCollision->postCollision;
+    tmp.heightBottom = -PLAYER_ECB_OFFSET.y;
+    return tmp;
+}
+
 /** Move the player horizontally when they are in the air */
 void Player::aerialDrift() {
     bool joystickMoving = std::abs(input->axis(MOVEMENT_AXIS_X)) > 0.3;
