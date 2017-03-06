@@ -129,11 +129,11 @@ void Player::grabLedge(Ledge* l) {
     changeAction(CLIFFCATCH);
 }
 
-bool Player::canGrabLedge() {
+bool Player::canGrabLedge() const {
     return ledgeRegrabCounter <= 0 && action->canGrabLedge(*this);
 }
 
-bool Player::canLand(Platform* p) {
+bool Player::canLand(Platform* p) const {
     return action->isLandable(*this, p);
 };
 
@@ -213,6 +213,9 @@ void Player::render(SDL_Renderer* ren) {
     SDL_SetRenderDrawColor(ren, 255, 215, 0, 255);
     previousCollision->postCollision.render(ren, PLAYER_SCALE);
 
+    SDL_SetRenderDrawColor(ren, 80, 127, 80, 255);
+    currentCollision->root.render(ren, PLAYER_SCALE);
+
     SDL_SetRenderDrawColor(ren, 255, 127, 80, 255);
     currentCollision->postCollision.render(ren, PLAYER_SCALE);
 
@@ -258,15 +261,15 @@ void Player::fixEcbBottom(int frames, double size) {
     ecbBottomFixedSize = size;
 }
 
-ActionState Player::getActionState() {
+ActionState Player::getActionState() const {
     return actionState;
 }
 
-Action* Player::getAction() {
+Action* Player::getAction() const {
     return action;
 }
 
-bool Player::isGrounded() {
+bool Player::isGrounded() const {
     return action->isGrounded(*this);
 }
 
@@ -274,7 +277,7 @@ double Player::getXInput(int frames) {
     return input->axis(MOVEMENT_AXIS_X, frames) * face;
 }
 
-Platform* Player::getCurrentPlatform() {
+Platform* Player::getCurrentPlatform() const {
     return currentPlatform;
 }
 

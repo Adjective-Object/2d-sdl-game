@@ -12,7 +12,7 @@ int checkLineIntersection(Pair const& p0,
                           Pair const& p2,
                           Pair const& p3,
                           Pair& out,
-                          double epsilon = 0.00001);
+                          double epsilon = 0.0000001);
 
 int checkLineSweep(Pair const& a1,
                    Pair const& a2,

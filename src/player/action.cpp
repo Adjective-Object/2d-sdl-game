@@ -151,19 +151,19 @@ void Action::onLanding(Player&) {
     std::cerr << "no action registered on landing" << std::endl;
 }
 
-bool Action::isGrounded(Player&) {
+bool Action::isGrounded(Player const&) {
     return true;
 }
 
-bool Action::isLandable(Player&, Platform*) {
+bool Action::isLandable(Player const&, Platform const*) {
     return true;
 }
 
-bool Action::canWalkOff(Player&) {
+bool Action::canWalkOff(Player const&) {
     return true;
 }
 
-bool Action::canGrabLedge(Player&) {
+bool Action::canGrabLedge(Player const&) {
     return false;
 }
 
@@ -241,12 +241,12 @@ class Fall : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isLandable(Player& p, Platform* plat) {
+    bool isLandable(Player const& p, Platform* plat) {
         return !(plat->isPassable() && p.input->axis(MOVEMENT_AXIS_Y) > 0.67);
     }
 
-    bool isGrounded(Player& p) override { return false; }
-    bool canGrabLedge(Player& p) override { return true; }
+    bool isGrounded(Player const& p) override { return false; }
+    bool canGrabLedge(Player const& p) override { return true; }
 };
 
 class SpecialFall : public Action {
@@ -257,8 +257,8 @@ class SpecialFall : public Action {
         p.aerialDrift();
     }
 
-    bool isGrounded(Player& p) override { return false; }
-    bool canGrabLedge(Player& p) override { return true; }
+    bool isGrounded(Player const& p) override { return false; }
+    bool canGrabLedge(Player const& p) override { return true; }
 };
 
 // normal landing
@@ -340,7 +340,7 @@ class JumpB : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isGrounded(Player& p) override { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 class JumpF : public Action {
@@ -364,7 +364,7 @@ class JumpF : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isGrounded(Player& p) override { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 void startDoubleJump(Player& p) {
@@ -408,7 +408,7 @@ class JumpAir : public Action {
                (p.timer != 0 && interruptWithDJump(p));
     }
 
-    bool isGrounded(Player& p) override { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 class Turn : public Action {
@@ -432,7 +432,7 @@ class Turn : public Action {
         return interruptWithJump(p) || (p.timer <= 1 && interruptWithDash(p));
     }
 
-    bool isGrounded(Player& p) override { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 #define PI 3.14159265
@@ -467,7 +467,7 @@ class EscapeAir : public Action {
         }
     }
 
-    bool isGrounded(Player& p) override { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 #define DASH_FRAME_MIN 14
@@ -670,8 +670,8 @@ class Pass : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isGrounded(Player& p) { return false; }
-    bool isLandable(Player& p, Platform* plat) {
+    bool isGrounded(Player const& p) { return false; }
+    bool isLandable(Player const& p, Platform* plat) {
         return plat != p.getCurrentPlatform();
     }
 };
@@ -743,7 +743,7 @@ class CliffCatch : public Action {
         p.cVel = Pair(0, 0);
     }
 
-    bool isGrounded(Player& p) { return false; }
+    bool isGrounded(Player const& p) { return false; }
 };
 
 class CliffWait : public Action {
@@ -765,7 +765,7 @@ class CliffWait : public Action {
         return false;
     }
 
-    bool isGrounded(Player& p) { return false; }
+    bool isGrounded(Player const& p) { return false; }
 };
 
 const char* actionStateName(ActionState state) {

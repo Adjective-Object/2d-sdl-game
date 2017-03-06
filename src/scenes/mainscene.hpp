@@ -11,12 +11,15 @@
 #include "player/inputhandler.hpp"
 #include "terrain/map.hpp"
 
+using namespace Terrain;
+
 class MainScene : public Scene {
     Player* player;
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;
     Map* map;
     InputMapping::JoystickInputHandler* playerInput;
+    bool frameByFrame = false;
 
    public:
     MainScene();

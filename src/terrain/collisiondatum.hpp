@@ -10,6 +10,15 @@ public:
     Pair position;
 };
 
+class EdgeCollision {
+    public:
+    PlatformSegment s1;
+    PlatformSegment s2;
+    Pair cornerPosition;
+    Pair collisionLine1;
+    Pair collisionLine2;
+};
+
 std::ostream& operator<<(std::ostream& strm, const CollisionDatum& p);
 
 

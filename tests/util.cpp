@@ -244,7 +244,7 @@ TEST(Util, checkLineSweep_Specific) {
     EXPECT_EQ(out2, Pair(9.1, -1));
 }
 
-TEST(Platform, checkLineSweep_Testing_Case) {
+TEST(Platform, checkLineSweep_Testing_Playtest_1) {
     // convoluted floor surface
     Pair p = Pair(0.7, 1.2);
 
@@ -252,6 +252,83 @@ TEST(Platform, checkLineSweep_Testing_Case) {
     Pair a2 = Pair(0.677943, 1.23575);
     Pair b1 = Pair(0.737943, 1.16833);
     Pair b2 = Pair(0.677943, 1.26833);
+
+    Pair collidedPoint;
+    Pair collidedLine1;
+    Pair collidedLine2;
+
+    int collision_dir =
+        checkLineSweep(a1, a2, b1, b2, p, collidedLine1, collidedLine2);
+
+    ASSERT_EQ(collision_dir, -1);
+}
+
+TEST(Platform, checkLineSweep_Testing_Playtest_2) {
+    // top right collision for these ECBs
+    /*
+    Ecb{
+        origin=Pair(3.34, 1.12792),
+        heightTop=0.1,
+        heightBottom=0.1,
+        widthLeft=0.06,
+        widthRight=0.06
+    }
+    to
+
+    Ecb{
+        origin=Pair(3.35388, 1.1185),
+        heightTop=0.1,
+        heightBottom=0.1,
+        widthLeft=0.06,
+        widthRight=0.06
+    }
+    */
+
+    Pair p = Pair(3.4, 1.1);
+
+    Pair a1 = Pair(3.34, 1.02792);
+    Pair a2 = Pair(3.4, 1.12792);
+    Pair b1 = Pair(3.3588, 1.0185);
+    Pair b2 = Pair(3.4188, 1.1185);
+
+    Pair collidedPoint;
+    Pair collidedLine1;
+    Pair collidedLine2;
+
+    int collision_dir =
+        checkLineSweep(a1, a2, b1, b2, p, collidedLine1, collidedLine2);
+
+    // TODO double check this
+    ASSERT_EQ(collision_dir, -1);
+}
+
+TEST(Platform, checkLineSweep_Testing_Othertest_3) {
+    // bottom right collision for these ECBs
+    /*
+    Ecb{
+        origin=Pair(9, 0),
+        heightTop=1,
+        heightBottom=1,
+        widthLeft=1,
+        widthRight=1
+    }
+
+    Ecb{
+        origin=Pair(19, -0.9),
+        heightTop=1,
+        heightBottom=1,
+        widthLeft=1,
+        widthRight=1
+    }
+    */
+
+    Pair p = Pair(9.9, 0.1);
+
+    Pair a1 = Pair(10, 0);
+    Pair a2 = Pair(9, 1);
+
+    Pair b1 = Pair(20, -0.9);
+    Pair b2 = Pair(19, 0.1);
 
     Pair collidedPoint;
     Pair collidedLine1;

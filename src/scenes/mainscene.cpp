@@ -11,6 +11,8 @@
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
 
+using namespace Terrain;
+
 Map mainSceneMap = Map(
     {
         // left passable platform
@@ -102,13 +104,19 @@ void MainScene::init() {
 
 void MainScene::update() {
     // update player positions
-    Scene::update();
-    Pair playerMotion = player->velocity * EnG->elapsed;
-    map->movePlayer(*player, playerMotion);
 
     Joystick* j = EnG->input.getJoystick(0);
-    if (j) {
-        playerInput->step(j);
+    if (j->down(11)) {
+        frameByFrame = !frameByFrame;
+    }
+    if (!frameByFrame || j->down(10) || j->held(6)) {
+        if (j) {
+            playerInput->step(j);
+        }
+
+        player->update();
+        Pair playerMotion = player->velocity * EnG->elapsed;
+        map->movePlayer(*player, playerMotion);
     }
 
     // update action label when the player's action state updates

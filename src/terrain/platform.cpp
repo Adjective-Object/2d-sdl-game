@@ -87,20 +87,23 @@ bool Platform::checkEdgeCollision(Pair const& a1,
                                   Pair const& a2,
                                   Pair const& b1,
                                   Pair const& b2,
-                                  Pair& collidedPoint,
-                                  Pair& collidedLine1,
-                                  Pair& collidedLine2) {
+                                  EdgeCollision& collision) {
     for (size_t i = 0; i < points.size() - 1; i++) {
         // TODO compare if multiple colls happen same frame?
-        int direction = checkLineSweep(a1, a2, b1, b2, points[i], collidedLine1,
-                                       collidedLine2);
+        int direction =
+            checkLineSweep(a1, a2, b1, b2, points[i], collision.collisionLine1,
+                           collision.collisionLine2);
         if (direction != 0) {
             std::cout << "nonzero collision direction" << direction
                       << " with point " << i << " (" << points[i] << ")"
                       << std::endl;
         }
         if (direction == -1) {
-            collidedPoint = points[i];
+            collision.cornerPosition = points[i];
+            collision.s1 = (i >= 0) ? PlatformSegment(this, i - 1)
+                                    : PlatformSegment(this, points.size() - 1);
+            collision.s2 = (i < points.size() - 1) ? PlatformSegment(this, i)
+                                                   : PlatformSegment(this, 0);
             return true;
         }
     }

@@ -14,6 +14,8 @@
 //     int segment;
 //     Pair position;
 
+using namespace Terrain;
+
 TEST(Map, getClosestCollision) {
     std::vector<Platform> platforms = {Platform({Pair(1, 5), Pair(1, -5)}),
                                        Platform({Pair(2, 5), Pair(2, -5)}),
@@ -272,6 +274,11 @@ TEST(Map, movePlayer_Airborne_Flat_Into_Corner_TopRight) {
 }
 
 TEST(Map, movePlayer_Airborne_Diagonal_Down_Corner_TopRight) {
+    /*
+        ╱╲ ─────
+        ╲╱ moving down and to the right, collide with the point
+    */
+
     // setup scene
     Player p = makeMockPlayer(Pair(10, 0));
     p.init();
@@ -445,4 +452,46 @@ TEST(Map, movePlayer_Airborne_DownY_BottomRight_SecondSegment) {
     m.movePlayer(p, requestedMotion);
 
     EXPECT_EQ(p.currentCollision->postCollision.right, Pair(0.1, 10));
+}
+
+TEST(Map, movePlayer_Upward_Partial_Ledge_Collision) {
+    /*
+        Test that we can decide between sliding along the top
+        right edge or the bottom right edge in this situation
+
+        moving up, colliding with both
+        the top right and bottom right ECb
+
+        ╱╲
+       ╱  ╲┌──── corner @ 3.4,  1.1
+       ╲  ╱│      touching the ECB's right edge to start
+        ╲╱ │
+
+    */
+
+    // setup scene
+    Player p = makeMockPlayer(Pair(3.34, 1.1));
+    p.init();
+    Map m = Map(
+        {
+            Platform({
+                Pair(3.4, 1.5), Pair(3.4, 1.1), Pair(3.5, 1.1),
+            }),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.setOrigin(Pair(3.34, 1.1));
+    tmpCollision.widthLeft = 0.06;
+    tmpCollision.widthRight = 0.06;
+    tmpCollision.heightTop = 0.1;
+    tmpCollision.heightBottom = 0.1;
+
+    // move down and try to slide off the point to the left.
+    // Y should be unaffected, should slide to the left.
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0.0141667, -0.00375);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.origin, Pair(3.34225, 1.09625));
 }

@@ -55,7 +55,6 @@ class Player : public Sprite {
     void fall(bool fast = false);
     void aerialDrift();
     void grabLedge(Ledge* l);
-    void land(Platform* p);
     void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
     void moveTo(Ecb& ecb);
@@ -66,18 +65,19 @@ class Player : public Sprite {
            Pair initialPosition);
     ~Player();
 
-    bool canGrabLedge();
-    bool isGrounded();
-    bool canFallOff();
+    bool canGrabLedge() const;
+    bool isGrounded() const;
+    bool canFallOff() const;
+    bool canLand(Platform* p) const;
+    Platform* getCurrentPlatform() const;
+    ActionState getActionState() const;
+    Action* getAction() const;
+
     void fallOffPlatform();
-    bool canLand(Platform* p);
+    void land(Platform* p);
 
     void changeAction(ActionState state);
     double getXInput(int frames = 0);
-    Platform* getCurrentPlatform();
-    ActionState getActionState();
-    Action* getAction();
-
     void setPosition(Pair newPosition);
     double getAttribute(char const* name);
 };

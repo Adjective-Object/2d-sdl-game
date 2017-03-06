@@ -20,10 +20,10 @@ class Action {
     virtual void step(Player& p) = 0;
     virtual LandType getLandType(Player& p);
     virtual void onLanding(Player& p);
-    virtual bool isGrounded(Player& p);
-    virtual bool isLandable(Player& p, Platform* plat);
-    virtual bool canWalkOff(Player& p);
-    virtual bool canGrabLedge(Player& p);
+    virtual bool isGrounded(const Player& p);
+    virtual bool isLandable(const Player& p, const Platform* plat);
+    virtual bool canWalkOff(const Player& p);
+    virtual bool canGrabLedge(const Player& p);
 };
 
 #define ACTION_STATE(x) x,

@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#define _debug(__VA_ARGS__)
+#define _debug(...)
 // #define _debug(...) { __VA_ARGS__; }
 
 double Dot(const Pair& a, const Pair& b) {
@@ -120,6 +120,12 @@ int checkLineSweep(Pair const& a1,
     if (wasIntersection1 == 0 || wasIntersection2 == 0)
         return 0;
 
+    _debug(std::cout << "line a intersection: " << intersectionA << std::endl;
+           std::cout << "line b intersection: " << intersectionB << std::endl;
+           std::cout << "wasIntersection A: " << wasIntersection1 << std::endl;
+           std::cout << "wasIntersection B: " << wasIntersection2
+                     << std::endl;);
+
     double pointADist = (intersectionA - c).euclid();
     double pointBDist = (intersectionB - c).euclid();
     double diffDist = pointADist + pointBDist;
@@ -140,9 +146,9 @@ int checkLineSweep(Pair const& a1,
            std::cout << "b2 - a2: " << (b2 - a2) << std::endl;
 
            std::cout << "(b1 - a1) * rC: " << (b1 - a1) * rC << std::endl;
-           std::cout << "(b2 - a2) * rC: " << (b2 - a2) * rC << std::endl;)
+           std::cout << "(b2 - a2) * rC: " << (b2 - a2) * rC << std::endl;);
 
-        out1 = a1 + ((b1 - a1) * rC);
+    out1 = a1 + ((b1 - a1) * rC);
     out2 = a2 + ((b2 - a2) * rC);
 
     return -wasIntersection1;

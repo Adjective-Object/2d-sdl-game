@@ -4,6 +4,54 @@
 #include <iostream>
 #include "engine/game.hpp"
 
+// helpers for abusing template functions violently
+
+using namespace Terrain;
+
+inline Pair const& getEcbSideRight(Ecb const& e) {
+    return e.right;
+}
+
+inline void setEcbSideRight(Ecb& e, Pair pos) {
+    return e.setRight(pos);
+}
+
+inline Pair const& getEcbSideLeft(Ecb const& e) {
+    return e.left;
+}
+
+inline void setEcbSideLeft(Ecb& e, Pair pos) {
+    return e.setLeft(pos);
+}
+
+inline Pair const& getEcbBottom(Ecb const& e) {
+    return e.bottom;
+}
+
+inline Pair const& getEcbTop(Ecb const& e) {
+    return e.top;
+}
+
+inline void setEcbTop(Ecb& e, Pair const pos) {
+    return e.setTop(pos);
+}
+
+inline double getX(Pair const& pos) {
+    return pos.x;
+}
+
+inline double getY(Pair const& pos) {
+    return pos.y;
+}
+
+inline void setX(Pair& pos, double val) {
+    pos.x = val;
+}
+
+inline void setY(Pair& pos, double val) {
+    pos.y = val;
+}
+
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
 
@@ -40,55 +88,14 @@ bool Map::getClosestEdgeCollision(Pair const& a1,
                                   Pair const& a2,
                                   Pair const& b1,
                                   Pair const& b2,
-                                  Pair& collisionPoint,
-                                  Pair& collidedPoint1,
-                                  Pair& collidedPoint2) {
+                                  EdgeCollision& collision) {
     for (Platform& platform : platforms) {
-        if (platform.checkEdgeCollision(a1, a2, b1, b2, collisionPoint,
-                                        collidedPoint1, collidedPoint2)) {
+        if (platform.checkEdgeCollision(a1, a2, b1, b2, collision)) {
             return true;
         }
     }
 
     return false;
-}
-
-bool Map::getClosestEcbCollision(Ecb const& start,
-                                 Ecb const& end,
-                                 CollisionDatum& closestCollision) {
-    double closestDist = DOUBLE_INFINITY;
-    CollisionDatum collision;
-    bool anyCollision = false;
-
-    getClosestCollision(start.left, end.left, collision);
-    if ((collision.position - start.left).euclid() < closestDist) {
-        closestCollision = collision;
-        closestCollision.position.x -= start.widthLeft;
-        anyCollision = true;
-    }
-
-    getClosestCollision(start.right, end.right, collision);
-    if ((collision.position - start.right).euclid() < closestDist) {
-        closestCollision = collision;
-        closestCollision.position.x += start.widthRight;
-        anyCollision = true;
-    }
-
-    getClosestCollision(start.top, end.top, collision);
-    if ((collision.position - start.top).euclid() < closestDist) {
-        closestCollision = collision;
-        closestCollision.position.y -= start.heightTop;
-        anyCollision = true;
-    }
-
-    getClosestCollision(start.bottom, end.bottom, collision);
-    if ((collision.position - start.bottom).euclid() < closestDist) {
-        closestCollision = collision;
-        closestCollision.position.y += start.heightBottom;
-        anyCollision = true;
-    }
-
-    return anyCollision;
 }
 
 void basicProjection(Player& player,
@@ -115,61 +122,77 @@ void basicProjection(Player& player,
     }
 }
 
-void rollback(Player& player,
-              Ecb& tmpEcb,
-              Ecb*& currentEcb,
-              Ecb*& projectedEcb) {
-    double collisionVerticalDifference =
-        std::abs(projectedEcb->origin.y) - tmpEcb.origin.y;
+/** Adjusts the projected ecb's position
+ *
+ * Takes the difference between the nestStepEcb and the position that the ecb
+ * would be in at equivalend y() had no collision occured, and applies that
+ * difference to projectedEcb.
+ *
+ */
+template <double (*x)(Pair const& pos), double (*y)(Pair const& pos)>
+void rollback(Player const& player,
+              Ecb const& currentEcb,
+              Ecb const& nextStepEcb,
+              Ecb& projectedEcb) {
+    // move the goal back by taking the X difference between the
+    // position without collision at the new Y and the position
+    // after wall sliding
 
-    if (!player.isGrounded() &&
-        collisionVerticalDifference > COLLISION_EPSILON) {
-        // move the goal back by taking the X difference between the
-        // position without collision at the new Y and the position
-        // after wall sliding
+    // get the relative positions of the destination with and
+    // without collision
+    Pair relPosNoColl = projectedEcb.origin - currentEcb.origin;
+    Pair relPosColl = nextStepEcb.origin - currentEcb.origin;
 
-        // get the relative positions of the destination with and
-        // without collision
-        Pair relPosNoColl = projectedEcb->origin - currentEcb->origin;
-        Pair relPosColl = tmpEcb.origin - currentEcb->origin;
-        relPosNoColl *= relPosColl.y / relPosNoColl.y;
+    if (y(relPosNoColl) == 0 || player.isGrounded()) {
+        std::cout << "rollback grounded " << nextStepEcb << std::endl;
+        projectedEcb.setOrigin(nextStepEcb.origin);
+    } else {
+        relPosNoColl *= y(relPosColl) / y(relPosNoColl);
 
         std::cout << relPosNoColl << " " << relPosColl << std::endl;
 
-        double noCollisionDistance = relPosColl.x - relPosNoColl.x;
+        double noCollisionDistance = x(relPosColl) - x(relPosNoColl);
 
         std::cout << "noCollisionDistance " << noCollisionDistance << std::endl;
 
         Pair rollbackPosition =
-            projectedEcb->origin + Pair(noCollisionDistance, 0);
+            projectedEcb.origin + Pair(noCollisionDistance, 0);
+
+        std::cout << "rollback position: " << rollbackPosition << std::endl;
 
         // update the player position and projected ECB
-        player.moveTo(tmpEcb);
-        projectedEcb->setOrigin(rollbackPosition);
-    } else {
-        player.moveTo(tmpEcb);
+        projectedEcb.setOrigin(rollbackPosition);
     }
 }
 
-template <TerrainCollisionType expectedType,
-          Pair& (*getEcbSide)(Ecb*),
-          void (*setEcbSide)(Ecb*, Pair pos),
-          double (*x)(Pair& pos),
-          double (*y)(Pair& pos),
+/** Perform a collision with the wall
+ *
+ */
+template <Pair const& (*getEcbSide)(Ecb const&),
+          void (*setEcbSide)(Ecb&, Pair const pos),
+          double (*x)(Pair const& pos),
+          double (*y)(Pair const& pos),
           void (*setNonblockingAxis)(Pair& pos, double value)>
-bool Map::performWallCollision(Player& player,
-                               Ecb*& currentEcb,
-                               Ecb*& projectedEcb) {
+bool Map::performWallCollision(Player const& player,
+                               const Pair expectedDirection,
+                               Ecb const& currentEcb,
+                               Ecb& nextStepEcb,
+                               Ecb& projectedEcb,
+                               double& distance) {
     CollisionDatum collision;
 
-    if (!getClosestCollision(getEcbSide(currentEcb), getEcbSide(projectedEcb),
+    // ignore collision if the collision is coming from the wrong direction
+    if (Dot((projectedEcb.origin - currentEcb.origin), expectedDirection) < 0) {
+        return false;
+    }
+
+    Ecb _currentEcb = currentEcb;
+    if (!getClosestCollision(getEcbSide(_currentEcb), getEcbSide(projectedEcb),
                              collision, NULL)) {
         return false;
     }
 
-    if (collision.type != expectedType) {
-        return false;
-    }
+    distance = (getEcbSide(currentEcb) - collision.position).euclid();
 
     std::cout << "colliding with wall " << collision.segment.getPlatform()
               << " at " << collision.position << std::endl;
@@ -178,7 +201,7 @@ bool Map::performWallCollision(Player& player,
 
     // perform sliding if the player is not grounded
     if (!player.isGrounded()) {
-        double directionY = y(projectedEcb->origin) - y(currentEcb->origin);
+        double directionY = y(projectedEcb.origin) - y(_currentEcb.origin);
         double slidePosition =
             (directionY > 0)
                 ? std::min(std::max(y(*collision.segment.secondPoint()),
@@ -194,14 +217,22 @@ bool Map::performWallCollision(Player& player,
     std::cout << "position after sliding " << wallSlidePosition << std::endl;
 
     // slide the ecb along the wall
-    Ecb tmpEcb = *projectedEcb;
-    setEcbSide(&tmpEcb, wallSlidePosition);
+    setEcbSide(nextStepEcb, wallSlidePosition);
 
-    std::cout << "ecbs " << currentEcb->origin << ".." << projectedEcb->origin
+    std::cout << "ecbs " << currentEcb.origin << ".." << projectedEcb.origin
               << std::endl;
 
-    rollback(player, tmpEcb, currentEcb, projectedEcb);
+    if (std::abs(y(currentEcb.origin) - y(nextStepEcb.origin)) <
+            COLLISION_EPSILON &&
+        std::abs(y(currentEcb.origin) - y(projectedEcb.origin)) >
+            COLLISION_EPSILON &&
+        !player.isGrounded()) {
+        std::cout << "ignoring wall collision: player is not grounded and the "
+                     "y difference is zero";
+        return false;
+    }
 
+    rollback<x, y>(player, currentEcb, nextStepEcb, projectedEcb);
     return true;
 }
 
@@ -213,22 +244,20 @@ class Line {
     Line(Pair start, Pair end) : start(start), end(end){};
 };
 
-template <Pair& (*getForwardEdge)(Ecb*),
-          Pair& (*getBackEdge)(Ecb*),
-          void (*setForwardEdge)(Ecb*, Pair pos)>
-bool Map::performWallEdgeCollision(Player& player,
-                                   Ecb*& currentEcb,
-                                   Ecb*& projectedEcb) {
-    Pair collisionPoint;
-    Pair collisionLine1, collisionLine2;
-
+template <Pair const& (*getForwardEdge)(Ecb const&),
+          Pair const& (*getBackEdge)(Ecb const&),
+          void (*setForwardEdge)(Ecb&, Pair const pos)>
+bool Map::performWallEdgeCollision(Player const& player,
+                                   Ecb const& currentEcb,
+                                   Ecb& nextStepEcb,
+                                   Ecb& projectedEcb,
+                                   double& distance) {
     Pair currentForward = getForwardEdge(currentEcb);
     Pair currentBack = getBackEdge(currentEcb);
 
     Pair projectedForward = getForwardEdge(projectedEcb);
     Pair projectedBack = getBackEdge(projectedEcb);
 
-    Pair line = currentForward - currentBack;
     Pair move = projectedForward - currentForward;
 
     // std::cout << "current ecb: " << *currentEcb << std::endl;
@@ -245,26 +274,19 @@ bool Map::performWallEdgeCollision(Player& player,
     if (move == Pair(0, 0))
         return false;
 
-    Ecb tmpEcb = *projectedEcb;
-
     Line currentEdge, projectedEdge;
-    if (currentForward.y > currentBack.y) {
+    EdgeCollision collision;
+    if ((currentForward.y > currentBack.y)) {
         currentEdge = Line(currentBack, currentForward);
         projectedEdge = Line(projectedBack, projectedForward);
 
         if (!getClosestEdgeCollision(currentEdge.start, currentEdge.end,
                                      projectedEdge.start, projectedEdge.end,
-                                     collisionPoint, collisionLine1,
-                                     collisionLine2)) {
-            std::cout << "no collision" << std::endl;
-            std::cout << currentForward << ".." << currentBack << "  "
-                      << projectedForward << ".." << projectedBack << "  "
-                      << std::endl;
-
+                                     collision)) {
             return false;
         }
 
-        setForwardEdge(&tmpEcb, collisionLine2);
+        setForwardEdge(nextStepEcb, collision.collisionLine2);
 
     } else {
         currentEdge = Line(currentForward, currentBack);
@@ -272,18 +294,18 @@ bool Map::performWallEdgeCollision(Player& player,
 
         if (!getClosestEdgeCollision(currentEdge.start, currentEdge.end,
                                      projectedEdge.start, projectedEdge.end,
-                                     collisionPoint, collisionLine1,
-                                     collisionLine2)) {
-            std::cout << "no collision" << std::endl;
-            std::cout << currentForward << ".." << currentBack << "  "
-                      << projectedForward << ".." << projectedBack << "  "
-                      << std::endl;
-
+                                     collision)) {
             return false;
         }
 
-        setForwardEdge(&tmpEcb, collisionLine1);
+        setForwardEdge(nextStepEcb, collision.collisionLine1);
     }
+
+    Pair collisionPoint = collision.cornerPosition;
+    Pair collisionLine1 = collision.collisionLine1;
+    Pair collisionLine2 = collision.collisionLine2;
+
+    distance = (collisionLine1 - currentEdge.start).euclid();
 
     std::cout << "collide with corner " << collisionPoint << std::endl;
     std::cout << "collision line  " << collisionLine1 << ".." << collisionLine2
@@ -303,6 +325,7 @@ bool Map::performWallEdgeCollision(Player& player,
         // angle of motion is > 90 degrees, we slide backwards. Otherwise.
         // we slide forwards
         double dot = Dot(move, currentEdge.end - currentEdge.start);
+
         std::cout << collisionLine1 << std::endl;
         std::cout << collisionPoint << std::endl;
         std::cout << collisionLine2 << std::endl;
@@ -310,7 +333,26 @@ bool Map::performWallEdgeCollision(Player& player,
         Pair slide = (dot < 0) ? collisionPoint - collisionLine2
                                : collisionPoint - collisionLine1;
 
-        if (slide.y == 0) {
+        // if the direction of sliding is into the platform, don't slide
+        double averagePlatformY =
+            (collision.s1.firstPoint()->y + collision.s1.secondPoint()->y +
+             collision.s2.firstPoint()->y + collision.s2.secondPoint()->y) /
+                4 -
+            collision.cornerPosition.y;
+
+        std::cout << "platform y is on average" << averagePlatformY
+                  << std::endl;
+
+        if ((collisionPoint == collisionLine1 ||
+             collisionPoint == collisionLine2) &&
+            sign(averagePlatformY) == sign(slide.y)) {
+            std::cout << "ignoring because we collided on a corner and the "
+                         "slide is in the same direction as platform"
+                      << std::endl;
+            return false;
+        }
+
+        if (std::abs(slide.y - 0) < COLLISION_EPSILON) {
             return false;
         }
 
@@ -319,170 +361,236 @@ bool Map::performWallEdgeCollision(Player& player,
 
         std::cout << "unscaled slide: " << slide << std::endl;
 
-        double ySlide = projectedEcb->origin.y - currentEcb->origin.y;
+        double ySlide = projectedEcb.origin.y - currentEcb.origin.y;
         std::cout << "initial vertical slide: " << ySlide << std::endl;
         ySlide = sign(ySlide) * std::min(std::abs(ySlide), std::abs(slide.y));
         std::cout << "minimal vertical slide: " << ySlide << std::endl;
 
-        if (std::abs(ySlide) < COLLISION_EPSILON) {
-            slide *= ySlide / slide.y;
-        }
+        slide *= ySlide / slide.y;
 
         std::cout << "current start " << currentEdge.start << std::endl;
         std::cout << "current end   " << currentEdge.end << std::endl;
         std::cout << "slide: " << slide << std::endl;
 
-        tmpEcb.setOrigin(tmpEcb.origin + slide);
+        nextStepEcb.setOrigin(nextStepEcb.origin + slide);
     }
 
-    std::cout << "projected Ecb " << *projectedEcb << std::endl;
-    std::cout << "collided Ecb " << tmpEcb << std::endl;
-    rollback(player, tmpEcb, currentEcb, projectedEcb);
+    std::cout << "projected Ecb " << projectedEcb << std::endl;
+    std::cout << "collided Ecb " << nextStepEcb << std::endl;
+    rollback<getX, getY>(player, currentEcb, nextStepEcb, projectedEcb);
 
-    std::cout << "rolled back projected Ecb " << *projectedEcb << std::endl;
+    std::cout << "rolled back projected Ecb " << projectedEcb << std::endl;
 
     return true;
 }
 
-inline Pair& getEcbSideRight(Ecb* e) {
-    return e->right;
-}
+bool Map::performFloorCollision(Player& player,
+                                Ecb const& currentEcb,
+                                Ecb& nextStepEcb,
+                                Ecb& projectedEcb,
+                                Platform*& currentPlatform,
+                                double& distance) {
+    CollisionDatum collision;
+    if (!getClosestCollision(currentEcb.bottom, projectedEcb.bottom, collision,
+                             currentPlatform)) {
+        return false;
+    }
+    if (collision.type != FLOOR_COLLISION)
+        return false;
+    if (!player.canLand(collision.segment.getPlatform()))
+        return false;
 
-inline void setEcbSideRight(Ecb* e, Pair pos) {
-    return e->setRight(pos);
-}
+    distance = (currentEcb.bottom - collision.position).euclid();
 
-inline Pair& getEcbSideLeft(Ecb* e) {
-    return e->left;
-}
+    // player landing alters ECB as well
+    currentPlatform = collision.segment.getPlatform();
+    player.land(currentPlatform);
+    nextStepEcb = player.currentCollision->postCollision;
+    nextStepEcb.setBottom(collision.position);
+    projectedEcb = nextStepEcb;
+    std::cout << nextStepEcb << std::endl;
 
-inline void setEcbSideLeft(Ecb* e, Pair pos) {
-    return e->setLeft(pos);
-}
-
-inline Pair& getEcbBottom(Ecb* e) {
-    return e->bottom;
-}
-
-inline Pair& getEcbTop(Ecb* e) {
-    return e->top;
-}
-
-inline void setEcbTop(Ecb* e, Pair pos) {
-    return e->setTop(pos);
-}
-
-inline double getX(Pair& pos) {
-    return pos.x;
-}
-
-inline double getY(Pair& pos) {
-    return pos.y;
-}
-
-inline void setX(Pair& pos, double val) {
-    pos.x = val;
-}
-
-inline void setY(Pair& pos, double val) {
-    pos.y = val;
+    return true;
 }
 
 void Map::movePlayer(Player& player, Pair& requestedDistance) {
     // TODO think about ledge grabbing
     grabLedges(player);
 
-    std::cout << "=========" << std::endl;
+    std::cout << "===========================" << std::endl;
     std::cout << "requested distance: " << requestedDistance << std::endl;
     std::cout << "grounded? " << player.isGrounded() << std::endl;
 
+    if (requestedDistance.x == 0 && requestedDistance.y == 0)
+        return;
+
     // if the player is grounded, move them along the platform
-    Pair projectedPosition;
+    Pair projectedPosition = player.position;
     basicProjection(player, requestedDistance, projectedPosition);
 
-    std::cout << "requested distance: " << requestedDistance << std::endl;
+    // motion state has 3 components.
+    // current position
+    Ecb currentEcb = player.currentCollision->playerModified;
+    // eventual ecb after resolving all motion
+    Ecb projectedEcb = player.currentCollision->postCollision;
+    projectedEcb.setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
+    player.currentCollision->root.setOrigin(projectedPosition +
+                                            PLAYER_ECB_OFFSET);
+    player.currentCollision->playerModified.setOrigin(projectedPosition +
+                                                      PLAYER_ECB_OFFSET);
+    // ecb after resolving the next step of motion
+    Ecb nextStepEcb = projectedEcb;
 
-    Ecb* currentEcb = &(player.currentCollision->playerModified);
-    Ecb* projectedEcb = &(player.currentCollision->postCollision);
-    projectedEcb->setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
-
-    std::cout << "requested distance: " << requestedDistance << std::endl;
+    std::cout << "remaining distance after motion: " << requestedDistance
+              << std::endl;
     std::cout << "projected pos:      " << projectedPosition << std::endl;
+
+#define debugEcb()                                                   \
+    {                                                                \
+        std::cout << "currentEcb   : " << currentEcb << std::endl;   \
+        std::cout << "nextStepEcb  : " << nextStepEcb << std::endl;  \
+        std::cout << "projectedEcb : " << projectedEcb << std::endl; \
+    };
+
+#define debugTmpEcb()                                                      \
+    {                                                                      \
+        std::cout << "currentEcb      : " << currentEcb << std::endl;      \
+        std::cout << "tmpNextStepEcb  : " << tmpNextStepEcb << std::endl;  \
+        std::cout << "tmpProjectedEcb : " << tmpProjectedEcb << std::endl; \
+    };
+
+#define overrideEcbs(name, type, side)                               \
+    {                                                                \
+        std::cout << "---- " << name << std::endl;                   \
+        if (thisProjectedDistance < currentClosestDistance) {        \
+            std::cout << "updated current predictions" << std::endl; \
+            std::cout << thisProjectedDistance << " < "              \
+                      << currentClosestDistance << std::endl;        \
+            closestNextStepEcb = tmpNextStepEcb;                     \
+            closestProjectedEcb = tmpProjectedEcb;                   \
+            currentClosestDistance = thisProjectedDistance;          \
+            e = type;                                                \
+            debugTmpEcb();                                           \
+        } else {                                                     \
+            std::cout << "ignoring, current is closer" << std::endl; \
+            std::cout << thisProjectedDistance << " > "              \
+                      << currentClosestDistance << std::endl;        \
+        }                                                            \
+    }
 
     int iterationCount = 0;
     do {
+        // panic state
         iterationCount++;
-        if (iterationCount > 20) {
-            exit(1);
+        if (iterationCount > 10) {
+            std::cout << "panicing and exiting" << std::endl;
+            // exit(1);
+            return;
         }
 
-        std::cout << "current   Ecb: " << *currentEcb << std::endl;
-        std::cout << "projected Ecb: " << *projectedEcb << std::endl;
+        std::cout << "---------------------------" << std::endl;
+        debugEcb();
+
+        double currentClosestDistance = DOUBLE_INFINITY;
+        double thisProjectedDistance = DOUBLE_INFINITY;
+        Ecb closestNextStepEcb = nextStepEcb;
+        Ecb closestProjectedEcb = projectedEcb;
+
+        Ecb tmpNextStepEcb = nextStepEcb;
+        Ecb tmpProjectedEcb = projectedEcb;
+
+        ENVIRONMENT_COLLISION_TYPE e = NO_ENVIRONMENT_COLLISION;
+
+        // we make movements in short segments.
+        // each of these collisions will optionally update nextStepEcb if they
+        // are closer than the original ecb
 
         Platform* currentPlatform = NULL;
         if (player.isGrounded()) {
             currentPlatform = player.getCurrentPlatform();
         }
 
-        // if (performWallEdgeCollision<getEcbSideRight, getEcbTop,
-        // setEcbSideRight>(
-        //     player, currentEcb, projectedEcb)) {
-        //     std::cout << "Top Right Edge Collision" std::endl;
-        // }
-
-        if (performWallEdgeCollision<getEcbSideRight, getEcbBottom,
-                                     setEcbSideRight>(player, currentEcb,
-                                                      projectedEcb)) {
-            std::cout << "Bottom Right Edge Collision" << std::endl;
-        }
-
-        if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
-                                     setEcbSideLeft>(player, currentEcb,
-                                                     projectedEcb)) {
-            std::cout << "Bottom Left Edge Collision" << std::endl;
-        }
-
         // perform right wall collision
-        if (performWallCollision<WALL_COLLISION, getEcbSideRight,
-                                 setEcbSideRight, getX, getY, setY>(
-                player, currentEcb, projectedEcb)) {
-            std::cout << "Right wall collision" << std::endl;
+        if (performWallCollision<getEcbSideRight, setEcbSideRight, getX, getY,
+                                 setY>(player, Pair(1, 0), currentEcb,
+                                       tmpNextStepEcb, tmpProjectedEcb,
+                                       thisProjectedDistance)) {
+            overrideEcbs("Right Wall collision", ENVIRONMENT_WALL_COLLISION,
+                         origin);
         }
 
         // perform left wall collision
-        if (performWallCollision<WALL_COLLISION, getEcbSideLeft, setEcbSideLeft,
-                                 getX, getY, setY>(player, currentEcb,
-                                                   projectedEcb)) {
-            std::cout << "left side wall collision" << std::endl;
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallCollision<getEcbSideLeft, setEcbSideLeft, getX, getY,
+                                 setY>(player, Pair(-1, 0), currentEcb,
+                                       tmpNextStepEcb, tmpProjectedEcb,
+                                       thisProjectedDistance)) {
+            overrideEcbs("Left Wall collision", ENVIRONMENT_WALL_COLLISION,
+                         origin);
         }
 
         // // perform ceiling collision
-        if (performWallCollision<CEIL_COLLISION, getEcbTop, setEcbTop, getY,
-                                 getX, setX>(player, currentEcb,
-                                             projectedEcb)) {
-            std::cout << "ceiling wall collision" << std::endl;
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallCollision<getEcbTop, setEcbTop, getY, getX, setX>(
+                player, Pair(0, -1), currentEcb, tmpNextStepEcb,
+                tmpProjectedEcb, thisProjectedDistance)) {
+            overrideEcbs("Ceiling collision", ENVIRONMENT_CEIL_COLLISION,
+                         origin);
         }
 
-        CollisionDatum collision;
-        if (getClosestCollision(currentEcb->bottom, projectedEcb->bottom,
-                                collision, currentPlatform)) {
-            // if there is a collision with the floor, land
-            if (collision.type == FLOOR_COLLISION) {
-                if (player.canLand(collision.segment.getPlatform())) {
-                    std::cout << "triggering landing "
-                              << collision.segment.getPlatform() << std::endl;
-
-                    // player landing alters ECB as well
-                    player.land(collision.segment.getPlatform());
-                    projectedEcb->setBottom(collision.position);
-                }
-            }
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallEdgeCollision<getEcbSideRight, getEcbTop,
+                                     setEcbSideRight>(
+                player, currentEcb, tmpNextStepEcb, tmpProjectedEcb,
+                thisProjectedDistance)) {
+            overrideEcbs("Top Right Edge collision", ENVIRONMENT_EDGE_COLLISION,
+                         origin);
         }
 
-        // reset player position to the projected Ecb
-        player.moveTo(*projectedEcb);
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallEdgeCollision<getEcbSideRight, getEcbBottom,
+                                     setEcbSideRight>(
+                player, currentEcb, tmpNextStepEcb, tmpProjectedEcb,
+                thisProjectedDistance)) {
+            overrideEcbs("Bottom Right Edge collision",
+                         ENVIRONMENT_EDGE_COLLISION, origin);
+        }
 
-    } while (currentEcb->origin != projectedEcb->origin);
+        // tmpNextStepEcb = nextStepEcb;
+        // tmpProjectedEcb = projectedEcb;
+        // if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
+        //                              setEcbSideLeft>(
+        //         player, currentEcb, tmpNextStepEcb, tmpProjectedEcb)) {
+        //     overrideEcbs("Bottom Left Edge collision",
+        //     ENVIRONMENT_EDGE_COLLISION, origin);
+        // }
+
+        // perform this collision last so that we can call player::land()
+        // without it being overridden
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performFloorCollision(player, currentEcb, tmpNextStepEcb,
+                                  tmpProjectedEcb, currentPlatform,
+                                  thisProjectedDistance)) {
+            overrideEcbs("Floor Collision", ENVIRONMENT_FLOOR_COLLISION,
+                         bottom);
+        }
+
+        // update this step of motion
+        currentEcb = closestNextStepEcb;
+        nextStepEcb = closestProjectedEcb;
+        projectedEcb = closestProjectedEcb;
+
+    } while (currentEcb.origin != projectedEcb.origin);
+
+    std::cout << "resolving: " << currentEcb << std::endl;
+
+    // reset player position to the projected Ecb
+    player.moveTo(currentEcb);
 }
 
 void Map::grabLedges(Player& player) {
