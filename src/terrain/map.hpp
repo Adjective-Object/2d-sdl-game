@@ -27,6 +27,7 @@ class Map {
               void (*setEcbSide)(Ecb&, Pair const pos),
               double (*x)(Pair const& pos),
               double (*y)(Pair const& pos),
+              void (*setX)(Pair& pos, double val),
               void (*setNonblockingAxis)(Pair& pos, double value)>
     bool performWallCollision(Player const& player,
                               const Pair expectedDirection,

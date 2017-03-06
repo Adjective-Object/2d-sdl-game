@@ -44,11 +44,11 @@ inline double getY(Pair const& pos) {
     return pos.y;
 }
 
-inline void setX(Pair& pos, double val) {
+inline void setX(Pair& pos, const double val) {
     pos.x = val;
 }
 
-inline void setY(Pair& pos, double val) {
+inline void setY(Pair& pos, const double val) {
     pos.y = val;
 }
 
@@ -129,7 +129,9 @@ void basicProjection(Player& player,
  * difference to projectedEcb.
  *
  */
-template <double (*x)(Pair const& pos), double (*y)(Pair const& pos)>
+template <double (*x)(Pair const& pos),
+          double (*y)(Pair const& pos),
+          void (*xSet)(Pair& pos, const double val)>
 void rollback(Player const& player,
               Ecb const& currentEcb,
               Ecb const& nextStepEcb,
@@ -155,8 +157,9 @@ void rollback(Player const& player,
 
         std::cout << "noCollisionDistance " << noCollisionDistance << std::endl;
 
-        Pair rollbackPosition =
-            projectedEcb.origin + Pair(noCollisionDistance, 0);
+        Pair rollbackAmount = Pair(0, 0);
+        xSet(rollbackAmount, noCollisionDistance);
+        Pair rollbackPosition = projectedEcb.origin + rollbackAmount;
 
         std::cout << "rollback position: " << rollbackPosition << std::endl;
 
@@ -172,6 +175,7 @@ template <Pair const& (*getEcbSide)(Ecb const&),
           void (*setEcbSide)(Ecb&, Pair const pos),
           double (*x)(Pair const& pos),
           double (*y)(Pair const& pos),
+          void (*setBlockingAxis)(Pair& pos, double val),
           void (*setNonblockingAxis)(Pair& pos, double value)>
 bool Map::performWallCollision(Player const& player,
                                const Pair expectedDirection,
@@ -233,7 +237,8 @@ bool Map::performWallCollision(Player const& player,
         return false;
     }
 
-    rollback<x, y>(player, currentEcb, nextStepEcb, projectedEcb);
+    rollback<x, y, setBlockingAxis>(player, currentEcb, nextStepEcb,
+                                    projectedEcb);
     return true;
 }
 
@@ -381,7 +386,7 @@ bool Map::performWallEdgeCollision(Player const& player,
 
     std::cout << "projected Ecb " << projectedEcb << std::endl;
     std::cout << "collided Ecb " << nextStepEcb << std::endl;
-    rollback<getX, getY>(player, currentEcb, nextStepEcb, projectedEcb);
+    rollback<getX, getY, setX>(player, currentEcb, nextStepEcb, projectedEcb);
 
     std::cout << "rolled back projected Ecb " << projectedEcb << std::endl;
 
@@ -496,9 +501,9 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
 
         // perform right wall collision
         if (performWallCollision<getEcbSideRight, setEcbSideRight, getX, getY,
-                                 setY>(player, Pair(1, 0), tmpCollisionPointEcb,
-                                       tmpNextStepEcb, tmpProjectedEcb,
-                                       thisProjectedDistance)) {
+                                 setX, setY>(
+                player, Pair(1, 0), tmpCollisionPointEcb, tmpNextStepEcb,
+                tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Right Wall collision", ENVIRONMENT_WALL_COLLISION,
                          origin);
         }
@@ -508,7 +513,7 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         if (performWallCollision<getEcbSideLeft, setEcbSideLeft, getX, getY,
-                                 setY>(
+                                 setX, setY>(
                 player, Pair(-1, 0), tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Left Wall collision", ENVIRONMENT_WALL_COLLISION,
@@ -519,7 +524,7 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (performWallCollision<getEcbTop, setEcbTop, getY, getX, setX>(
+        if (performWallCollision<getEcbTop, setEcbTop, getY, getX, setY, setX>(
                 player, Pair(0, -1), tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Ceiling collision", ENVIRONMENT_CEIL_COLLISION,
