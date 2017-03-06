@@ -71,13 +71,15 @@ bool Map::getClosestCollision(Pair const& start,
         TerrainCollisionType t =
             p.checkCollision(start, end, collisionPoint, segment);
 
-        double distance = (collisionPoint - start).euclid();
-        if (t != NO_COLLISION && distance < closestDist) {
-            closestDist = distance;
-            out.type = t;
-            out.segment = segment;
-            out.position = collisionPoint;
-            anyCollision = true;
+        if (t != NO_COLLISION) {
+            double distance = (collisionPoint - start).euclid();
+            if (distance < closestDist) {
+                closestDist = distance;
+                out.type = t;
+                out.segment = segment;
+                out.position = collisionPoint;
+                anyCollision = true;
+            }
         }
     }
 
@@ -227,6 +229,7 @@ bool Map::performWallCollision(Player const& player,
     std::cout << "ecbs " << currentEcb.origin << ".." << projectedEcb.origin
               << std::endl;
 
+    // this is required to transfer from wall sliding to edge sliding
     if (std::abs(y(currentEcb.origin) - y(nextStepEcb.origin)) <
             COLLISION_EPSILON &&
         std::abs(y(currentEcb.origin) - y(projectedEcb.origin)) >
@@ -282,7 +285,8 @@ bool Map::performWallEdgeCollision(Player const& player,
 
     Line currentEdge, projectedEdge;
     EdgeCollision collision;
-    if ((currentForward.y > currentBack.y)) {
+    if ((currentForward.y > currentBack.y) ==
+        (currentForward.x > currentBack.x)) {
         currentEdge = Line(currentBack, currentForward);
         projectedEdge = Line(projectedBack, projectedForward);
 
@@ -382,6 +386,13 @@ bool Map::performWallEdgeCollision(Player const& player,
         std::cout << "slide: " << slide << std::endl;
 
         nextStepEcb.setOrigin(nextStepEcb.origin + slide);
+        // deal with clipping due to floating point errors
+        if (getForwardEdge(nextStepEcb).x - collisionPoint.x <
+            COLLISION_EPSILON) {
+            Pair newOrigin = getForwardEdge(nextStepEcb);
+            newOrigin.x = collisionPoint.x;
+            setForwardEdge(nextStepEcb, newOrigin);
+        }
     }
 
     std::cout << "projected Ecb " << projectedEcb << std::endl;
@@ -553,14 +564,26 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
 
-        // tmpNextStepEcb = nextStepEcb;
-        // tmpProjectedEcb = projectedEcb;
-        // if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
-        //                              setEcbSideLeft>(
-        //         player, currentEcb, tmpNextStepEcb, tmpProjectedEcb)) {
-        //     overrideEcbs("Bottom Left Edge collision",
-        //     ENVIRONMENT_EDGE_COLLISION, origin);
-        // }
+        tmpCollisionPointEcb = currentEcb;
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
+                                     setEcbSideLeft>(
+                player, tmpCollisionPointEcb, tmpNextStepEcb, tmpProjectedEcb,
+                thisProjectedDistance)) {
+            overrideEcbs("Bottom Left Edge collision",
+                         ENVIRONMENT_EDGE_COLLISION, origin);
+        }
+
+        tmpCollisionPointEcb = currentEcb;
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (performWallEdgeCollision<getEcbSideLeft, getEcbTop, setEcbSideLeft>(
+                player, tmpCollisionPointEcb, tmpNextStepEcb, tmpProjectedEcb,
+                thisProjectedDistance)) {
+            overrideEcbs("Bottom Left Edge collision",
+                         ENVIRONMENT_EDGE_COLLISION, origin);
+        }
 
         // perform this collision last so that we can call player::land()
         // without it being overridden

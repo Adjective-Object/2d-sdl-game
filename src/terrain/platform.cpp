@@ -157,31 +157,32 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         }
     }
 
+    std::cout << "i: " << i << std::endl;
+    std::cout << "points: " << points.size() << std::endl;
+
     // if we've stepped beyond the end of the platform, abandon it
-    if (i == points.size()) {
+    if (i >= points.size() - 1) {
         std::cerr << "grounded movement starts off of platform (" << i << ")"
                   << std::endl;
         return false;
     }
 
-    // std::cout << "i: " << i << std::endl;
-
-    // std::cout << "resting on segment " << i << std::endl;
-    // std::cout << "length is " << lengths[i] << std::endl;
+    std::cout << "resting on segment " << i << std::endl;
+    std::cout << "length is " << lengths[i] << std::endl;
 
     double currentPlatformPercent =
         (position - points[i]).euclid() / lengths[i];
     double remainingDistance = std::abs(velocity.x);
     int direction = velocity.x == 0 ? 1 : sign(velocity.x);
 
-    // std::cout << "direction " << direction << std::endl;
-    // std::cout << "distance " << remainingDistance << std::endl;
+    std::cout << "direction " << direction << std::endl;
+    std::cout << "distance " << remainingDistance << std::endl;
 
     while (1) {
-        // std::cout << "reducing movment by remaining len of platform " << i
-        //           << std::endl;
-        // std::cout << "length: " << lengths[i]
-        //           << " percent: " << currentPlatformPercent << std::endl;
+        std::cout << "reducing movment by remaining len of platform " << i
+                  << std::endl;
+        std::cout << "length: " << lengths[i]
+                  << " percent: " << currentPlatformPercent << std::endl;
 
         if (direction < 0) {
             // leftware motion
@@ -193,7 +194,7 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
             currentPlatformPercent = 0;
         }
 
-        // std::cout << "remaining dist " << remainingDistance << std::endl;
+        std::cout << "remaining dist " << remainingDistance << std::endl;
 
         // if we've gone too negative remainingDistance, then we've
         // exhausted the requested platform motion. Undo the previous
@@ -220,9 +221,8 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
         // position on the platform with x velocity corresponding to
         // remaining distance
         if (i < 0 || i >= lengths.size()) {
-            // printf(
-            //     "stepping off platform %d (direction: %d, dist left:%f)\n",
-            //     i, direction, remainingDistance);
+            printf("stepping off platform %d (direction: %d, dist left:%f)\n",
+                   i, direction, remainingDistance);
             i -= direction;
             velocity.x = direction * remainingDistance;
             position.x = points[i].x;

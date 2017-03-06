@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <SDL_ttf.h>
+#include <cmath>
 
 #include "engine/game.hpp"
 #include "engine/joystickindicator.hpp"
@@ -117,6 +118,9 @@ void MainScene::update() {
         player->update();
         Pair playerMotion = player->velocity * EnG->elapsed;
         map->movePlayer(*player, playerMotion);
+        if (std::isnan(player->position.x) || std::isnan(player->position.y)) {
+            exit(1);
+        }
     }
 
     // update action label when the player's action state updates

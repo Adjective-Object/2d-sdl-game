@@ -166,7 +166,13 @@ bool onLine(Pair const& l1, Pair const& l2, Pair const& point) {
     double ratio = (xdiff / slope.x);
     if (ratio < 0 || ratio > 1)
         return false;
-    Pair predictedPoint = l1 + slope * ratio;
+    Pair predictedPoint = l1 + slope / slope.x * xdiff;
+
+    _debug(std::cout << "ratio:     " << ratio << std::endl;
+           std::cout << "predicted: " << predictedPoint << std::endl;
+           std::cout << "point:     " << point << std::endl;
+           std::cout << "diff:      " << (predictedPoint - point)
+                     << std::endl;);
 
     return (predictedPoint - point).euclid() < EPSILON;
 }
