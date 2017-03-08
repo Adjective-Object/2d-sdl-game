@@ -136,7 +136,7 @@ void Joystick::setDown(unsigned int buttonId) {
 }
 
 void Joystick::setUp(unsigned int buttonId) {
-    upMask[currentHistory] &= ~(1 << buttonId);
+    upMask[currentHistory] |= 1 << buttonId;
     heldMask[currentHistory] &= ~(1 << buttonId);
 }
 

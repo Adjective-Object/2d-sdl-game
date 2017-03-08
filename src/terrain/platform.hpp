@@ -29,23 +29,23 @@ class Platform : public Entity {
         Pair const& next,
         Pair& out,
         PlatformSegment& segment,
-        TerrainCollisionType expectedCollisionType);
+        TerrainCollisionType expectedCollisionType) const;
 
     bool checkEdgeCollision(Pair const& a1,
                             Pair const& a2,
                             Pair const& b1,
                             Pair const& b2,
-                            EdgeCollision& collision);
+                            EdgeCollision& collision) const;
 
-    bool groundedMovement(Pair& position, Pair& distance);
+    bool groundedMovement(Pair& position, Pair& distance) const;
 
     void init();
     void preUpdate();
     void update();
     void postUpdate();
     void render(SDL_Renderer* r);
-    bool isPassable();
-    PlatformSegment getSegment(int index);
+    bool isPassable() const;
+    PlatformSegment getSegment(int index) const;
 
     static bool isWall(double angle);
     static bool isCeil(double angle);

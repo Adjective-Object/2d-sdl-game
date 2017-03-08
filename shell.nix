@@ -20,6 +20,7 @@ in with pkgs; let
     pkgconfig
     clang-tools
     gmock
+    glibc
   ];
 
 in stdenv.mkDerivation {

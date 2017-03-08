@@ -3,23 +3,23 @@
 #include "engine/pair.hpp"
 
 PlatformSegment::PlatformSegment() : platform(NULL), index(0) {}
-PlatformSegment::PlatformSegment(Platform* platform, int index)
+PlatformSegment::PlatformSegment(const Platform* platform, int index)
     : platform(platform), index(index) {}
 
-Pair* PlatformSegment::firstPoint() {
+const Pair* PlatformSegment::firstPoint() {
     return &(platform->points[index]);
 }
 
-Pair* PlatformSegment::secondPoint() {
+const Pair* PlatformSegment::secondPoint() {
     return &(platform->points[index + 1]);
 }
 
-Pair PlatformSegment::slope() {
+const Pair PlatformSegment::slope() {
     Pair diff = *firstPoint() - *secondPoint();
     return diff / diff.euclid();
 }
 
-Platform* PlatformSegment::getPlatform() {
+const Platform* PlatformSegment::getPlatform() {
     return platform;
 }
 

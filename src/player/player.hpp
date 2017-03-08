@@ -19,7 +19,7 @@ class Player : public Sprite {
     AnimationBank* bank;
 
    public:
-    Platform* currentPlatform = NULL;
+    const Platform* currentPlatform = NULL;
     Ledge* currentLedge = NULL;
 
     PlayerCollision* previousCollision = new PlayerCollision();
@@ -68,19 +68,19 @@ class Player : public Sprite {
     bool canGrabLedge() const;
     bool isGrounded() const;
     bool canFallOff() const;
-    bool canLand(Platform* p) const;
-    Platform* getCurrentPlatform() const;
+    bool canLand(const Platform* p) const;
+    const Platform* getCurrentPlatform() const;
     ActionState getActionState() const;
     Action* getAction() const;
 
     void fallOffPlatform();
-    void land(Platform* p);
-    Ecb getLandedEcb(Platform*) const;
+    void land(const Platform* p);
+    Ecb getLandedEcb(const Platform*) const;
 
     void changeAction(ActionState state);
-    double getXInput(int frames = 0);
+    double getXInput(int frames = 0) const;
     void setPosition(Pair newPosition);
-    double getAttribute(char const* name);
+    double getAttribute(char const* name) const;
 };
 
 #endif

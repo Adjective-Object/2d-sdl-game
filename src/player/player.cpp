@@ -133,13 +133,13 @@ bool Player::canGrabLedge() const {
     return ledgeRegrabCounter <= 0 && action->canGrabLedge(*this);
 }
 
-bool Player::canLand(Platform* p) const {
+bool Player::canLand(const Platform* p) const {
     return action->isLandable(*this, p);
 };
 
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
-void Player::land(Platform* p) {
+void Player::land(const Platform* p) {
     double yvel = cVel.y;
     cVel.y = 0;
     grounded = true;
@@ -168,7 +168,7 @@ void Player::land(Platform* p) {
     }
 }
 
-Ecb Player::getLandedEcb(Platform* p) const {
+Ecb Player::getLandedEcb(const Platform* p) const {
     Ecb tmp = currentCollision->postCollision;
     tmp.heightBottom = -PLAYER_ECB_OFFSET.y;
     return tmp;
@@ -279,11 +279,11 @@ bool Player::isGrounded() const {
     return action->isGrounded(*this);
 }
 
-double Player::getXInput(int frames) {
+double Player::getXInput(int frames) const {
     return input->axis(MOVEMENT_AXIS_X, frames) * face;
 }
 
-Platform* Player::getCurrentPlatform() const {
+const Platform* Player::getCurrentPlatform() const {
     return currentPlatform;
 }
 
@@ -292,6 +292,6 @@ void Player::setPosition(Pair newPosition) {
     currentCollision->postCollision.setOrigin(position + PLAYER_ECB_OFFSET);
 }
 
-double Player::getAttribute(char const* name) {
+double Player::getAttribute(char const* name) const {
     return config->getAttribute(name);
 }

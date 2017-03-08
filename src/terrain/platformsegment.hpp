@@ -6,16 +6,16 @@ class Platform;
 
 class PlatformSegment {
     friend class Platform;
-    Platform* platform;
+    const Platform* platform;
     int index;
 
    public:
     PlatformSegment();
-    PlatformSegment(Platform* platform, int index);
-    Pair* firstPoint();
-    Pair* secondPoint();
-    Pair slope();
-    Platform* getPlatform();
+    PlatformSegment(const Platform* platform, int index);
+    const Pair* firstPoint();
+    const Pair* secondPoint();
+    const Pair slope();
+    const Platform* getPlatform();
 
     bool operator==(const PlatformSegment& p) const;
     friend std::ostream& operator<<(std::ostream& strm,

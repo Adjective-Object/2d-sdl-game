@@ -56,7 +56,7 @@ TerrainCollisionType Platform::checkCollision(
     Pair const& next,
     Pair& out,
     PlatformSegment& segment,
-    TerrainCollisionType expectedCollisionType) {
+    TerrainCollisionType expectedCollisionType) const {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -98,7 +98,7 @@ bool Platform::checkEdgeCollision(Pair const& a1,
                                   Pair const& a2,
                                   Pair const& b1,
                                   Pair const& b2,
-                                  EdgeCollision& collision) {
+                                  EdgeCollision& collision) const {
     for (size_t i = 0; i < points.size() - 1; i++) {
         // TODO compare if multiple colls happen same frame?
         int direction =
@@ -147,7 +147,7 @@ void Platform::render(SDL_Renderer* r) {
     }
 }
 
-bool Platform::groundedMovement(Pair& position, Pair& velocity) {
+bool Platform::groundedMovement(Pair& position, Pair& velocity) const {
     Pair wsRelPos = position - points[0];
     if (wsRelPos.x < 0) {
         std::cerr << "grounded movement starts before platform" << std::endl;
@@ -248,11 +248,11 @@ bool Platform::groundedMovement(Pair& position, Pair& velocity) {
     }
 }
 
-bool Platform::isPassable() {
+bool Platform::isPassable() const {
     return passable;
 }
 
-PlatformSegment Platform::getSegment(int index) {
+PlatformSegment Platform::getSegment(int index) const {
     return PlatformSegment(this, index);
 }
 

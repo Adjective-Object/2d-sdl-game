@@ -23,60 +23,29 @@ class Map {
 
     void grabLedges(Player& player);
 
-    template <Pair const& (*getEcbSide)(Ecb const&),
-              void (*setEcbSide)(Ecb&, Pair const pos),
-              double (*x)(Pair const& pos),
-              double (*y)(Pair const& pos),
-              void (*setBlockingAxis)(Pair& pos, double val),
-              void (*setNonblockingAxis)(Pair& pos, double value),
-              TerrainCollisionType expectedEnvironmentCollision>
-    bool performWallCollision(Player const& player,
-                              const Pair expectedDirection,
-                              Ecb& currentEcb,
-                              Ecb& nextStepEcb,
-                              Ecb& projectedEcb,
-                              double& distance,
-                              PlatformSegment& ignoredSegment);
-
-    template <Pair const& (*getForwardEdge)(Ecb const&),
-              Pair const& (*getBackEdge)(Ecb const&),
-              void (*setForwardEdge)(Ecb&, Pair const pos)>
-    bool performWallEdgeCollision(Player const& player,
-                                  Ecb& currentEcb,
-                                  Ecb& nextStepEcb,
-                                  Ecb& projectedEcb,
-                                  double& distance);
-
-    bool performFloorCollision(Player& player,
-                               Ecb& currentEcb,
-                               Ecb& nextStepEcb,
-                               Ecb& projectedEcb,
-                               Platform*& collidedPlatform,
-                               double& distance);
-
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
-    void movePlayer(Player& player, Pair& requestedDistance);
-    void moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb);
+    void movePlayer(Player& player, Pair& requestedDistance) const;
+    void moveRecursive(Player& player,
+                       Ecb& currentEcb,
+                       Ecb& projectedEcb) const;
     void render(SDL_Renderer* r);
 
-    bool getClosestCollision(Pair const& start,
-                             Pair const& end,
-                             CollisionDatum& out,
-                             PlatformSegment& ignoredSegment,
-                             TerrainCollisionType expectedEnvironmentCollision);
+    bool getClosestCollision(
+        Pair const& start,
+        Pair const& end,
+        CollisionDatum& out,
+        PlatformSegment& ignoredSegment,
+        TerrainCollisionType expectedEnvironmentCollision) const;
 
     bool getClosestEdgeCollision(Pair const& a1,
                                  Pair const& a2,
                                  Pair const& b1,
                                  Pair const& b2,
-                                 EdgeCollision& out);
-
-    bool getClosestEcbCollision(Ecb const& start,
-                                Ecb const& end,
-                                CollisionDatum& out);
+                                 EdgeCollision& out) const;
 
     Platform* getPlatform(size_t index);
 };
 }
+
 #endif
