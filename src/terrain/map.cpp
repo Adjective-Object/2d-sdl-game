@@ -451,6 +451,41 @@ bool performFloorCollision(Map const& m,
     return true;
 }
 
+#define WALL_COLL_ARGS Map const& m , \
+                          Player const& player , \
+                          const Pair expectedDirection , \
+                          Ecb& currentEcb , \
+                          Ecb& nextStepEcb , \
+                          Ecb& projectedEcb , \
+                          double& distance , \
+                          PlatformSegment& lastWallCollision
+
+constexpr bool (*rightWallCollision)(WALL_COLL_ARGS) =
+performWallCollision<getEcbSideRight, setEcbSideRight, getX, getY, setX, setY,
+    WALL_COLLISION>;
+constexpr bool (*leftWallCollision)(WALL_COLL_ARGS) =
+performWallCollision<getEcbSideLeft, setEcbSideLeft, getX, getY, setX, setY,
+    WALL_COLLISION>;
+constexpr bool (*ceilingCollision)(WALL_COLL_ARGS) =
+    performWallCollision<getEcbTop, setEcbTop, getY, getX, setY, setX,
+                                 CEIL_COLLISION>;
+
+#define EDGE_COLL_ARGS Map const& m, \
+                              Player const& player, \
+                              Ecb& currentEcb, \
+                              Ecb& nextStepEcb, \
+                              Ecb& projectedEcb, \
+                              double& distance
+
+constexpr bool (*topRightEdgeCollision)(EDGE_COLL_ARGS) =
+performWallEdgeCollision<getEcbSideRight, getEcbTop, setEcbSideRight>;
+constexpr bool (*bottomRightEdgeCollision)(EDGE_COLL_ARGS) =
+performWallEdgeCollision<getEcbSideRight, getEcbBottom, setEcbSideRight>;
+constexpr bool (*bottomLeftEdgeCollision)(EDGE_COLL_ARGS) =
+performWallEdgeCollision<getEcbSideLeft, getEcbBottom, setEcbSideLeft>;
+constexpr bool (*topLeftEdgeCollision)(EDGE_COLL_ARGS) =
+performWallEdgeCollision<getEcbSideLeft, getEcbTop, setEcbSideLeft>;
+
 void Map::moveRecursive(Player& player,
                         Ecb& currentEcb,
                         Ecb& projectedEcb) const {
@@ -543,8 +578,7 @@ void Map::moveRecursive(Player& player,
         Player const& player_const = player;
 
         // perform right wall collision
-        if (performWallCollision<getEcbSideRight, setEcbSideRight, getX, getY,
-                                 setX, setY, WALL_COLLISION>(
+        if (rightWallCollision(
                 *this, player_const, Pair(1, 0), tmpCollisionPointEcb,
                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
                 tmpLastWallCollision)) {
@@ -557,8 +591,7 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if (performWallCollision<getEcbSideLeft, setEcbSideLeft, getX, getY,
-                                 setX, setY, WALL_COLLISION>(
+        if (leftWallCollision(
                 *this, player_const, Pair(-1, 0), tmpCollisionPointEcb,
                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
                 tmpLastWallCollision)) {
@@ -571,8 +604,7 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if (performWallCollision<getEcbTop, setEcbTop, getY, getX, setY, setX,
-                                 CEIL_COLLISION>(
+        if (ceilingCollision(
                 *this, player_const, Pair(0, -1), tmpCollisionPointEcb,
                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
                 tmpLastWallCollision)) {
@@ -583,8 +615,7 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (performWallEdgeCollision<getEcbSideRight, getEcbTop,
-                                     setEcbSideRight>(
+        if (topRightEdgeCollision(
                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Top Right Edge collision", ENVIRONMENT_EDGE_COLLISION,
@@ -594,8 +625,7 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (performWallEdgeCollision<getEcbSideRight, getEcbBottom,
-                                     setEcbSideRight>(
+        if (bottomRightEdgeCollision(
                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Bottom Right Edge collision",
@@ -605,8 +635,7 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (performWallEdgeCollision<getEcbSideLeft, getEcbBottom,
-                                     setEcbSideLeft>(
+        if (bottomLeftEdgeCollision(
                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Bottom Left Edge collision",
@@ -616,7 +645,7 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (performWallEdgeCollision<getEcbSideLeft, getEcbTop, setEcbSideLeft>(
+        if (topRightEdgeCollision(
                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance)) {
             overrideEcbs("Bottom Left Edge collision",
