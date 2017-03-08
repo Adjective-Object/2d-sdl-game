@@ -27,14 +27,16 @@ class Map {
               void (*setEcbSide)(Ecb&, Pair const pos),
               double (*x)(Pair const& pos),
               double (*y)(Pair const& pos),
-              void (*setX)(Pair& pos, double val),
-              void (*setNonblockingAxis)(Pair& pos, double value)>
+              void (*setBlockingAxis)(Pair& pos, double val),
+              void (*setNonblockingAxis)(Pair& pos, double value),
+              TerrainCollisionType expectedEnvironmentCollision>
     bool performWallCollision(Player const& player,
                               const Pair expectedDirection,
                               Ecb& currentEcb,
                               Ecb& nextStepEcb,
                               Ecb& projectedEcb,
-                              double& distance);
+                              double& distance,
+                              PlatformSegment& ignoredSegment);
 
     template <Pair const& (*getForwardEdge)(Ecb const&),
               Pair const& (*getBackEdge)(Ecb const&),
@@ -61,7 +63,8 @@ class Map {
     bool getClosestCollision(Pair const& start,
                              Pair const& end,
                              CollisionDatum& out,
-                             Platform* ignoredPlatform = NULL);
+                             PlatformSegment& ignoredSegment,
+                             TerrainCollisionType expectedEnvironmentCollision);
 
     bool getClosestEdgeCollision(Pair const& a1,
                                  Pair const& a2,

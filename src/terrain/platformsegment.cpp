@@ -24,7 +24,8 @@ Platform* PlatformSegment::getPlatform() {
 }
 
 bool PlatformSegment::operator==(const PlatformSegment& p) const {
-    return p.platform == platform && p.index == index;
+    return p.platform == platform &&
+           (p.index == index || p.index == -1 || index == -1);
 }
 
 std::ostream& operator<<(std::ostream& strm, const PlatformSegment& p) {

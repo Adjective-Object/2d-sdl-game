@@ -16,33 +16,33 @@
 
 using namespace Terrain;
 
-TEST(Map, getClosestCollision) {
-    std::vector<Platform> platforms = {Platform({Pair(1, 5), Pair(1, -5)}),
-                                       Platform({Pair(2, 5), Pair(2, -5)}),
-                                       Platform({Pair(3, 5), Pair(3, -5)}),
-                                       Platform({Pair(4, 5), Pair(4, -5)})};
-    Map m = Map(platforms, {});
+// TEST(Map, getClosestCollision) {
+//     std::vector<Platform> platforms = {Platform({Pair(1, 5), Pair(1, -5)}),
+//                                        Platform({Pair(2, 5), Pair(2, -5)}),
+//                                        Platform({Pair(3, 5), Pair(3, -5)}),
+//                                        Platform({Pair(4, 5), Pair(4, -5)})};
+//     Map m = Map(platforms, {});
 
-    CollisionDatum collision;
+//     CollisionDatum collision;
 
-    ASSERT_TRUE(m.getClosestCollision(Pair(0, 0), Pair(4, 0), collision));
+//     ASSERT_TRUE(m.getClosestCollision(Pair(0, 0), Pair(4, 0), collision));
 
-    EXPECT_EQ(WALL_COLLISION, collision.type);
-    EXPECT_EQ(m.getPlatform(0)->getSegment(0), collision.segment);
-    EXPECT_EQ(Pair(1, 0), collision.position);
-}
+//     EXPECT_EQ(WALL_COLLISION, collision.type);
+//     EXPECT_EQ(m.getPlatform(0)->getSegment(0), collision.segment);
+//     EXPECT_EQ(Pair(1, 0), collision.position);
+// }
 
-TEST(Map, getClosestCollision_Miss) {
-    Map m = Map({Platform({Pair(1, -5), Pair(1, 5)}),
-                 Platform({Pair(2, -5), Pair(2, 5)}),
-                 Platform({Pair(3, -5), Pair(3, 5)}),
-                 Platform({Pair(4, -5), Pair(4, 5)})},
-                {});
+// TEST(Map, getClosestCollision_Miss) {
+//     Map m = Map({Platform({Pair(1, -5), Pair(1, 5)}),
+//                  Platform({Pair(2, -5), Pair(2, 5)}),
+//                  Platform({Pair(3, -5), Pair(3, 5)}),
+//                  Platform({Pair(4, -5), Pair(4, 5)})},
+//                 {});
 
-    CollisionDatum collision;
+//     CollisionDatum collision;
 
-    EXPECT_FALSE(m.getClosestCollision(Pair(0, 0), Pair(10, 0), collision));
-}
+//     EXPECT_FALSE(m.getClosestCollision(Pair(0, 0), Pair(10, 0), collision));
+// }
 
 TEST(Map, movePlayer_NoCollisions) {
     // setup scene
@@ -546,4 +546,74 @@ TEST(Map, movePlayer_Interrupt_Collision_Motion) {
     EXPECT_NEAR(p.currentCollision->postCollision.origin.x, 4, 0.0001);
     EXPECT_NEAR(p.currentCollision->postCollision.right.x, 5, 0.0001);
     EXPECT_NEAR(p.currentCollision->postCollision.bottom.y, 5, 0.0001);
+}
+
+TEST(Map, movePlayer_Playtest_3) {
+    /*
+        Sliding an ecb from a falling position against the corner into
+        a wall
+     */
+
+    // setup scene
+    Player p = makeMockPlayer(Pair(3.34, 1.1));
+    p.init();
+    Map m = Map(
+        {
+            Platform({
+                Pair(2.1, 0.5), Pair(2.5, 0.5), Pair(2.5, 1), Pair(2.1, 1),
+                Pair(2.1, 0.5),
+            }),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.setOrigin(Pair(2.05173, 0.48045));
+    tmpCollision.widthLeft = 0.06;
+    tmpCollision.widthRight = 0.06;
+    tmpCollision.heightTop = 0.1;
+    tmpCollision.heightBottom = 0.1;
+
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0.0141667, 0.0299667);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_EQ(p.currentCollision->postCollision.origin.x, 2.04);
+    EXPECT_NEAR(p.currentCollision->postCollision.origin.y, 0.510417, 0.00001);
+}
+
+TEST(Map, movePlayer_Teleport_Playtest_4) {
+    /*
+    Sliding an ecb from a falling position against the corner into
+    a wall
+ */
+
+    // setup scene
+    Player p = makeMockPlayer(Pair(3.34, 1.1));
+    p.init();
+    Map m = Map(
+        {
+            // convoluted floor surface
+            Platform({
+                Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35),
+                Pair(0.7, 1.2), Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6),
+                Pair(2.0, 2.0), Pair(2.2, 2.0), Pair(2.4, 2.0), Pair(3, 1.5),
+                Pair(3.4, 1.5), Pair(3.4, 1.1), Pair(3.5, 1.1),
+            }),
+        },
+        {});
+
+    Ecb tmpCollision = p.currentCollision->postCollision;
+    tmpCollision.setOrigin(Pair(0.800927, 1));
+    tmpCollision.widthLeft = 0.06;
+    tmpCollision.widthRight = 0.06;
+    tmpCollision.heightTop = 0.1;
+    tmpCollision.heightBottom = 0.2;
+
+    p.land(m.getPlatform(0));
+    p.moveTo(tmpCollision);
+    Pair requestedMotion = Pair(0.0101667, 0);
+    m.movePlayer(p, requestedMotion);
+
+    EXPECT_NEAR(p.currentCollision->postCollision.origin.x, 0.8110937, 0.00001);
+    EXPECT_NEAR(p.currentCollision->postCollision.origin.y, 1, 0.00001);
 }

@@ -93,11 +93,6 @@ bool Platform::checkEdgeCollision(Pair const& a1,
         int direction =
             checkLineSweep(a1, a2, b1, b2, points[i], collision.collisionLine1,
                            collision.collisionLine2);
-        if (direction != 0) {
-            std::cout << "nonzero collision direction" << direction
-                      << " with point " << i << " (" << points[i] << ")"
-                      << std::endl;
-        }
         if (direction == -1) {
             collision.cornerPosition = points[i];
             collision.s1 = (i >= 0) ? PlatformSegment(this, i - 1)
