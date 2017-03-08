@@ -24,10 +24,12 @@ class Platform : public Entity {
                                         double platformAngle,
                                         Pair& otherPair);
 
-    TerrainCollisionType checkCollision(Pair const& previous,
-                                        Pair const& next,
-                                        Pair& out,
-                                        PlatformSegment& segment);
+    TerrainCollisionType checkCollision(
+        Pair const& previous,
+        Pair const& next,
+        Pair& out,
+        PlatformSegment& segment,
+        TerrainCollisionType expectedCollisionType);
 
     bool checkEdgeCollision(Pair const& a1,
                             Pair const& a2,

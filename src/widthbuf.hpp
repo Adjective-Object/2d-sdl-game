@@ -109,8 +109,8 @@ class widthstream : public std::ostream {
     widthbuf buf;
 public:
     widthstream(size_t width, std::ostream &os) 
-        : buf(width, os.rdbuf()), 
-        std::ostream(&buf) 
+        : std::ostream(&buf),
+        buf(width, os.rdbuf())
     {}
 
     widthstream &indent(int w) { 

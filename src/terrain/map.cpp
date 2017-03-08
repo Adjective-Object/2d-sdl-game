@@ -69,11 +69,13 @@ bool Map::getClosestCollision(Pair const& start,
     bool anyCollision = false;
 
     for (Platform& p : platforms) {
-        TerrainCollisionType t =
-            p.checkCollision(start, end, collisionPoint, segment);
+        TerrainCollisionType t = p.checkCollision(
+            start, end, collisionPoint, segment, expectedCollisionType);
 
-        if (t != expectedCollisionType)
+        if (t != expectedCollisionType) {
             continue;
+        }
+
         if (segment == ignoredCollision) {
             out << "ignoring collision with platform because it was previously "
                    "collided with"
@@ -167,11 +169,10 @@ void rollback(Player const& player,
         out << relPosNoColl << " " << relPosColl << std::endl;
 
         double noCollisionDistance = x(relPosColl) - x(relPosNoColl);
-        // if (currentEcb.origin == nextStepEcb.origin) {
-        //     // we collide with the wall at the next step. only slide.
-        //     noCollisionDistance = x(currentEcb.origin) -
-        //     x(projectedEcb.origin);
-        // }
+        if (currentEcb.origin == nextStepEcb.origin) {
+            // we collide with the wall at the next step. only slide.
+            noCollisionDistance = x(currentEcb.origin) - x(projectedEcb.origin);
+        }
 
         out << "noCollisionDistance " << noCollisionDistance << std::endl;
 
@@ -534,7 +535,7 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
 
         // perform right wall collision
         if (performWallCollision<getEcbSideRight, setEcbSideRight, getX, getY,
-                                 setX, setY, FLOOR_COLLISION>(
+                                 setX, setY, WALL_COLLISION>(
                 player, Pair(1, 0), tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance, tmpLastWallCollision)) {
             overrideEcbs("Right Wall collision", ENVIRONMENT_WALL_COLLISION,
@@ -547,7 +548,7 @@ void Map::moveRecursive(Player& player, Ecb& currentEcb, Ecb& projectedEcb) {
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
         if (performWallCollision<getEcbSideLeft, setEcbSideLeft, getX, getY,
-                                 setX, setY, FLOOR_COLLISION>(
+                                 setX, setY, WALL_COLLISION>(
                 player, Pair(-1, 0), tmpCollisionPointEcb, tmpNextStepEcb,
                 tmpProjectedEcb, thisProjectedDistance, tmpLastWallCollision)) {
             overrideEcbs("Left Wall collision", ENVIRONMENT_WALL_COLLISION,

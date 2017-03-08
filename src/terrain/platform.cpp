@@ -51,10 +51,12 @@ bool Platform::isCeil(double angle) {
 }
 
 #define PLATFORM_LAND_EPSILON 0.000001
-TerrainCollisionType Platform::checkCollision(Pair const& previous,
-                                              Pair const& next,
-                                              Pair& out,
-                                              PlatformSegment& segment) {
+TerrainCollisionType Platform::checkCollision(
+    Pair const& previous,
+    Pair const& next,
+    Pair& out,
+    PlatformSegment& segment,
+    TerrainCollisionType expectedCollisionType) {
     if (points.size() < 2) {
         // this is an error situation
         std::cerr << "less than 2 points wtf" << std::endl;
@@ -72,10 +74,19 @@ TerrainCollisionType Platform::checkCollision(Pair const& previous,
             segment = PlatformSegment(this, i);
 
             if (isCeil(angles[i])) {
+                if (expectedCollisionType != CEIL_COLLISION)
+                    continue;
                 return CEIL_COLLISION;
-            } else if (isWall(angles[i])) {
+            }
+
+            else if (isWall(angles[i])) {
+                if (expectedCollisionType != WALL_COLLISION)
+                    continue;
                 return WALL_COLLISION;
             }
+
+            if (expectedCollisionType != FLOOR_COLLISION)
+                continue;
             return FLOOR_COLLISION;
         }
     }
