@@ -6,6 +6,7 @@
 #include "./platform.hpp"
 #include "./ledge.hpp"
 #include "./collisiondatum.hpp"
+#include "widthbuf.hpp"
 
 namespace Terrain {
 
@@ -46,6 +47,8 @@ class Map {
 
     Platform* getPlatform(size_t index);
 };
+
+extern widthstream out;
 }
 
 #endif

@@ -2,6 +2,9 @@
 #include <streambuf>
 #include <iomanip>
 
+#ifndef __WIDTHBUF
+#define __WIDTHBUF
+
 class widthbuf: public std::streambuf {
 public:
     widthbuf(int w, std::streambuf* s)
@@ -119,3 +122,4 @@ public:
     }
 };
 
+#endif
