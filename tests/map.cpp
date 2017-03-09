@@ -299,7 +299,6 @@ TEST(Map, movePlayer_Airborne_Flat_Into_Corner_BottomRight) {
     EXPECT_EQ(p.currentCollision->postCollision.top, Pair(9.1, -1));
 }
 
-
 TEST(Map, movePlayer_Airborne_Flat_Into_Corner_BottomLeft) {
     // setup scene
     Player p = makeMockPlayer(Pair(10, 0));
@@ -325,8 +324,6 @@ TEST(Map, movePlayer_Airborne_Flat_Into_Corner_BottomLeft) {
     EXPECT_EQ(p.currentCollision->postCollision.left, Pair(9.9, 0));
     EXPECT_EQ(p.currentCollision->postCollision.top, Pair(10.9, -1));
 }
-
-
 
 TEST(Map, movePlayer_Airborne_Diagonal_Down_Corner_TopRight) {
     /*
