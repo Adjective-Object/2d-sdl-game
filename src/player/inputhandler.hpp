@@ -1,6 +1,6 @@
 #ifndef __GAME_INPUT_MANAGER
 #define __GAME_INPUT_MANAGER
-#include "engine/input.hpp"
+#include "engine/input/input.hpp"
 
 namespace InputMapping {
 
@@ -36,24 +36,56 @@ typedef struct AXIS_MAPPING {
     AXIS virtualAxisId;
 } AXIS_MAPPING;
 
-class InputHandler {
-   public:
-    virtual bool up(BUTTON buttonId, int framesBack = 0) = 0;
-    virtual bool down(BUTTON buttonId, int framesBack = 0) = 0;
-    virtual bool held(BUTTON buttonId, int framesBack = 0) = 0;
-    virtual double axis(AXIS axisId, int framesBack = 0) = 0;
-};
+extern BUTTON_MAPPING gamecubeButtons[];
+extern AXIS_MAPPING gamecubeAxies[];
 
-class JoystickInputHandler : public InputHandler {
+class InputHandler {
+   protected:
     Joystick virtualJoystick = Joystick(__NUM_BUTTONS, __NUM_AXIES, 10);
 
    public:
-    JoystickInputHandler();
-    void step(Joystick* j);
-    bool up(BUTTON buttonId, int framesBack = 0) override;
-    bool down(BUTTON buttonId, int framesBack = 0) override;
-    bool held(BUTTON buttonId, int framesBack = 0) override;
-    double axis(AXIS axisId, int framesBack = 0) override;
+    InputHandler();
+    virtual void step() = 0;
+    virtual bool up(BUTTON buttonId, int framesBack = 0);
+    virtual bool down(BUTTON buttonId, int framesBack = 0);
+    virtual bool held(BUTTON buttonId, int framesBack = 0);
+    virtual double axis(AXIS axisId, int framesBack = 0);
+};
+
+class JoystickInputHandler : public InputHandler {
+    BUTTON_MAPPING* buttonMap;
+    AXIS_MAPPING* axisMap;
+    Joystick* j;
+
+   public:
+    JoystickInputHandler(BUTTON_MAPPING* b, AXIS_MAPPING* a, Joystick* j);
+    void step() override;
+};
+
+typedef struct KEYBOARD_MAPPING {
+    int keysym;
+    BUTTON virtualButtonId;
+} KEYBOARD_MAPPING;
+
+typedef struct KEYBOARD_AXIS_MAPPING {
+    int keysym;
+    AXIS virtualAxisId;
+    double value;
+} KEYBOARD_AXIS_MAPPING;
+
+extern KEYBOARD_MAPPING gamecubeKeys[];
+extern KEYBOARD_AXIS_MAPPING gamecubeKeyAxies[];
+
+class KeyboardInputHandler : public InputHandler {
+    KEYBOARD_MAPPING* keyMap;
+    KEYBOARD_AXIS_MAPPING* keyAxisMap;
+    Keyboard* k;
+
+   public:
+    KeyboardInputHandler(KEYBOARD_MAPPING* keyMap,
+                         KEYBOARD_AXIS_MAPPING* keyAxisMap,
+                         Keyboard* k);
+    void step() override;
 };
 }
 

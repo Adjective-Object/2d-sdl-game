@@ -2,7 +2,6 @@
 #define __GAME_MAINPLAYER
 
 #include <SDL.h>
-#include "engine/input.hpp"
 #include "engine/sprite.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"

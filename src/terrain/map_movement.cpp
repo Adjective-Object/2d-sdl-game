@@ -9,6 +9,9 @@
 
 using namespace Terrain;
 
+#define _debug(...) \
+    {}
+
 inline Pair const& getEcbSideRight(Ecb const& e) {
     return e.right;
 }
@@ -78,12 +81,12 @@ void rollback(Player const& player,
     Pair relPosColl = nextStepEcb.origin - currentEcb.origin;
 
     if (y(relPosNoColl) == 0 || player.isGrounded()) {
-        out << "rollback grounded " << nextStepEcb << std::endl;
+        _debug(out << "rollback grounded " << nextStepEcb << std::endl;);
         projectedEcb.setOrigin(nextStepEcb.origin);
     } else {
         relPosNoColl *= y(relPosColl) / y(relPosNoColl);
 
-        out << relPosNoColl << " " << relPosColl << std::endl;
+        _debug(out << relPosNoColl << " " << relPosColl << std::endl;);
 
         double noCollisionDistance = x(relPosColl) - x(relPosNoColl);
         if (currentEcb.origin == nextStepEcb.origin) {
@@ -91,13 +94,14 @@ void rollback(Player const& player,
             noCollisionDistance = x(currentEcb.origin) - x(projectedEcb.origin);
         }
 
-        out << "noCollisionDistance " << noCollisionDistance << std::endl;
+        _debug(out << "noCollisionDistance " << noCollisionDistance
+                   << std::endl;);
 
         Pair rollbackAmount = Pair(0, 0);
         xSet(rollbackAmount, noCollisionDistance);
         Pair rollbackPosition = projectedEcb.origin + rollbackAmount;
 
-        out << "rollback position: " << rollbackPosition << std::endl;
+        _debug(out << "rollback position: " << rollbackPosition << std::endl;);
 
         // update the player position and projected ECB
         projectedEcb.setOrigin(rollbackPosition);
@@ -143,16 +147,18 @@ bool performWallCollision(Map const& m,
     // ignore collisions if we would instead collide on an edge
     if (*collision.segment.firstPoint() == collision.position &&
         lineDirectionY == sign(directionY)) {
-        out << "ignoring collision with wall because the edge will collide"
-            << std::endl;
+        _debug(
+            out << "ignoring collision with wall because the edge will collide"
+                << std::endl;);
         return false;
     }
 
     // ignore collisions if we would instead collide on an edge
     if (*collision.segment.secondPoint() == collision.position &&
         lineDirectionY != sign(directionY)) {
-        out << "ignoring collision with wall because the edge will collide"
-            << std::endl;
+        _debug(
+            out << "ignoring collision with wall because the edge will collide"
+                << std::endl;);
         return false;
     }
 
@@ -160,8 +166,8 @@ bool performWallCollision(Map const& m,
 
     distance = (getEcbSide(currentEcb) - collision.position).euclid();
 
-    out << "colliding with wall " << collision.segment.getPlatform() << " at "
-        << collision.position << std::endl;
+    _debug(out << "colliding with wall " << collision.segment.getPlatform()
+               << " at " << collision.position << std::endl;);
 
     Pair wallSlidePosition = collision.position;
 
@@ -179,14 +185,15 @@ bool performWallCollision(Map const& m,
         setNonblockingAxis(wallSlidePosition, slidePosition);
     }
 
-    out << "position after sliding " << wallSlidePosition << std::endl;
+    _debug(out << "position after sliding " << wallSlidePosition << std::endl;)
 
-    // slide the ecb along the wall and update the next position w/o movement
-    setEcbSide(currentEcb, collision.position);
+        // slide the ecb along the wall and update the next position w/o
+        // movement
+        setEcbSide(currentEcb, collision.position);
     setEcbSide(nextStepEcb, wallSlidePosition);
 
-    out << "ecbs " << currentEcb.origin << ".." << projectedEcb.origin
-        << std::endl;
+    _debug(out << "ecbs " << currentEcb.origin << ".." << projectedEcb.origin
+               << std::endl;);
 
     rollback<x, y, setBlockingAxis>(player, currentEcb, nextStepEcb,
                                     projectedEcb);
@@ -248,11 +255,11 @@ bool performWallEdgeCollision(Map const& m,
     Pair collisionLine2 = collision.collisionLine2;
     Pair collisionPoint = collision.cornerPosition;
 
-    out << "collision line " << collisionLine1 << ".." << collisionLine2
-        << std::endl;
+    _debug(out << "collision line " << collisionLine1 << ".." << collisionLine2
+               << std::endl;);
 
     setEdge(nextStepEcb, collisionLine);
-    out << "next step " << nextStepEcb << std::endl;
+    _debug(out << "next step " << nextStepEcb << std::endl;);
 
     // update the position w/o collision to the initial collision position
     currentEcb = nextStepEcb;
@@ -284,7 +291,8 @@ bool performWallEdgeCollision(Map const& m,
                 4 -
             collision.cornerPosition.y;
 
-        out << "platform y is on average" << averagePlatformY << std::endl;
+        _debug(out << "platform y is on average" << averagePlatformY
+                   << std::endl;);
 
         if ((collisionPoint == collisionLine1 ||
              collisionPoint == collisionLine2) &&
@@ -364,7 +372,7 @@ bool performFloorCollision(Map const& m,
     nextStepEcb.setBottom(collision.position);
     currentEcb = nextStepEcb;
     projectedEcb = nextStepEcb;
-    out << nextStepEcb << std::endl;
+    _debug(out << nextStepEcb << std::endl;);
 
     return true;
 }

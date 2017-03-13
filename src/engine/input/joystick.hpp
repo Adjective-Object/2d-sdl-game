@@ -1,24 +1,9 @@
-#ifndef __ENGINE_INPUT
-#define __ENGINE_INPUT
-
+#ifndef __ENGINE_JOYSTICK
+#define __ENGINE_JOYSTICK
 #include <SDL.h>
-#include <vector>
+#include <stdint.h>
 
 class Input;
-class Joystick;
-
-class Input {
-    Joystick** joysticks = nullptr;
-    size_t num_joysticks;
-
-   public:
-    Input();
-    ~Input();
-    void init();
-    void clear();
-    void processEvent(SDL_Event*);
-    Joystick* getJoystick(unsigned int id);
-};
 
 typedef struct AxisCalibration {
     bool enabled = false;
@@ -46,8 +31,9 @@ class Joystick {
     void setUp(unsigned int buttonId);
     void clear();
     void setAxis(unsigned int axisId, double value);
+    size_t numAxies();
 
-    Joystick(int numButtons, int numAxies, int historySize = 10);
+    Joystick(int numButtons, int numAxies, size_t historySize = 10);
     ~Joystick();
     void calibrateAxis(unsigned int axisId,
                        double lower,

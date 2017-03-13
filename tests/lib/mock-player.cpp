@@ -13,7 +13,8 @@ Player makeMockPlayer(Pair initialPosition) {
         initialized = true;
         config = new PlayerConfig("assets/attributes.yaml");
         bank = new AnimationBank();
-        mockInput = new InputMapping::JoystickInputHandler();
+        mockInput = new InputMapping::JoystickInputHandler(
+            InputMapping::gamecubeButtons, InputMapping::gamecubeAxies, NULL);
     }
 
     return Player(config, mockInput, bank, initialPosition);

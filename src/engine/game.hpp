@@ -2,7 +2,7 @@
 #define __ENGINE_GAME
 
 #include "entity.hpp"
-#include "input.hpp"
+#include "input/input.hpp"
 #include "scene.hpp"
 #include <SDL_image.h>
 #include <string>

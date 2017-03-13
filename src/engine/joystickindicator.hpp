@@ -1,7 +1,7 @@
 #ifndef __ENGINE_JOYSTICK_INDICATOR
 #define __ENGINE_JOYSTICK_INDICATOR
 #include "entity.hpp"
-#include "input.hpp"
+#include "input/joystick.hpp"
 
 class JoystickIndicator : public Entity {
     int axis1, axis2;

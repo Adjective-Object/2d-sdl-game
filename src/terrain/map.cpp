@@ -11,6 +11,9 @@
 
 using namespace Terrain;
 
+#define _debug(...) \
+    {}
+
 widthstream Terrain::out(255, std::cout);
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
@@ -102,13 +105,11 @@ void Map::moveRecursive(Player& player,
     // ecb after resolving the next step of motion
     Ecb nextStepEcb = projectedEcb;
 
-    out.indent(4);
-
-    out << std::endl;
-    out << "===========================" << std::endl;
-    out << "moveRecursive" << std::endl;
-    out << "    " << currentEcb << std::endl;
-    out << "    " << projectedEcb << std::endl;
+    _debug(out.indent(4); out << std::endl;
+           out << "===========================" << std::endl;
+           out << "moveRecursive" << std::endl;
+           out << "    " << currentEcb << std::endl;
+           out << "    " << projectedEcb << std::endl;);
 
 #define debugEcb()                                             \
     {                                                          \
@@ -124,26 +125,26 @@ void Map::moveRecursive(Player& player,
         out << "tmpProjectedEcb : " << tmpProjectedEcb << std::endl; \
     };
 
-#define overrideEcbs(name, type, side)                                      \
-    {                                                                       \
-        out << "---- " << name << std::endl;                                \
-        if (thisProjectedDistance < currentClosestDistance) {               \
-            out << "updated current predictions" << std::endl;              \
-            out << thisProjectedDistance << " < " << currentClosestDistance \
-                << std::endl;                                               \
-            closestCollisionPointEcb = tmpCollisionPointEcb;                \
-            closestNextStepEcb = tmpNextStepEcb;                            \
-            closestProjectedEcb = tmpProjectedEcb;                          \
-            closestLastWallCollision = tmpLastWallCollision;                \
-            currentClosestDistance = thisProjectedDistance;                 \
-            e = type;                                                       \
-            debugTmpEcb();                                                  \
-        } else {                                                            \
-            out << "ignoring, current is closer" << std::endl;              \
-            out << thisProjectedDistance << " > " << currentClosestDistance \
-                << std::endl;                                               \
-        }                                                                   \
-        out << "----" << std::endl;                                         \
+#define overrideEcbs(name, type, side)                                \
+    {                                                                 \
+        _debug(out << "---- " << name << std::endl;);                 \
+        if (thisProjectedDistance < currentClosestDistance) {         \
+            _debug(out << "updated current predictions" << std::endl; \
+                   out << thisProjectedDistance << " < "              \
+                       << currentClosestDistance << std::endl;);      \
+            closestCollisionPointEcb = tmpCollisionPointEcb;          \
+            closestNextStepEcb = tmpNextStepEcb;                      \
+            closestProjectedEcb = tmpProjectedEcb;                    \
+            closestLastWallCollision = tmpLastWallCollision;          \
+            currentClosestDistance = thisProjectedDistance;           \
+            e = type;                                                 \
+            debugTmpEcb();                                            \
+        } else {                                                      \
+            _debug(out << "ignoring, current is closer" << std::endl; \
+                   out << thisProjectedDistance << " > "              \
+                       << currentClosestDistance << std::endl;);      \
+        }                                                             \
+        _debug(out << "----" << std::endl;);                          \
     }
 
     PlatformSegment lastWallCollision = PlatformSegment(NULL, -1);
@@ -153,18 +154,16 @@ void Map::moveRecursive(Player& player,
         // panic state
         iterationCount++;
         if (iterationCount > 10) {
-            out << "panicing and exiting on iteration " << iterationCount
-                << std::endl;
-            // exit(1);
-            // out << indent_manip::pop;
-            out.indent(-4);
+            _debug(out << "panicing and exiting on iteration " << iterationCount
+                       << std::endl;
+                   // exit(1);
+                   out.indent(-4););
             return;
         }
 
-        out << std::endl;
-        out << "---------------------------" << std::endl;
-        debugEcb();
-        out << "---------------------------" << std::endl;
+        _debug(out << std::endl;
+               out << "---------------------------" << std::endl; debugEcb();
+               out << "---------------------------" << std::endl;);
 
         double currentClosestDistance = DOUBLE_INFINITY;
         double thisProjectedDistance = DOUBLE_INFINITY;
@@ -284,7 +283,8 @@ void Map::moveRecursive(Player& player,
         // recursively update this step of motion if we were interrupted
         if (currentClosestDistance != DOUBLE_INFINITY &&
             closestNextStepEcb.origin != projectedEcb.origin) {
-            out << "######## movement was interrupted, recursing!" << std::endl;
+            _debug(out << "######## movement was interrupted, recursing!"
+                       << std::endl;);
             // start the recursive walk at the position of the collision
             currentEcb = closestCollisionPointEcb;
             Ecb predictedNextStepEcb = closestNextStepEcb;
@@ -293,8 +293,9 @@ void Map::moveRecursive(Player& player,
                 // the other motion interrupted this motion, so
                 // our projected ECB is no longer valid. The recursive call
                 // will have resolved motion ,so we break;
-                out << "recursive walk changed projected ECB" << std::endl;
-                out << "breaking loop" << std::endl;
+                _debug(out << "recursive walk changed projected ECB"
+                           << std::endl;
+                       out << "breaking loop" << std::endl;);
                 // currentEcb = closestNextStepEcb;
                 break;
             }
@@ -309,21 +310,19 @@ void Map::moveRecursive(Player& player,
 
     } while (currentEcb.origin != projectedEcb.origin);
 
-    out << "resolving: " << currentEcb << std::endl;
-    out << "===========================" << std::endl;
-    out.indent(-4);
-    // out << indent_manip::pop;
+    _debug(out << "resolving: " << currentEcb << std::endl;
+           out << "===========================" << std::endl; out.indent(-4););
 }
 
 void Map::movePlayer(Player& player, Pair& requestedDistance) const {
     // TODO think about ledge grabbing
     // grabLedges(player);
 
-    out << "===========================" << std::endl;
-    out << "===========================" << std::endl;
-    out << "===========================" << std::endl;
-    out << "requested distance: " << requestedDistance << std::endl;
-    out << "grounded? " << player.isGrounded() << std::endl;
+    _debug(out << "===========================" << std::endl;
+           out << "===========================" << std::endl;
+           out << "===========================" << std::endl;
+           out << "requested distance: " << requestedDistance << std::endl;
+           out << "grounded? " << player.isGrounded() << std::endl;);
 
     if (requestedDistance.x == 0 && requestedDistance.y == 0)
         return;
@@ -343,9 +342,9 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) const {
     player.currentCollision->playerModified.setOrigin(projectedPosition +
                                                       PLAYER_ECB_OFFSET);
 
-    out << "remaining distance after motion: " << requestedDistance
-        << std::endl;
-    out << "projected pos:      " << projectedPosition << std::endl;
+    _debug(out << "remaining distance after motion: " << requestedDistance
+               << std::endl;
+           out << "projected pos:      " << projectedPosition << std::endl;);
 
     moveRecursive(player, currentEcb, projectedEcb);
 

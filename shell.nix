@@ -28,6 +28,7 @@ in stdenv.mkDerivation {
   buildInputs = dependencies ++ devDependencies;
   shellHook = ''
     export GTEST_DIR=${gtest}
+    export LIBCXX_DIR=${libcxx}
   '';
 }
 

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "game.hpp"
-#include "input.hpp"
+#include "input/input.hpp"
 #include "util.hpp"
 #include <SDL.h>
 #include <SDL_image.h>

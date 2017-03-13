@@ -4,7 +4,8 @@
 #include <vector>
 #include <SDL.h>
 
-#include "engine/input.hpp"
+#include "engine/input/input.hpp"
+#include "engine/input/joystick.hpp"
 #include "engine/scene.hpp"
 #include "engine/text.hpp"
 #include "player/player.hpp"
@@ -18,8 +19,9 @@ class MainScene : public Scene {
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;
     Map* map;
-    InputMapping::JoystickInputHandler* playerInput;
+    InputMapping::InputHandler* playerInput;
     bool frameByFrame = false;
+    Joystick* joystick = NULL;
 
    public:
     MainScene();

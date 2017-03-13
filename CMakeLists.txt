@@ -64,8 +64,12 @@ set(LIB_SRCS
     src/engine/util.cpp
     src/engine/game.hpp
     src/engine/game.cpp
-    src/engine/input.hpp
-    src/engine/input.cpp
+    src/engine/input/input.hpp
+    src/engine/input/input.cpp
+    src/engine/input/joystick.hpp
+    src/engine/input/joystick.cpp
+    src/engine/input/keyboard.hpp
+    src/engine/input/keyboard.cpp
     src/engine/text.hpp
     src/engine/text.cpp
     src/engine/joystickindicator.hpp

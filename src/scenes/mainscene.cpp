@@ -3,6 +3,7 @@
 #include <iostream>
 #include <SDL_ttf.h>
 #include <cmath>
+#include <cstring>
 
 #include "engine/game.hpp"
 #include "engine/joystickindicator.hpp"
@@ -73,9 +74,16 @@ void MainScene::init() {
 
         entities.push_back(new JoystickIndicator(0, 1, 10, 10, 50, 50));
         entities.push_back(new JoystickIndicator(3, 4, 70, 10, 50, 50));
+
+        playerInput = new InputMapping::JoystickInputHandler(
+            InputMapping::gamecubeButtons, InputMapping::gamecubeAxies,
+            joystick);
+    } else {
+        playerInput = new InputMapping::KeyboardInputHandler(
+            InputMapping::gamecubeKeys, InputMapping::gamecubeKeyAxies,
+            EnG->input.getKeyboard());
     }
 
-    playerInput = new InputMapping::JoystickInputHandler();
     PlayerConfig* marthConfig = new PlayerConfig("assets/attributes.yaml");
     AnimationBank* animationBank = new AnimationBank();
     animationBank->loadImages();
@@ -106,21 +114,26 @@ void MainScene::init() {
 void MainScene::update() {
     // update player positions
 
-    Joystick* j = EnG->input.getJoystick(0);
-    if (j->down(11)) {
-        frameByFrame = !frameByFrame;
-    }
-    if (!frameByFrame || j->down(10) || j->held(6)) {
-        if (j) {
-            playerInput->step(j);
+    if (joystick) {
+        if (joystick->down(11)) {
+            frameByFrame = !frameByFrame;
         }
+        if (!frameByFrame || joystick->down(10) || joystick->held(6)) {
+            playerInput->step();
 
+            player->update();
+            Pair playerMotion = player->velocity * EnG->elapsed;
+            map->movePlayer(*player, playerMotion);
+            if (std::isnan(player->position.x) ||
+                std::isnan(player->position.y)) {
+                exit(1);
+            }
+        }
+    } else {
+        playerInput->step();
         player->update();
         Pair playerMotion = player->velocity * EnG->elapsed;
         map->movePlayer(*player, playerMotion);
-        if (std::isnan(player->position.x) || std::isnan(player->position.y)) {
-            exit(1);
-        }
     }
 
     // update action label when the player's action state updates
