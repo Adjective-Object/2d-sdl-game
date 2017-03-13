@@ -65,6 +65,7 @@ double InputHandler::axis(AXIS axisId, int framesBack) {
 }
 
 KEYBOARD_MAPPING InputMapping::gamecubeKeys[] = {{SDLK_z, JUMP},
+                                                 {SDLK_x, SHIELD_BUTTON},
                                                  {-1, __NUM_BUTTONS}};
 
 KEYBOARD_AXIS_MAPPING InputMapping::gamecubeKeyAxies[] = {
@@ -96,9 +97,9 @@ void KeyboardInputHandler::step() {
         if (mapping.virtualButtonId == __NUM_BUTTONS)
             break;
         if (k->down(mapping.keysym)) {
-            virtualJoystick.setDown(mapping.keysym);
+            virtualJoystick.setDown(mapping.virtualButtonId);
         } else {
-            virtualJoystick.setUp(mapping.keysym);
+            virtualJoystick.setUp(mapping.virtualButtonId);
         }
     }
 
