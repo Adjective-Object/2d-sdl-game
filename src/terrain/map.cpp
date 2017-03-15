@@ -128,7 +128,9 @@ void Map::moveRecursive(Player& player,
 #define overrideEcbs(name, type, side)                                \
     {                                                                 \
         _debug(out << "---- " << name << std::endl;);                 \
-        if (thisProjectedDistance < currentClosestDistance) {         \
+        if (thisProjectedDistance < currentClosestDistance || \
+            (thisProjectedDistance == currentClosestDistance && \
+             thisPriority > currentPriority)) {         \
             _debug(out << "updated current predictions" << std::endl; \
                    out << thisProjectedDistance << " < "              \
                        << currentClosestDistance << std::endl;);      \
@@ -137,6 +139,7 @@ void Map::moveRecursive(Player& player,
             closestProjectedEcb = tmpProjectedEcb;                    \
             closestLastWallCollision = tmpLastWallCollision;          \
             currentClosestDistance = thisProjectedDistance;           \
+            currentPriority = thisPriority;                            \
             e = type;                                                 \
             debugTmpEcb();                                            \
         } else {                                                      \
@@ -167,6 +170,7 @@ void Map::moveRecursive(Player& player,
 
         double currentClosestDistance = DOUBLE_INFINITY;
         double thisProjectedDistance = DOUBLE_INFINITY;
+        int currentPriority = 0, thisPriority;
         Ecb closestCollisionPointEcb = nextStepEcb;
         Ecb closestNextStepEcb = nextStepEcb;
         Ecb closestProjectedEcb = projectedEcb;
@@ -187,10 +191,10 @@ void Map::moveRecursive(Player& player,
         Player const& player_const = player;
 
         // perform right wall collision
-        if (rightWallCollision(*this, player_const, Pair(1, 0),
+        if ((thisPriority = rightWallCollision(*this, player_const, Pair(1, 0),
                                tmpCollisionPointEcb, tmpNextStepEcb,
                                tmpProjectedEcb, thisProjectedDistance,
-                               tmpLastWallCollision)) {
+                               tmpLastWallCollision))) {
             overrideEcbs("Right Wall collision", ENVIRONMENT_WALL_COLLISION,
                          origin);
         }
@@ -200,10 +204,10 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if (leftWallCollision(*this, player_const, Pair(-1, 0),
+        if ((thisPriority = leftWallCollision(*this, player_const, Pair(-1, 0),
                               tmpCollisionPointEcb, tmpNextStepEcb,
                               tmpProjectedEcb, thisProjectedDistance,
-                              tmpLastWallCollision)) {
+                              tmpLastWallCollision))) {
             overrideEcbs("Left Wall collision", ENVIRONMENT_WALL_COLLISION,
                          origin);
         }
@@ -213,10 +217,10 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if (ceilingCollision(*this, player_const, Pair(0, -1),
+        if ((thisPriority = ceilingCollision(*this, player_const, Pair(0, -1),
                              tmpCollisionPointEcb, tmpNextStepEcb,
                              tmpProjectedEcb, thisProjectedDistance,
-                             tmpLastWallCollision)) {
+                             tmpLastWallCollision))) {
             overrideEcbs("Ceiling collision", ENVIRONMENT_CEIL_COLLISION,
                          origin);
         }
@@ -224,9 +228,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+        if ((thisPriority = topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
                                   tmpNextStepEcb, tmpProjectedEcb,
-                                  thisProjectedDistance)) {
+                                  thisProjectedDistance))) {
             overrideEcbs("Top Right Edge collision", ENVIRONMENT_EDGE_COLLISION,
                          origin);
         }
@@ -234,9 +238,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (bottomRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+        if ((thisPriority = bottomRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
                                      tmpNextStepEcb, tmpProjectedEcb,
-                                     thisProjectedDistance)) {
+                                     thisProjectedDistance))) {
             overrideEcbs("Bottom Right Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -244,9 +248,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (bottomLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+        if ((thisPriority = bottomLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
                                     tmpNextStepEcb, tmpProjectedEcb,
-                                    thisProjectedDistance)) {
+                                    thisProjectedDistance))) {
             overrideEcbs("Bottom Left Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -254,9 +258,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+        if ((thisPriority = topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
                                   tmpNextStepEcb, tmpProjectedEcb,
-                                  thisProjectedDistance)) {
+                                  thisProjectedDistance))) {
             overrideEcbs("Bottom Left Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -264,11 +268,11 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if (topLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                  tmpNextStepEcb, tmpProjectedEcb,
-                                  thisProjectedDistance)) {
-            overrideEcbs("Top Left Edge collision",
-                         ENVIRONMENT_EDGE_COLLISION, origin);
+        if ((thisPriority = topLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+                                 tmpNextStepEcb, tmpProjectedEcb,
+                                 thisProjectedDistance))) {
+            overrideEcbs("Top Left Edge collision", ENVIRONMENT_EDGE_COLLISION,
+                         origin);
         }
 
         if (!player.isGrounded()) {

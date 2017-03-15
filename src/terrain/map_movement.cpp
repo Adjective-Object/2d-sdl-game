@@ -118,7 +118,7 @@ template <Pair const& (*getEcbSide)(Ecb const&),
           void (*setBlockingAxis)(Pair& pos, double val),
           void (*setNonblockingAxis)(Pair& pos, double value),
           TerrainCollisionType expectedCollisionType>
-bool performWallCollision(Map const& m,
+int performWallCollision(Map const& m,
                           Player const& player,
                           const Pair expectedDirection,
                           Ecb& currentEcb,
@@ -127,17 +127,18 @@ bool performWallCollision(Map const& m,
                           double& distance,
                           PlatformSegment& lastWallCollision) {
     CollisionDatum collision;
+    int priority = 10;
 
     // ignore collision if the collision is coming from the wrong direction
     if (Dot((projectedEcb.origin - currentEcb.origin), expectedDirection) < 0) {
-        return false;
+        return 0;
     }
 
     Ecb _currentEcb = currentEcb;
     if (!m.getClosestCollision(getEcbSide(_currentEcb),
                                getEcbSide(projectedEcb), collision,
                                lastWallCollision, expectedCollisionType)) {
-        return false;
+        return 0;
     }
 
     double directionY = y(projectedEcb.origin) - y(_currentEcb.origin);
@@ -148,18 +149,18 @@ bool performWallCollision(Map const& m,
     if (*collision.segment.firstPoint() == collision.position &&
         lineDirectionY == sign(directionY)) {
         _debug(
-            out << "ignoring collision with wall because the edge will collide"
+            out << "reducing collision with wall because the edge might collide"
                 << std::endl;);
-        return false;
+        priority = 1;
     }
 
     // ignore collisions if we would instead collide on an edge
     if (*collision.segment.secondPoint() == collision.position &&
         lineDirectionY != sign(directionY)) {
         _debug(
-            out << "ignoring collision with wall because the edge will collide"
+            out << "reducing collision with wall because the edge might collide"
                 << std::endl;);
-        return false;
+        priority = 1;
     }
 
     lastWallCollision = collision.segment;
@@ -197,7 +198,7 @@ bool performWallCollision(Map const& m,
 
     rollback<x, y, setBlockingAxis>(player, currentEcb, nextStepEcb,
                                     projectedEcb);
-    return true;
+    return priority;
 }
 
 class Line {
@@ -213,12 +214,13 @@ template <Pair const& (*getForwardEdge)(Ecb const&),
           void (*setForwardEdge)(Ecb&, Pair const pos),
           Line (*getEdge)(Ecb const&),
           void (*setEdge)(Ecb&, Line edge)>
-bool performWallEdgeCollision(Map const& m,
+int performWallEdgeCollision(Map const& m,
                               Player const& player,
                               Ecb& currentEcb,
                               Ecb& nextStepEcb,
                               Ecb& projectedEcb,
                               double& distance) {
+    int priority = 10;
     Pair currentForward = getForwardEdge(currentEcb);
     Pair projectedForward = getForwardEdge(projectedEcb);
 
@@ -236,7 +238,7 @@ bool performWallEdgeCollision(Map const& m,
     // out << "move: " << move << std::endl;
 
     if (move == Pair(0, 0))
-        return false;
+        return 0;
 
     Line currentEdge = getEdge(currentEcb);
     Line projectedEdge = getEdge(projectedEcb);
@@ -245,7 +247,7 @@ bool performWallEdgeCollision(Map const& m,
     if (!m.getClosestEdgeCollision(currentEdge.start, currentEdge.end,
                                    projectedEdge.start, projectedEdge.end,
                                    collision)) {
-        return false;
+        return 0;
     }
 
     Line collisionLine =
@@ -297,31 +299,31 @@ bool performWallEdgeCollision(Map const& m,
         if ((collisionPoint == collisionLine1 ||
              collisionPoint == collisionLine2) &&
             sign(averagePlatformY) == sign(slide.y)) {
-            out << "ignoring because we collided on a corner and the "
-                   "slide is in the same direction as platform"
-                << std::endl;
-            return false;
+            _debug(out << "ignoring because we collided on a corner and the "
+                          "slide is in the same direction as platform"
+                       << std::endl;);
+            return 0;
         }
 
         if (std::abs(slide.y - 0) < COLLISION_EPSILON) {
-            return false;
+            return 0;
         }
 
         // scale the slide back if the destination Y is less than the
         // destination slide
 
-        out << "unscaled slide: " << slide << std::endl;
+        _debug(out << "unscaled slide: " << slide << std::endl;);
 
         double ySlide = projectedEcb.origin.y - currentEcb.origin.y;
-        out << "initial vertical slide: " << ySlide << std::endl;
+        _debug(out << "initial vertical slide: " << ySlide << std::endl;);
         ySlide = sign(ySlide) * std::min(std::abs(ySlide), std::abs(slide.y));
-        out << "minimal vertical slide: " << ySlide << std::endl;
+        _debug(out << "minimal vertical slide: " << ySlide << std::endl;);
 
         slide *= ySlide / slide.y;
 
-        out << "current start " << currentEdge.start << std::endl;
-        out << "current end   " << currentEdge.end << std::endl;
-        out << "slide: " << slide << std::endl;
+        _debug(out << "current start " << currentEdge.start << std::endl;
+               out << "current end   " << currentEdge.end << std::endl;
+               out << "slide: " << slide << std::endl;);
 
         nextStepEcb.setOrigin(nextStepEcb.origin + slide);
         // deal with clipping due to floating point errors
@@ -333,13 +335,14 @@ bool performWallEdgeCollision(Map const& m,
         }
     }
 
-    out << "projected  " << projectedEcb << std::endl;
-    out << "collided  " << nextStepEcb << std::endl;
+    _debug(out << "projected  " << projectedEcb << std::endl;
+           out << "collided  " << nextStepEcb << std::endl;);
+
     rollback<getX, getY, setX>(player, currentEcb, nextStepEcb, projectedEcb);
 
-    out << "rolled back projected " << projectedEcb << std::endl;
+    _debug(out << "rolled back projected " << projectedEcb << std::endl;);
 
-    return true;
+    return priority;
 }
 
 namespace Terrain {
@@ -377,7 +380,7 @@ bool performFloorCollision(Map const& m,
     return true;
 }
 
-bool (*rightWallCollision)(WALL_COLL_ARGS) =
+int (*rightWallCollision)(WALL_COLL_ARGS) =
     performWallCollision<getEcbSideRight,
                          setEcbSideRight,
                          getX,
@@ -385,7 +388,7 @@ bool (*rightWallCollision)(WALL_COLL_ARGS) =
                          setX,
                          setY,
                          WALL_COLLISION>;
-bool (*leftWallCollision)(WALL_COLL_ARGS) =
+int (*leftWallCollision)(WALL_COLL_ARGS) =
     performWallCollision<getEcbSideLeft,
                          setEcbSideLeft,
                          getX,
@@ -393,7 +396,7 @@ bool (*leftWallCollision)(WALL_COLL_ARGS) =
                          setX,
                          setY,
                          WALL_COLLISION>;
-bool (*ceilingCollision)(WALL_COLL_ARGS) = performWallCollision<getEcbTop,
+int (*ceilingCollision)(WALL_COLL_ARGS) = performWallCollision<getEcbTop,
                                                                 setEcbTop,
                                                                 getY,
                                                                 getX,
@@ -433,28 +436,28 @@ inline void setTopLeftEdge(Ecb& e, Line l) {
     e.setLeft(l.start);
 }
 
-bool (*topRightEdgeCollision)(EDGE_COLL_ARGS) =
+int (*topRightEdgeCollision)(EDGE_COLL_ARGS) =
     performWallEdgeCollision<getEcbSideRight,
                              getEcbTop,
                              setEcbSideRight,
                              getTopRightEdge,
                              setTopRightEdge>;
 
-bool (*bottomRightEdgeCollision)(EDGE_COLL_ARGS) =
+int (*bottomRightEdgeCollision)(EDGE_COLL_ARGS) =
     performWallEdgeCollision<getEcbSideRight,
                              getEcbBottom,
                              setEcbSideRight,
                              getBottomRightEdge,
                              setBottomRightEdge>;
 
-bool (*bottomLeftEdgeCollision)(EDGE_COLL_ARGS) =
+int (*bottomLeftEdgeCollision)(EDGE_COLL_ARGS) =
     performWallEdgeCollision<getEcbSideLeft,
                              getEcbBottom,
                              setEcbSideLeft,
                              getBottomLeftEdge,
                              setBottomLeftEdge>;
 
-bool (*topLeftEdgeCollision)(EDGE_COLL_ARGS) =
+int (*topLeftEdgeCollision)(EDGE_COLL_ARGS) =
     performWallEdgeCollision<getEcbSideLeft,
                              getEcbTop,
                              setEcbSideLeft,
