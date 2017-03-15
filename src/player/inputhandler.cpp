@@ -66,6 +66,7 @@ double InputHandler::axis(AXIS axisId, int framesBack) {
 
 KEYBOARD_MAPPING InputMapping::gamecubeKeys[] = {{SDLK_z, JUMP},
                                                  {SDLK_x, SHIELD_BUTTON},
+                                                 {SDLK_RETURN, START},
                                                  {-1, __NUM_BUTTONS}};
 
 KEYBOARD_AXIS_MAPPING InputMapping::gamecubeKeyAxies[] = {
