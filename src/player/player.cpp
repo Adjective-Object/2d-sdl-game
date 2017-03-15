@@ -81,6 +81,9 @@ void Player::update() {
     if (action->isGrounded(*this)) {
         currentCollision->playerModified.heightBottom = -PLAYER_ECB_OFFSET.y;
         currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
+        currentCollision->playerModified.setOrigin(position +
+                                                   PLAYER_ECB_OFFSET);
+        currentCollision->postCollision.setOrigin(position + PLAYER_ECB_OFFSET);
     } else if (ecbFixedCounter > 0) {
         ecbFixedCounter--;
         currentCollision->playerModified.heightBottom =
