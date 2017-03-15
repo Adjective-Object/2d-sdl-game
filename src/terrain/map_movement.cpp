@@ -183,14 +183,18 @@ int performWallCollision(Map const& m,
                                     y(*collision.segment.firstPoint())),
                            y(getEcbSide(projectedEcb)));
 
-        setNonblockingAxis(wallSlidePosition, slidePosition);
+        double wallSlidePercent = (slidePosition - y(*collision.segment.firstPoint())) /
+            (y(*collision.segment.secondPoint()) - y(*collision.segment.firstPoint()));
+        wallSlidePosition =
+            *collision.segment.firstPoint() + (
+                    (*collision.segment.secondPoint() - *collision.segment.firstPoint()) * wallSlidePercent);
     }
 
-    _debug(out << "position after sliding " << wallSlidePosition << std::endl;)
+    _debug(out << "position after sliding " << wallSlidePosition << std::endl;);
 
-        // slide the ecb along the wall and update the next position w/o
-        // movement
-        setEcbSide(currentEcb, collision.position);
+    // slide the ecb along the wall and update the next position w/o
+    // movement
+    setEcbSide(currentEcb, collision.position);
     setEcbSide(nextStepEcb, wallSlidePosition);
 
     _debug(out << "ecbs " << currentEcb.origin << ".." << projectedEcb.origin

@@ -38,9 +38,16 @@ Map mainSceneMap = Map(
             },
             true),
 
+        // far right passable platform
+        Platform(
+            {
+                Pair(2.95, 1.1), Pair(3.1, 1.1),
+            },
+            true),
+
         // floating box
         Platform({
-            Pair(2.1, 0.5), Pair(2.5, 0.5), Pair(2.5, 1), Pair(2.1, 1),
+            Pair(2.1, 0.5), Pair(2.55, 0.5), Pair(2.5, 1), Pair(2.1, 1),
             Pair(2.1, 0.5),
         }),
 
@@ -54,7 +61,7 @@ Map mainSceneMap = Map(
         }),
     },
     {
-        Ledge(Pair(2.1, 0.5), FACING_LEFT), Ledge(Pair(2.5, 0.5), FACING_RIGHT),
+        Ledge(Pair(2.1, 0.5), FACING_LEFT), Ledge(Pair(2.55, 0.5), FACING_RIGHT),
 
     });
 
