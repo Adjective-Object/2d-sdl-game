@@ -261,6 +261,16 @@ void Map::moveRecursive(Player& player,
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
 
+        tmpCollisionPointEcb = currentEcb;
+        tmpNextStepEcb = nextStepEcb;
+        tmpProjectedEcb = projectedEcb;
+        if (topLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
+                                  tmpNextStepEcb, tmpProjectedEcb,
+                                  thisProjectedDistance)) {
+            overrideEcbs("Top Left Edge collision",
+                         ENVIRONMENT_EDGE_COLLISION, origin);
+        }
+
         if (!player.isGrounded()) {
             // perform this collision last so that we can call player::land()
             // without it being overridden
