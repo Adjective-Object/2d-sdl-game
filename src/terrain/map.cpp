@@ -11,8 +11,11 @@
 
 using namespace Terrain;
 
+// #define _debug(...) \
+//     {}
+
 #define _debug(...) \
-    {}
+    { __VA_ARGS__ }
 
 widthstream Terrain::out(255, std::cout);
 
@@ -38,7 +41,7 @@ bool Map::getClosestCollision(
             continue;
         }
 
-        if (segment == ignoredCollision) {
+        if (segment == ignoredCollision && false) {
             out << "ignoring collision with platform because it was previously "
                    "collided with"
                 << std::endl;
@@ -77,12 +80,23 @@ bool Map::getClosestEdgeCollision(Pair const& a1,
 
 void basicProjection(Player& player,
                      Pair& requestedDistance,
-                     Pair& projectedPosition) {
+                     Pair& projectedPosition,
+                     PlatformMovementState& ms) {
     if (player.isGrounded()) {
         // move player along platform
         projectedPosition = player.position;
-        player.getCurrentPlatform()->groundedMovement(projectedPosition,
-                                                      requestedDistance);
+        if (!ms.initialized) {
+            std::cout << "initializing movement state" << std::endl;
+            if (!player.getCurrentPlatform()->initGroundedMovement(
+                    projectedPosition, requestedDistance, ms)) {
+                requestedDistance = Pair(0, 0);
+                return;
+            }
+        }
+
+        if (!ms.platform->stepGroundedMovement(projectedPosition,
+                                               requestedDistance, ms)) {
+        }
 
         if (requestedDistance.euclidSquared() > 0) {
             player.fallOffPlatform();
@@ -96,6 +110,7 @@ void basicProjection(Player& player,
     // movement
     else {
         projectedPosition = player.position + requestedDistance;
+        requestedDistance = Pair(0, 0);
     }
 }
 
@@ -128,9 +143,9 @@ void Map::moveRecursive(Player& player,
 #define overrideEcbs(name, type, side)                                \
     {                                                                 \
         _debug(out << "---- " << name << std::endl;);                 \
-        if (thisProjectedDistance < currentClosestDistance || \
-            (thisProjectedDistance == currentClosestDistance && \
-             thisPriority > currentPriority)) {         \
+        if (thisProjectedDistance < currentClosestDistance ||         \
+            (thisProjectedDistance == currentClosestDistance &&       \
+             thisPriority > currentPriority)) {                       \
             _debug(out << "updated current predictions" << std::endl; \
                    out << thisProjectedDistance << " < "              \
                        << currentClosestDistance << std::endl;);      \
@@ -139,7 +154,7 @@ void Map::moveRecursive(Player& player,
             closestProjectedEcb = tmpProjectedEcb;                    \
             closestLastWallCollision = tmpLastWallCollision;          \
             currentClosestDistance = thisProjectedDistance;           \
-            currentPriority = thisPriority;                            \
+            currentPriority = thisPriority;                           \
             e = type;                                                 \
             debugTmpEcb();                                            \
         } else {                                                      \
@@ -191,10 +206,10 @@ void Map::moveRecursive(Player& player,
         Player const& player_const = player;
 
         // perform right wall collision
-        if ((thisPriority = rightWallCollision(*this, player_const, Pair(1, 0),
-                               tmpCollisionPointEcb, tmpNextStepEcb,
-                               tmpProjectedEcb, thisProjectedDistance,
-                               tmpLastWallCollision))) {
+        if ((thisPriority = rightWallCollision(
+                 *this, player_const, Pair(1, 0), tmpCollisionPointEcb,
+                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
+                 tmpLastWallCollision))) {
             overrideEcbs("Right Wall collision", ENVIRONMENT_WALL_COLLISION,
                          origin);
         }
@@ -204,10 +219,10 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if ((thisPriority = leftWallCollision(*this, player_const, Pair(-1, 0),
-                              tmpCollisionPointEcb, tmpNextStepEcb,
-                              tmpProjectedEcb, thisProjectedDistance,
-                              tmpLastWallCollision))) {
+        if ((thisPriority = leftWallCollision(
+                 *this, player_const, Pair(-1, 0), tmpCollisionPointEcb,
+                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
+                 tmpLastWallCollision))) {
             overrideEcbs("Left Wall collision", ENVIRONMENT_WALL_COLLISION,
                          origin);
         }
@@ -217,10 +232,10 @@ void Map::moveRecursive(Player& player,
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
         tmpLastWallCollision = lastWallCollision;
-        if ((thisPriority = ceilingCollision(*this, player_const, Pair(0, -1),
-                             tmpCollisionPointEcb, tmpNextStepEcb,
-                             tmpProjectedEcb, thisProjectedDistance,
-                             tmpLastWallCollision))) {
+        if ((thisPriority = ceilingCollision(
+                 *this, player_const, Pair(0, -1), tmpCollisionPointEcb,
+                 tmpNextStepEcb, tmpProjectedEcb, thisProjectedDistance,
+                 tmpLastWallCollision))) {
             overrideEcbs("Ceiling collision", ENVIRONMENT_CEIL_COLLISION,
                          origin);
         }
@@ -228,9 +243,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if ((thisPriority = topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                  tmpNextStepEcb, tmpProjectedEcb,
-                                  thisProjectedDistance))) {
+        if ((thisPriority = topRightEdgeCollision(
+                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
+                 tmpProjectedEcb, thisProjectedDistance))) {
             overrideEcbs("Top Right Edge collision", ENVIRONMENT_EDGE_COLLISION,
                          origin);
         }
@@ -238,9 +253,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if ((thisPriority = bottomRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                     tmpNextStepEcb, tmpProjectedEcb,
-                                     thisProjectedDistance))) {
+        if ((thisPriority = bottomRightEdgeCollision(
+                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
+                 tmpProjectedEcb, thisProjectedDistance))) {
             overrideEcbs("Bottom Right Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -248,9 +263,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if ((thisPriority = bottomLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                    tmpNextStepEcb, tmpProjectedEcb,
-                                    thisProjectedDistance))) {
+        if ((thisPriority = bottomLeftEdgeCollision(
+                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
+                 tmpProjectedEcb, thisProjectedDistance))) {
             overrideEcbs("Bottom Left Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -258,9 +273,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if ((thisPriority = topRightEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                  tmpNextStepEcb, tmpProjectedEcb,
-                                  thisProjectedDistance))) {
+        if ((thisPriority = topRightEdgeCollision(
+                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
+                 tmpProjectedEcb, thisProjectedDistance))) {
             overrideEcbs("Bottom Left Edge collision",
                          ENVIRONMENT_EDGE_COLLISION, origin);
         }
@@ -268,9 +283,9 @@ void Map::moveRecursive(Player& player,
         tmpCollisionPointEcb = currentEcb;
         tmpNextStepEcb = nextStepEcb;
         tmpProjectedEcb = projectedEcb;
-        if ((thisPriority = topLeftEdgeCollision(*this, player_const, tmpCollisionPointEcb,
-                                 tmpNextStepEcb, tmpProjectedEcb,
-                                 thisProjectedDistance))) {
+        if ((thisPriority = topLeftEdgeCollision(
+                 *this, player_const, tmpCollisionPointEcb, tmpNextStepEcb,
+                 tmpProjectedEcb, thisProjectedDistance))) {
             overrideEcbs("Top Left Edge collision", ENVIRONMENT_EDGE_COLLISION,
                          origin);
         }
@@ -343,27 +358,32 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) const {
 
     // if the player is grounded, move them along the platform
     Pair projectedPosition = player.position;
-    basicProjection(player, requestedDistance, projectedPosition);
+    PlatformMovementState movementState;
+    while (requestedDistance != Pair(0, 0)) {
+        out << "++++++++++++++++++" << std::endl;
+        basicProjection(player, requestedDistance, projectedPosition,
+                        movementState);
+        // motion state has 3 components.
+        // current position
+        Ecb currentEcb = player.currentCollision->playerModified;
+        // eventual ecb after resolving all motion
+        Ecb projectedEcb = player.currentCollision->postCollision;
+        projectedEcb.setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
+        player.currentCollision->root.setOrigin(projectedPosition +
+                                                PLAYER_ECB_OFFSET);
+        player.currentCollision->playerModified.setOrigin(projectedPosition +
+                                                          PLAYER_ECB_OFFSET);
 
-    // motion state has 3 components.
-    // current position
-    Ecb currentEcb = player.currentCollision->playerModified;
-    // eventual ecb after resolving all motion
-    Ecb projectedEcb = player.currentCollision->postCollision;
-    projectedEcb.setOrigin(projectedPosition + PLAYER_ECB_OFFSET);
-    player.currentCollision->root.setOrigin(projectedPosition +
-                                            PLAYER_ECB_OFFSET);
-    player.currentCollision->playerModified.setOrigin(projectedPosition +
-                                                      PLAYER_ECB_OFFSET);
+        _debug(out << "remaining distance after motion: " << requestedDistance
+                   << std::endl;
+               out << "projected pos:      " << projectedPosition
+                   << std::endl;);
 
-    _debug(out << "remaining distance after motion: " << requestedDistance
-               << std::endl;
-           out << "projected pos:      " << projectedPosition << std::endl;);
+        moveRecursive(player, currentEcb, projectedEcb);
 
-    moveRecursive(player, currentEcb, projectedEcb);
-
-    // reset player position to the projected Ecb
-    player.moveTo(currentEcb);
+        // reset player position to the projected Ecb
+        player.moveTo(currentEcb);
+    }
 }
 
 void Map::grabLedges(Player& player) {

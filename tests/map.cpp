@@ -122,8 +122,8 @@ TEST(Map, movePlayer_Grounded_Flat_Into_Wall) {
     Pair requestedMotion = Pair(10, 0);
     m.movePlayer(p, requestedMotion);
 
-    EXPECT_NEAR(15, p.currentCollision->postCollision.right.x, 0.000001);
-    EXPECT_NEAR(10, p.currentCollision->postCollision.bottom.y, 0.000001);
+    EXPECT_NEAR(p.currentCollision->postCollision.right.x, 15, 0.000001);
+    EXPECT_NEAR(p.currentCollision->postCollision.bottom.y, 10, 0.000001);
 }
 
 TEST(Map, movePlayer_Grounded_Slant_Down_Left_Into_Wall) {

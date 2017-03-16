@@ -6,6 +6,7 @@
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
 #include "./platformsegment.hpp"
+#include "./platform_movement.hpp"
 #include "./collisiontype.hpp"
 #include "./collisiondatum.hpp"
 
@@ -38,6 +39,13 @@ class Platform : public Entity {
                             EdgeCollision& collision) const;
 
     bool groundedMovement(Pair& position, Pair& distance) const;
+
+    bool stepGroundedMovement(Pair& position,
+                              Pair& distance,
+                              PlatformMovementState&) const;
+    bool initGroundedMovement(Pair& position,
+                              Pair& velocity,
+                              PlatformMovementState& out) const;
 
     void init();
     void preUpdate();

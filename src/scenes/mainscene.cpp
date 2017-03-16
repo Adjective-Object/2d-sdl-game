@@ -61,7 +61,8 @@ Map mainSceneMap = Map(
         }),
     },
     {
-        Ledge(Pair(2.1, 0.5), FACING_LEFT), Ledge(Pair(2.55, 0.5), FACING_RIGHT),
+        Ledge(Pair(2.1, 0.5), FACING_LEFT),
+        Ledge(Pair(2.55, 0.5), FACING_RIGHT),
 
     });
 

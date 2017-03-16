@@ -2,6 +2,7 @@
 #include "engine/util.hpp"
 #include "constants.hpp"
 #include <iostream>
+#include <cmath>
 #include "engine/game.hpp"
 #include "widthbuf.hpp"
 #include "map.hpp"
@@ -9,8 +10,11 @@
 
 using namespace Terrain;
 
+// #define _debug(...) \
+//     {}
+
 #define _debug(...) \
-    {}
+    { __VA_ARGS__ }
 
 inline Pair const& getEcbSideRight(Ecb const& e) {
     return e.right;
@@ -119,13 +123,13 @@ template <Pair const& (*getEcbSide)(Ecb const&),
           void (*setNonblockingAxis)(Pair& pos, double value),
           TerrainCollisionType expectedCollisionType>
 int performWallCollision(Map const& m,
-                          Player const& player,
-                          const Pair expectedDirection,
-                          Ecb& currentEcb,
-                          Ecb& nextStepEcb,
-                          Ecb& projectedEcb,
-                          double& distance,
-                          PlatformSegment& lastWallCollision) {
+                         Player const& player,
+                         const Pair expectedDirection,
+                         Ecb& currentEcb,
+                         Ecb& nextStepEcb,
+                         Ecb& projectedEcb,
+                         double& distance,
+                         PlatformSegment& lastWallCollision) {
     CollisionDatum collision;
     int priority = 10;
 
@@ -183,11 +187,14 @@ int performWallCollision(Map const& m,
                                     y(*collision.segment.firstPoint())),
                            y(getEcbSide(projectedEcb)));
 
-        double wallSlidePercent = (slidePosition - y(*collision.segment.firstPoint())) /
-            (y(*collision.segment.secondPoint()) - y(*collision.segment.firstPoint()));
-        wallSlidePosition =
-            *collision.segment.firstPoint() + (
-                    (*collision.segment.secondPoint() - *collision.segment.firstPoint()) * wallSlidePercent);
+        double wallSlidePercent =
+            (slidePosition - y(*collision.segment.firstPoint())) /
+            (y(*collision.segment.secondPoint()) -
+             y(*collision.segment.firstPoint()));
+        wallSlidePosition = *collision.segment.firstPoint() +
+                            ((*collision.segment.secondPoint() -
+                              *collision.segment.firstPoint()) *
+                             wallSlidePercent);
     }
 
     _debug(out << "position after sliding " << wallSlidePosition << std::endl;);
@@ -219,11 +226,11 @@ template <Pair const& (*getForwardEdge)(Ecb const&),
           Line (*getEdge)(Ecb const&),
           void (*setEdge)(Ecb&, Line edge)>
 int performWallEdgeCollision(Map const& m,
-                              Player const& player,
-                              Ecb& currentEcb,
-                              Ecb& nextStepEcb,
-                              Ecb& projectedEcb,
-                              double& distance) {
+                             Player const& player,
+                             Ecb& currentEcb,
+                             Ecb& nextStepEcb,
+                             Ecb& projectedEcb,
+                             double& distance) {
     int priority = 10;
     Pair currentForward = getForwardEdge(currentEcb);
     Pair projectedForward = getForwardEdge(projectedEcb);
@@ -392,21 +399,20 @@ int (*rightWallCollision)(WALL_COLL_ARGS) =
                          setX,
                          setY,
                          WALL_COLLISION>;
-int (*leftWallCollision)(WALL_COLL_ARGS) =
-    performWallCollision<getEcbSideLeft,
-                         setEcbSideLeft,
-                         getX,
-                         getY,
-                         setX,
-                         setY,
-                         WALL_COLLISION>;
-int (*ceilingCollision)(WALL_COLL_ARGS) = performWallCollision<getEcbTop,
-                                                                setEcbTop,
-                                                                getY,
+int (*leftWallCollision)(WALL_COLL_ARGS) = performWallCollision<getEcbSideLeft,
+                                                                setEcbSideLeft,
                                                                 getX,
-                                                                setY,
+                                                                getY,
                                                                 setX,
-                                                                CEIL_COLLISION>;
+                                                                setY,
+                                                                WALL_COLLISION>;
+int (*ceilingCollision)(WALL_COLL_ARGS) = performWallCollision<getEcbTop,
+                                                               setEcbTop,
+                                                               getY,
+                                                               getX,
+                                                               setY,
+                                                               setX,
+                                                               CEIL_COLLISION>;
 
 inline Line getTopRightEdge(Ecb const& e) {
     return Line(e.top, e.right);
