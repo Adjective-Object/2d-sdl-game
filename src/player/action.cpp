@@ -241,7 +241,7 @@ class Fall : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isLandable(Player const& p, Platform* plat) {
+    bool isLandable(Player const& p, Platform const* plat) {
         return !(plat->isPassable() && p.input->axis(MOVEMENT_AXIS_Y) > 0.67);
     }
 
@@ -300,7 +300,7 @@ class KneeBend : public Action {
         }
     }
 
-    bool canWalkOff() { return false; }
+    bool canWalkOff(Player const&) { return false; }
 };
 
 void startGroundedJump(Player& p, bool isShort) {
@@ -671,7 +671,7 @@ class Pass : public Action {
     }
 
     bool isGrounded(Player const& p) { return false; }
-    bool isLandable(Player const& p, Platform* plat) {
+    bool isLandable(Player const& p, Platform const* plat) {
         return plat != p.getCurrentPlatform();
     }
 };

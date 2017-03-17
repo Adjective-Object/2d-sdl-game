@@ -14,9 +14,9 @@
 #include "platform_segment_iterator.hpp"
 #include "platform_point_iterator.hpp"
 
-// #define _debug(...)
-#define _debug(...) \
-    { __VA_ARGS__ }
+#define _debug(...)
+// #define _debug(...) \
+//     { __VA_ARGS__ }
 
 Platform::Platform(std::vector<Pair> points, bool passable)
     : points(points), passable(passable) {

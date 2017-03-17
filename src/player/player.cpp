@@ -140,6 +140,10 @@ bool Player::canLand(const Platform* p) const {
     return action->isLandable(*this, p);
 };
 
+bool Player::canFallOff() const {
+    return action->canWalkOff(*this);
+}
+
 /** Transition from falling to being on ground
     Determine what state to enter from the state we are in */
 void Player::land(const Platform* p) {

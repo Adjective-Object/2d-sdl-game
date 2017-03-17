@@ -382,8 +382,10 @@ bool performFloorCollision(Map const& m,
     }
     if (collision.type != FLOOR_COLLISION)
         return false;
-    if (!player.canLand(collision.segment.getPlatform()))
+    if (!player.canLand(collision.segment.getPlatform())) {
+        std::cout << "no landing allowed! landing is illegal!" << std::endl;
         return false;
+    }
 
     distance = (currentEcb.bottom - collision.position).euclid();
 
@@ -395,6 +397,7 @@ bool performFloorCollision(Map const& m,
     projectedEcb = nextStepEcb;
     _debug(out << nextStepEcb << std::endl;);
 
+    std::cout << "landing is happening!" << std::endl;
     return true;
 }
 

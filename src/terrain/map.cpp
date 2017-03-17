@@ -13,10 +13,11 @@
 
 using namespace Terrain;
 
-// #define _debug(...) {}
-
 #define _debug(...) \
-    { __VA_ARGS__ }
+    {}
+
+// #define _debug(...) \
+//    { __VA_ARGS__ }
 
 widthstream Terrain::out(255, std::cout);
 
@@ -97,10 +98,6 @@ bool Map::getClosestEdgeCollision(Pair const& a1,
         Pair point = p.point();
         if (p.getPlatform()->isPassable())
             continue;
-        if (ignoredCollision != NULL &&
-            (point == *ignoredCollision->firstPoint() ||
-             point == *ignoredCollision->secondPoint()))
-            continue;
 
         int direction =
             checkLineSweep(a1, a2, b1, b2, point, collision.collisionLine1,
@@ -108,6 +105,14 @@ bool Map::getClosestEdgeCollision(Pair const& a1,
 
         if (direction != -1)
             continue;
+
+        if (ignoredCollision != NULL &&
+            (point == *ignoredCollision->firstPoint() ||
+             point == *ignoredCollision->secondPoint())) {
+            continue;
+            std::cout << "ignoring this platform, i'm standing on it!"
+                      << std::endl;
+        }
 
         collision.cornerPosition = point;
         collision.s1 = p.firstSegment();
@@ -136,12 +141,14 @@ void basicProjection(Player& player,
         if (!ms.platform->stepGroundedMovement(projectedPosition,
                                                requestedDistance, ms)) {
             if (requestedDistance.euclidSquared() > 0) {
-                player.fallOffPlatform();
+                if (player.canFallOff()) {
+                    player.fallOffPlatform();
+                } else {
+                    requestedDistance = Pair(0, 0);
+                }
             }
         }
 
-        // add remaining distnace (for falling)
-        projectedPosition += requestedDistance;
     }
 
     // if the player is not grounded, just move them according to requested
@@ -169,7 +176,7 @@ void Map::moveRecursive(Player& player,
         out << "currentEcb   : " << currentEcb << std::endl;   \
         out << "nextStepEcb  : " << nextStepEcb << std::endl;  \
         out << "projectedEcb : " << projectedEcb << std::endl; \
-    };
+    }
 
 #define debugTmpEcb()                                                \
     {                                                                \
