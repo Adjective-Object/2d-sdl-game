@@ -226,7 +226,7 @@ TEST(Map, movePlayer_Airborne_Slanted_Down_Into_Wall) {
     EXPECT_NEAR(p.position.y, 15, 0.000001);
 }
 
-TEST(Map, movePlayer_Airborne_Slanted_Up_Into_Wall_Slip_Off) {
+TEST(Map, DISABLED_movePlayer_Airborne_Slanted_Up_Into_Wall_Slip_Off) {
     // setup scene
     Player p = makeMockPlayer(Pair(10, 0));
     p.init();
@@ -506,7 +506,7 @@ TEST(Map, movePlayer_Airborne_DownY_BottomRight_SecondSegment) {
     EXPECT_EQ(p.currentCollision->postCollision.right, Pair(0.1, 10));
 }
 
-TEST(Map, movePlayer_Upward_Partial_Ledge_Collision) {
+TEST(Map, DISABLED_movePlayer_Upward_Partial_Ledge_Collision) {
     /*
         Test that we can decide between sliding along the top
         right edge or the bottom right edge in this situation
