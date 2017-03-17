@@ -6,6 +6,7 @@
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
 #include "./platformsegment.hpp"
+#include "./platformpoint.hpp"
 #include "./platform_point_iterator.hpp"
 #include "./platform_segment_iterator.hpp"
 #include "./platform_movement.hpp"
@@ -14,6 +15,7 @@
 
 class Platform : public Entity {
     friend class PlatformSegment;
+    friend class PlatformPoint;
     friend class PlatformPointArray;
     friend class PlatformSegmentArray;
     std::vector<Pair> points;
@@ -28,13 +30,6 @@ class Platform : public Entity {
     static Pair movePointToSegmentSpace(Pair& platformPair,
                                         double platformAngle,
                                         Pair& otherPair);
-
-    TerrainCollisionType checkCollision(
-        Pair const& previous,
-        Pair const& next,
-        Pair& out,
-        PlatformSegment& segment,
-        TerrainCollisionType expectedCollisionType) const;
 
     bool checkEdgeCollision(Pair const& a1,
                             Pair const& a2,
@@ -58,12 +53,13 @@ class Platform : public Entity {
     void render(SDL_Renderer* r);
     bool isPassable() const;
     PlatformSegment getSegment(int index) const;
+    size_t getSegmentIndexByLocation(Pair position, int direction = 0) const;
 
     static bool isWall(double angle);
     static bool isCeil(double angle);
 
-    PlatformSegmentArray segments_iter();
-    PlatformPointArray points_iter();
+    PlatformSegmentArray segments_iter() const;
+    PlatformPointArray points_iter() const;
 };
 
 #endif

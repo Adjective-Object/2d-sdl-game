@@ -692,16 +692,17 @@ TEST(Map, pointsIterator) {
         {});
 
     // remove all points
-    for (Pair p : m.getPoints()) {
-        auto position = pts_set.find(p);
+    for (PlatformPoint p : m.getPoints()) {
+        auto position = pts_set.find(p.point());
         if (position == pts_set.end()) {
-            std::cout << "pair " << p << " not found in set!" << std::endl;
+            ASSERT_NE(position, pts_set.end())
+                << "pair " << p.point() << " not found in set!" << std::endl;
             continue;
         }
         pts_set.erase(position);
     }
 
-    ASSERT_TRUE(pts_set.size() == 0) << std::endl;
+    ASSERT_EQ(pts_set.size(), 0) << "set empty" << std::endl;
     if (pts_set.size() != 0) {
         std::cout << "set contains:" << std::endl;
         for (Pair p : pts_set) {

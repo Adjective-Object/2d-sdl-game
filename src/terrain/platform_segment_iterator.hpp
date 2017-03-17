@@ -5,16 +5,20 @@
 #include "platformsegment.hpp"
 
 class PlatformSegmentArray {
-    Platform* platform;
+    const Platform* platform;
 
    public:
-    PlatformSegmentArray(Platform* p);
+    PlatformSegmentArray(const Platform* p);
 
     class iterator {
         PlatformSegment segment;
 
        public:
+        typedef PlatformSegment& reference;
+        typedef PlatformSegment* pointer;
+
         iterator(PlatformSegment segment);
+        iterator();
         iterator operator++();
         iterator operator++(int offset);
         PlatformSegment& operator*();

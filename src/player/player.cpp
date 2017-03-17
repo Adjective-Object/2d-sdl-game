@@ -127,7 +127,7 @@ void Player::fallOffPlatform() {
     changeAction(FALL);
 }
 
-void Player::grabLedge(Ledge* l) {
+void Player::grabLedge(Ledge const* l) {
     currentLedge = l;
     changeAction(CLIFFCATCH);
 }
@@ -288,6 +288,11 @@ double Player::getXInput(int frames) const {
 
 const Platform* Player::getCurrentPlatform() const {
     return currentPlatform;
+}
+
+const PlatformSegment Player::getCurrentPlatformSegment() const {
+    int seg = currentPlatform->getSegmentIndexByLocation(position);
+    return PlatformSegment(currentPlatform, seg);
 }
 
 void Player::setPosition(Pair newPosition) {

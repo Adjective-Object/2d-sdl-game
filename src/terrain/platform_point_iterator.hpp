@@ -3,15 +3,34 @@
 #include <iterator>
 #include "platform.hpp"
 #include "engine/pair.hpp"
+#include "platformpoint.hpp"
+
 class PlatformPointArray {
    private:
-    Platform* platform;
+    const Platform* platform;
 
    public:
-    PlatformPointArray(Platform* p);
-    typedef std::vector<Pair>::iterator iterator;
-    std::vector<Pair>::iterator begin();
-    std::vector<Pair>::iterator end();
+    PlatformPointArray(const Platform* p);
+
+    class iterator {
+        PlatformPoint point;
+
+       public:
+        typedef PlatformPoint& reference;
+        typedef PlatformPoint* pointer;
+
+        iterator(PlatformPoint point);
+        iterator();
+        iterator operator++();
+        iterator operator++(int offset);
+        reference operator*();
+        pointer operator->();
+        bool operator==(const iterator rhs);
+        bool operator!=(const iterator rhs);
+    };
+
+    iterator begin();
+    iterator end();
 };
 
 #endif

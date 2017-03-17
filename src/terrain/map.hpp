@@ -23,7 +23,7 @@ class Map {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
 
-    void grabLedges(Player& player);
+    void grabLedges(Player& player) const;
 
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
@@ -44,12 +44,13 @@ class Map {
                                  Pair const& a2,
                                  Pair const& b1,
                                  Pair const& b2,
-                                 EdgeCollision& out) const;
+                                 EdgeCollision& out,
+                                 PlatformSegment* ignored) const;
 
     Platform* getPlatform(size_t index);
 
-    IteratorChain<PlatformPointArray> getPoints();
-    IteratorChain<PlatformSegmentArray> getSegments();
+    IteratorChain<PlatformPointArray> getPoints() const;
+    IteratorChain<PlatformSegmentArray> getSegments() const;
 };
 
 extern widthstream out;

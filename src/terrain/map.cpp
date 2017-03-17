@@ -13,8 +13,7 @@
 
 using namespace Terrain;
 
-// #define _debug(...) \
-//     {}
+// #define _debug(...) {}
 
 #define _debug(...) \
     { __VA_ARGS__ }
@@ -24,6 +23,7 @@ widthstream Terrain::out(255, std::cout);
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
     : platforms(platforms), ledges(ledges){};
 
+#define PLATFORM_LAND_EPSILON 0.000001
 bool Map::getClosestCollision(
     Pair const& start,
     Pair const& end,
@@ -32,32 +32,53 @@ bool Map::getClosestCollision(
     TerrainCollisionType expectedCollisionType) const {
     double closestDist = DOUBLE_INFINITY;
     PlatformSegment segment;
-    Pair collisionPoint;
     bool anyCollision = false;
 
-    for (Platform const& p : platforms) {
-        TerrainCollisionType t = p.checkCollision(
-            start, end, collisionPoint, segment, expectedCollisionType);
-
-        if (t != expectedCollisionType) {
-            continue;
-        }
-
+    for (PlatformSegment segment : getSegments()) {
         if (segment == ignoredCollision && false) {
-            out << "ignoring collision with platform because it was previously "
-                   "collided with"
-                << std::endl;
-            out << ignoredCollision << std::endl;
-            out << segment << std::endl;
+            _debug(out << "ignoring collision with platform because it was "
+                          "previously "
+                          "collided with"
+                       << std::endl;
+                   out << ignoredCollision << std::endl;
+                   out << segment << std::endl;);
             continue;
         }
 
-        double distance = (collisionPoint - start).euclid();
+        Pair p1 = *segment.firstPoint(), p2 = *segment.secondPoint(),
+             intersectionPoint;
+        int direction = checkLineIntersection(
+            start, end, p1, p2, intersectionPoint, PLATFORM_LAND_EPSILON);
+
+        if (direction >= 0)
+            continue;
+
+        double angle = segment.angle();
+        switch (expectedCollisionType) {
+            case CEIL_COLLISION:
+                std::cout << "ceil coll! " << angle << "  "
+                          << Platform::isCeil(angle) << std::endl;
+                if (!Platform::isCeil(angle))
+                    continue;
+                break;
+            case WALL_COLLISION:
+                if (Platform::isCeil(angle) || !Platform::isWall(angle))
+                    continue;
+                break;
+            case FLOOR_COLLISION:
+                if (Platform::isCeil(angle) || Platform::isWall(angle))
+                    continue;
+                break;
+            case NO_COLLISION:
+                break;
+        }
+
+        double distance = (intersectionPoint - start).euclid();
         if (distance < closestDist) {
             closestDist = distance;
-            outputCollision.type = t;
+            outputCollision.type = expectedCollisionType;
             outputCollision.segment = segment;
-            outputCollision.position = collisionPoint;
+            outputCollision.position = intersectionPoint;
             anyCollision = true;
         }
     }
@@ -69,12 +90,29 @@ bool Map::getClosestEdgeCollision(Pair const& a1,
                                   Pair const& a2,
                                   Pair const& b1,
                                   Pair const& b2,
-                                  EdgeCollision& collision) const {
-    for (Platform const& platform : platforms) {
-        if (!platform.isPassable() &&
-            platform.checkEdgeCollision(a1, a2, b1, b2, collision)) {
-            return true;
-        }
+                                  EdgeCollision& collision,
+                                  PlatformSegment* ignoredCollision) const {
+    for (PlatformPoint const& p : getPoints()) {
+        // TODO compare if multiple colls happen same frame?
+        Pair point = p.point();
+        if (p.getPlatform()->isPassable())
+            continue;
+        if (ignoredCollision != NULL &&
+            (point == *ignoredCollision->firstPoint() ||
+             point == *ignoredCollision->secondPoint()))
+            continue;
+
+        int direction =
+            checkLineSweep(a1, a2, b1, b2, point, collision.collisionLine1,
+                           collision.collisionLine2);
+
+        if (direction != -1)
+            continue;
+
+        collision.cornerPosition = point;
+        collision.s1 = p.firstSegment();
+        collision.s2 = p.secondSegment();
+        return true;
     }
 
     return false;
@@ -88,7 +126,6 @@ void basicProjection(Player& player,
         // move player along platform
         projectedPosition = player.position;
         if (!ms.initialized) {
-            std::cout << "initializing movement state" << std::endl;
             if (!player.getCurrentPlatform()->initGroundedMovement(
                     projectedPosition, requestedDistance, ms)) {
                 requestedDistance = Pair(0, 0);
@@ -98,10 +135,9 @@ void basicProjection(Player& player,
 
         if (!ms.platform->stepGroundedMovement(projectedPosition,
                                                requestedDistance, ms)) {
-        }
-
-        if (requestedDistance.euclidSquared() > 0) {
-            player.fallOffPlatform();
+            if (requestedDistance.euclidSquared() > 0) {
+                player.fallOffPlatform();
+            }
         }
 
         // add remaining distnace (for falling)
@@ -145,9 +181,10 @@ void Map::moveRecursive(Player& player,
 #define overrideEcbs(name, type, side)                                \
     {                                                                 \
         _debug(out << "---- " << name << std::endl;);                 \
-        if (thisProjectedDistance < currentClosestDistance ||         \
-            (thisProjectedDistance == currentClosestDistance &&       \
-             thisPriority > currentPriority)) {                       \
+        if (!(tmpProjectedEcb.origin == projectedEcb.origin) &&       \
+            (thisProjectedDistance < currentClosestDistance ||        \
+             (thisProjectedDistance == currentClosestDistance &&      \
+              thisPriority > currentPriority))) {                     \
             _debug(out << "updated current predictions" << std::endl; \
                    out << thisProjectedDistance << " < "              \
                        << currentClosestDistance << std::endl;);      \
@@ -347,7 +384,7 @@ void Map::moveRecursive(Player& player,
 
 void Map::movePlayer(Player& player, Pair& requestedDistance) const {
     // TODO think about ledge grabbing
-    // grabLedges(player);
+    grabLedges(player);
 
     _debug(out << "===========================" << std::endl;
            out << "===========================" << std::endl;
@@ -362,7 +399,7 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) const {
     Pair projectedPosition = player.position;
     PlatformMovementState movementState;
     while (requestedDistance != Pair(0, 0)) {
-        out << "++++++++++++++++++" << std::endl;
+        _debug(out << "++++++++++++++++++" << std::endl;);
         basicProjection(player, requestedDistance, projectedPosition,
                         movementState);
         // motion state has 3 components.
@@ -388,17 +425,18 @@ void Map::movePlayer(Player& player, Pair& requestedDistance) const {
     }
 }
 
-void Map::grabLedges(Player& player) {
-    if (player.canGrabLedge()) {
-        for (Ledge& l : ledges) {
-            Pair ledgebox_position = player.position + Pair(0, -LEDGEBOX_BASE);
-            Pair diff = l.position - ledgebox_position;
-            if (sign(diff.x) == sign(player.face) && player.face != l.facing &&
-                std::abs(diff.x) < LEDGEBOX_WIDTH &&
-                diff.y > -LEDGEBOX_HEIGHT && diff.y < 0) {
-                player.grabLedge(&l);
-                return;
-            }
+void Map::grabLedges(Player& player) const {
+    if (!player.canGrabLedge())
+        return;
+
+    for (Ledge const& l : ledges) {
+        Pair ledgebox_position = player.position + Pair(0, -LEDGEBOX_BASE);
+        Pair diff = l.position - ledgebox_position;
+        if (sign(diff.x) == sign(player.face) && player.face != l.facing &&
+            std::abs(diff.x) < LEDGEBOX_WIDTH && diff.y > -LEDGEBOX_HEIGHT &&
+            diff.y < 0) {
+            player.grabLedge(&l);
+            return;
         }
     }
 }
@@ -417,40 +455,17 @@ Platform* Map::getPlatform(size_t index) {
     return &(platforms[index]);
 }
 
-// Pair slide(
-//     Pair const& l1,
-//     Pair const& l2,
-//     Pair const& coll,
-//     Pair const& dest) {
-
-//     Pair slope = l2 - l1;
-//     Pair perp = Pair(-slope.y, slope.x);
-//     Pair projected = dest + perp;
-
-//     Pair intersectionPoint;
-//     checkLineIntersection(l1, l2, dest, projected, intersectionPoint);
-
-//     if (onLine(l1, l2, intersectionPoint)) {
-//         return intersectionPoint - coll;
-//     } else if (r > 1){
-//         return l2 - coll;
-//     } else {
-//         return l1 - coll;
-//     }
-
-// }
-
-IteratorChain<PlatformPointArray> Map::getPoints() {
+IteratorChain<PlatformPointArray> Map::getPoints() const {
     std::vector<PlatformPointArray> arrays;
-    for (Platform& p : platforms) {
+    for (Platform const& p : platforms) {
         arrays.push_back(p.points_iter());
     }
     return IteratorChain<PlatformPointArray>(arrays);
 }
 
-IteratorChain<PlatformSegmentArray> Map::getSegments() {
+IteratorChain<PlatformSegmentArray> Map::getSegments() const {
     std::vector<PlatformSegmentArray> arrays;
-    for (Platform& p : platforms) {
+    for (Platform const& p : platforms) {
         arrays.push_back(p.segments_iter());
     }
     return IteratorChain<PlatformSegmentArray>(arrays);

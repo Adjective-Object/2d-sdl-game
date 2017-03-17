@@ -5,7 +5,7 @@
 
 typedef PlatformSegmentArray::iterator itr;
 
-PlatformSegmentArray::PlatformSegmentArray(Platform* p) : platform(p) {}
+PlatformSegmentArray::PlatformSegmentArray(const Platform* p) : platform(p) {}
 
 itr PlatformSegmentArray::begin() {
     return itr(PlatformSegment(platform, 0));
@@ -16,6 +16,7 @@ itr PlatformSegmentArray::end() {
 }
 
 PlatformSegmentArray::iterator::iterator(PlatformSegment s) : segment(s) {}
+PlatformSegmentArray::iterator::iterator() {}
 
 itr PlatformSegmentArray::iterator::operator++() {
     segment.index++;
@@ -23,8 +24,7 @@ itr PlatformSegmentArray::iterator::operator++() {
 }
 
 itr PlatformSegmentArray::iterator::operator++(int offset) {
-    segment.index += offset;
-    return *this;
+    return operator++();
 }
 
 PlatformSegment& PlatformSegmentArray::iterator::operator*() {

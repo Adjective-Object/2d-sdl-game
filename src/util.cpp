@@ -154,7 +154,7 @@ int checkLineSweep(Pair const& a1,
     return -wasIntersection1;
 };
 
-#define EPSILON 0.000001
+#define EPSILON 0.0001
 bool onLine(Pair const& l1, Pair const& l2, Pair const& point) {
     if (std::abs(l1.x - l2.x) < EPSILON) {
         return std::abs(point.x - l1.x) < EPSILON &&

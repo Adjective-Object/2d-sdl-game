@@ -16,6 +16,7 @@ class PlatformSegment {
     const Pair* firstPoint() const;
     const Pair* secondPoint() const;
     const Pair slope() const;
+    double angle() const;
     const Platform* getPlatform() const;
 
     bool operator==(const PlatformSegment& p) const;

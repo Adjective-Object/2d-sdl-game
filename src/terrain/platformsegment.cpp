@@ -19,6 +19,10 @@ const Pair PlatformSegment::slope() const {
     return diff / diff.euclid();
 }
 
+double PlatformSegment::angle() const {
+    return platform->angles[index];
+}
+
 const Platform* PlatformSegment::getPlatform() const {
     return platform;
 }

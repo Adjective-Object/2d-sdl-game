@@ -10,8 +10,7 @@
 
 using namespace Terrain;
 
-// #define _debug(...) \
-//     {}
+// #define _debug(...)
 
 #define _debug(...) \
     { __VA_ARGS__ }
@@ -255,9 +254,17 @@ int performWallEdgeCollision(Map const& m,
     Line projectedEdge = getEdge(projectedEcb);
     EdgeCollision collision;
 
+    PlatformSegment p, *point;
+    if (player.isGrounded()) {
+        p = player.getCurrentPlatformSegment();
+        point = &p;
+    } else {
+        point = NULL;
+    }
+
     if (!m.getClosestEdgeCollision(currentEdge.start, currentEdge.end,
                                    projectedEdge.start, projectedEdge.end,
-                                   collision)) {
+                                   collision, point)) {
         return 0;
     }
 

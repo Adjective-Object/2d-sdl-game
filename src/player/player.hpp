@@ -19,7 +19,7 @@ class Player : public Sprite {
 
    public:
     const Platform* currentPlatform = NULL;
-    Ledge* currentLedge = NULL;
+    const Ledge* currentLedge = NULL;
 
     PlayerCollision* previousCollision = new PlayerCollision();
     PlayerCollision* currentCollision = new PlayerCollision();
@@ -53,7 +53,7 @@ class Player : public Sprite {
 
     void fall(bool fast = false);
     void aerialDrift();
-    void grabLedge(Ledge* l);
+    void grabLedge(Ledge const* l);
     void fixEcbBottom(int frames, double size);
     void moveTo(Pair newPos);
     void moveTo(Ecb& ecb);
@@ -69,6 +69,7 @@ class Player : public Sprite {
     bool canFallOff() const;
     bool canLand(const Platform* p) const;
     const Platform* getCurrentPlatform() const;
+    const PlatformSegment getCurrentPlatformSegment() const;
     ActionState getActionState() const;
     Action* getAction() const;
 

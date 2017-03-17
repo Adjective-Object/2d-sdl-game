@@ -734,7 +734,7 @@ class CliffCatch : public Action {
             p.changeAction(CLIFFWAIT);
         }
         // fix self to the ledge
-        Ledge* l = p.currentLedge;
+        const Ledge* l = p.currentLedge;
 
         // character offset
         Pair target = l->position + Pair(-0.08 * p.face, 0.38);

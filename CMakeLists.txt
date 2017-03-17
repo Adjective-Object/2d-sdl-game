@@ -59,6 +59,8 @@ set(LIB_SRCS
     src/terrain/platform.cpp
     src/terrain/platformsegment.hpp
     src/terrain/platformsegment.cpp
+    src/terrain/platformpoint.hpp
+    src/terrain/platformpoint.cpp
     src/terrain/map.hpp
     src/terrain/map.cpp
     src/terrain/map_movement.hpp
