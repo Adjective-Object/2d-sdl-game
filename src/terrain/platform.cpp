@@ -10,6 +10,8 @@
 #include "constants.hpp"
 #include "util.hpp"
 #include "./collisiontype.hpp"
+#include "platform_segment_iterator.hpp"
+#include "platform_point_iterator.hpp"
 
 Platform::Platform(std::vector<Pair> points, bool passable)
     : points(points), passable(passable) {
@@ -200,6 +202,8 @@ bool Platform::initGroundedMovement(Pair& position,
     out.currentPlatformPercent = (position - points[i]).euclid() / lengths[i];
     out.remainingDistance = std::abs(velocity.x);
     out.direction = velocity.x == 0 ? 1 : sign(velocity.x);
+
+    return true;
 }
 
 /** Move by up to the length of the current platform
@@ -288,6 +292,14 @@ bool Platform::isPassable() const {
 
 PlatformSegment Platform::getSegment(int index) const {
     return PlatformSegment(this, index);
+}
+
+PlatformSegmentArray Platform::segments_iter() {
+    return PlatformSegmentArray(this);
+}
+
+PlatformPointArray Platform::points_iter() {
+    return PlatformPointArray(this);
 }
 
 void Platform::init(){};

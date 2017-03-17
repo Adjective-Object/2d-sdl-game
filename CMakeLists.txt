@@ -6,7 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++17")
 
 #########################
 # external dependencies #
@@ -33,6 +33,7 @@ SET(ALL_INCLUDE_DIRS
 
 set(LIB_SRCS 
     src/scenes/mainscene.hpp
+    src/iterator_wrapper.hpp
     src/scenes/mainscene.cpp
     src/util.hpp
     src/util.cpp
@@ -50,6 +51,10 @@ set(LIB_SRCS
     src/player/playercollision.cpp
     src/player/inputhandler.hpp
     src/player/inputhandler.cpp
+    src/terrain/platform_point_iterator.hpp
+    src/terrain/platform_point_iterator.cpp
+    src/terrain/platform_segment_iterator.hpp
+    src/terrain/platform_segment_iterator.cpp
     src/terrain/platform.hpp
     src/terrain/platform.cpp
     src/terrain/platformsegment.hpp
@@ -93,10 +98,8 @@ set(TEST_SRCS
     tests/ecb.cpp
     tests/map.cpp
     tests/util.cpp
-
     tests/lib/mock-player.cpp
-    tests/lib/mock-player.hpp
-    )
+    tests/lib/mock-player.hpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}

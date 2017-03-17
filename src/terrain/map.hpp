@@ -7,6 +7,7 @@
 #include "./ledge.hpp"
 #include "./collisiondatum.hpp"
 #include "widthbuf.hpp"
+#include "iterator_wrapper.hpp"
 
 namespace Terrain {
 
@@ -46,6 +47,9 @@ class Map {
                                  EdgeCollision& out) const;
 
     Platform* getPlatform(size_t index);
+
+    IteratorChain<PlatformPointArray> getPoints();
+    IteratorChain<PlatformSegmentArray> getSegments();
 };
 
 extern widthstream out;

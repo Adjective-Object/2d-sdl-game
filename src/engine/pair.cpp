@@ -122,6 +122,10 @@ bool Pair::operator!=(const Pair& p) const {
     return !(*this == p);
 }
 
+bool Pair::operator<(const Pair& p) const {
+    return (x < p.x) || (x == p.x && y < p.y);
+}
+
 /////////////
 // PRINTER //
 /////////////

@@ -669,3 +669,43 @@ TEST(Map, movePlayer_Teleport_Playtest_4) {
     EXPECT_NEAR(p.currentCollision->postCollision.origin.x, 0.8110937, 0.00001);
     EXPECT_NEAR(p.currentCollision->postCollision.origin.y, 1, 0.00001);
 }
+
+TEST(Map, pointsIterator) {
+    std::vector<Pair> pts1 = std::vector<Pair>({
+        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
+        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
+        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+    });
+    std::vector<Pair> pts2 = std::vector<Pair>({
+        Pair(2.505, 2.0), Pair(2.45, 2.0),
+    });
+
+    std::set<Pair> pts_set = std::set<Pair>();
+    pts_set.insert(pts1.begin(), pts1.end());
+    pts_set.insert(pts2.begin(), pts2.end());
+
+    // make a map from the point lists
+    Map m = Map(
+        {
+            Platform(pts1), Platform(pts2),
+        },
+        {});
+
+    // remove all points
+    for (Pair p : m.getPoints()) {
+        auto position = pts_set.find(p);
+        if (position == pts_set.end()) {
+            std::cout << "pair " << p << " not found in set!" << std::endl;
+            continue;
+        }
+        pts_set.erase(position);
+    }
+
+    ASSERT_TRUE(pts_set.size() == 0) << std::endl;
+    if (pts_set.size() != 0) {
+        std::cout << "set contains:" << std::endl;
+        for (Pair p : pts_set) {
+            std::cout << "    " << p << std::endl;
+        }
+    }
+}

@@ -6,6 +6,8 @@
 #include "engine/game.hpp"
 #include "widthbuf.hpp"
 #include "map_movement.hpp"
+#include "terrain/platform_point_iterator.hpp"
+#include "terrain/platform_segment_iterator.hpp"
 
 // helpers for abusing template functions violently
 
@@ -437,3 +439,19 @@ Platform* Map::getPlatform(size_t index) {
 //     }
 
 // }
+
+IteratorChain<PlatformPointArray> Map::getPoints() {
+    std::vector<PlatformPointArray> arrays;
+    for (Platform& p : platforms) {
+        arrays.push_back(p.points_iter());
+    }
+    return IteratorChain<PlatformPointArray>(arrays);
+}
+
+IteratorChain<PlatformSegmentArray> Map::getSegments() {
+    std::vector<PlatformSegmentArray> arrays;
+    for (Platform& p : platforms) {
+        arrays.push_back(p.segments_iter());
+    }
+    return IteratorChain<PlatformSegmentArray>(arrays);
+}

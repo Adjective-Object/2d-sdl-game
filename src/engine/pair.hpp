@@ -44,6 +44,9 @@ class Pair {
     // comparators
     bool operator==(const Pair& p) const;
     bool operator!=(const Pair& p) const;
+
+    // defined solely for ordering in sets
+    bool operator<(const Pair& p) const;
 };
 
 std::ostream& operator<<(std::ostream& strm, const Pair& p);

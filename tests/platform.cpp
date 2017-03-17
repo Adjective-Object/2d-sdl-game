@@ -398,3 +398,55 @@ TEST(Platform, checkCollision_Playtest_1) {
 
     ASSERT_TRUE(p.checkEdgeCollision(a1, a2, b1, b2, e));
 }
+
+TEST(Platform, pointsIterator) {
+    std::vector<Pair> pts = std::vector<Pair>({
+        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
+        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
+        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+    });
+    std::set<Pair> pts_set = std::set<Pair>(pts.begin(), pts.end());
+
+    Platform platform = Platform(pts);
+    for (Pair p : platform.points_iter()) {
+        auto position = pts_set.find(p);
+        pts_set.erase(position);
+    }
+
+    ASSERT_TRUE(pts_set.size() == 0) << std::endl;
+    if (pts_set.size() != 0) {
+        std::cout << "set contains:" << std::endl;
+        for (Pair p : pts_set) {
+            std::cout << "    " << p << std::endl;
+        }
+    }
+}
+
+TEST(Platform, segmentsIterator) {
+    std::vector<Pair> pts = std::vector<Pair>({
+        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
+        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
+        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+    });
+
+    Platform platform = Platform(pts);
+    std::set<PlatformSegment> segment_set = std::set<PlatformSegment>();
+
+    for (size_t i = 0; i < pts.size() - 1; i++) {
+        PlatformSegment s = platform.getSegment(i);
+        segment_set.insert(s);
+    }
+
+    for (PlatformSegment s : platform.segments_iter()) {
+        auto position = segment_set.find(s);
+        segment_set.erase(position);
+    }
+
+    ASSERT_TRUE(segment_set.size() == 0) << std::endl;
+    if (segment_set.size() != 0) {
+        std::cout << "set contains:" << std::endl;
+        for (PlatformSegment s : segment_set) {
+            std::cout << "    " << s << std::endl;
+        }
+    }
+}

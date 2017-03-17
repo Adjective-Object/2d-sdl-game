@@ -6,12 +6,16 @@
 #include "engine/pair.hpp"
 #include "engine/entity.hpp"
 #include "./platformsegment.hpp"
+#include "./platform_point_iterator.hpp"
+#include "./platform_segment_iterator.hpp"
 #include "./platform_movement.hpp"
 #include "./collisiontype.hpp"
 #include "./collisiondatum.hpp"
 
 class Platform : public Entity {
     friend class PlatformSegment;
+    friend class PlatformPointArray;
+    friend class PlatformSegmentArray;
     std::vector<Pair> points;
     std::vector<double> angles;
     std::vector<double> lengths;
@@ -57,6 +61,9 @@ class Platform : public Entity {
 
     static bool isWall(double angle);
     static bool isCeil(double angle);
+
+    PlatformSegmentArray segments_iter();
+    PlatformPointArray points_iter();
 };
 
 #endif
