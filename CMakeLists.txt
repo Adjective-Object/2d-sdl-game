@@ -6,7 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++17")
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 
 #########################
 # external dependencies #
@@ -16,9 +16,10 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
-PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
+PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
-PKG_SEARCH_MODULE(OPENGL REQUIRED libGL)
+PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
+PKG_SEARCH_MODULE(GLU REQUIRED glu)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -31,6 +32,7 @@ SET(ALL_INCLUDE_DIRS
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIRS}
     "src")
 
 set(LIB_SRCS 
@@ -133,6 +135,7 @@ target_link_libraries(ctest
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    ${GLU_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
     ${TEST_LIB}
@@ -158,6 +161,7 @@ target_link_libraries(sdl_game
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    ${GLU_LIBRARIES}
     ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC

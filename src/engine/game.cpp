@@ -9,6 +9,7 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 #define GL3_PROTOTYPES 1
+#include <GL/glu.h>
 #include <GL/gl.h>
 
 Game* EnG = nullptr;
@@ -76,10 +77,6 @@ SDL_Window* Game::makeWindow(const std::string& name,
 
 SDL_GLContext Game::makeGlContext(SDL_Window* win) {
     SDL_GLContext context = SDL_GL_CreateContext(win);
-    if (context == nullptr) {
-        std::cout << "Error initializing openGL" << std::endl;
-        exit(1);
-    }
     return context;
 }
 
@@ -157,9 +154,18 @@ void Game::start() {
         // update the frame buffer
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // figure out camera
+        glPushMatrix();
+        glLoadIdentity();
+
+        glTranslatef(0, 0, -3);
+
         currentScene->render();
 
-        // Update the screen
+        glTranslatef(0, 0, -3);
+
+        glPopMatrix();
         SDL_GL_SwapWindow(win);
 
         // Cap framerate at 60fps
