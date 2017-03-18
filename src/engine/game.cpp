@@ -159,11 +159,17 @@ void Game::start() {
         glPushMatrix();
         glLoadIdentity();
 
-        glTranslatef(0, 0, -3);
+        gluLookAt(
+                4,3,3,
+                0,0,0,
+                0,1,0
+                );
 
         currentScene->render();
 
-        glTranslatef(0, 0, -3);
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        glTranslatef(0, x/100.0f, y/100.0f);
 
         glPopMatrix();
         SDL_GL_SwapWindow(win);
