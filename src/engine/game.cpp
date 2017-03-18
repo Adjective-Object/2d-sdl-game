@@ -7,6 +7,10 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#define GL_GLEXT_PROTOTYPES 1
+#define GL3_PROTOTYPES 1
+#include <GL/gl.h>
+
 Game* EnG = nullptr;
 SDL_Texture* FALLBACK_TEXTURE = nullptr;
 
@@ -41,6 +45,7 @@ Game::Game(unsigned int width,
 
     // create the game stuff
     win = makeWindow("poop", width, height);
+    ctx = makeGlContext(win);
     ren = makeRenderer(win);
 
     // TODO replace this with a string constant
@@ -67,6 +72,15 @@ SDL_Window* Game::makeWindow(const std::string& name,
     }
 
     return win;
+}
+
+SDL_GLContext Game::makeGlContext(SDL_Window* win) {
+    SDL_GLContext context = SDL_GL_CreateContext(win);
+    if (context == nullptr) {
+        std::cout << "Error initializing openGL" << std::endl;
+        exit(1);
+    }
+    return context;
 }
 
 /**
@@ -141,12 +155,12 @@ void Game::start() {
         currentScene->update();
 
         // update the frame buffer
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-        SDL_RenderClear(ren);
-        currentScene->render(ren);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        currentScene->render();
 
         // Update the screen
-        SDL_RenderPresent(ren);
+        SDL_GL_SwapWindow(win);
 
         // Cap framerate at 60fps
         long int ticks = (SDL_GetTicks() - thisTick);

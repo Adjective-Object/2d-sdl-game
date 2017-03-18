@@ -18,6 +18,7 @@ PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
+PKG_SEARCH_MODULE(OPENGL REQUIRED libGL)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -29,6 +30,7 @@ SET(ALL_INCLUDE_DIRS
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIRS}
     "src")
 
 set(LIB_SRCS 
@@ -88,7 +90,13 @@ set(LIB_SRCS
     src/engine/pair.hpp
     src/engine/pair.cpp
     src/engine/scene.hpp
-    src/engine/scene.cpp)
+    src/engine/scene.cpp
+    src/engine/renderer/abstractrenderer.hpp
+    src/engine/renderer/meshrenderer.hpp
+    src/engine/renderer/meshrenderer.cpp
+    src/engine/renderer/lib/loadshaders.hpp
+    src/engine/renderer/lib/loadshaders.cpp
+    )
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}
@@ -124,6 +132,7 @@ target_link_libraries(ctest
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
     ${TEST_LIB}
@@ -148,6 +157,7 @@ target_link_libraries(sdl_game
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
     ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC

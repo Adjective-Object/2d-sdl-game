@@ -448,6 +448,7 @@ void Map::grabLedges(Player& player) const {
     }
 }
 
+/*
 void Map::render(SDL_Renderer* r) {
     for (Platform& p : platforms) {
         p.render(r);
@@ -457,6 +458,7 @@ void Map::render(SDL_Renderer* r) {
         l.render(r);
     }
 }
+*/
 
 Platform* Map::getPlatform(size_t index) {
     return &(platforms[index]);

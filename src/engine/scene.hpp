@@ -29,7 +29,7 @@ class Scene {
     /**
      * Render step of the scene's main loop
      **/
-    virtual void render(SDL_Renderer* r);
+    virtual void render();
 
     Scene();
     ~Scene();

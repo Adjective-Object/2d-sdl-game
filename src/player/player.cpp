@@ -307,3 +307,7 @@ void Player::setPosition(Pair newPosition) {
 double Player::getAttribute(char const* name) const {
     return config->getAttribute(name);
 }
+
+AbstractRenderer* Player::getRenderer() {
+    return &renderer;
+}

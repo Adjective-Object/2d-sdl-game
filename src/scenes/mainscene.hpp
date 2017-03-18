@@ -28,7 +28,7 @@ class MainScene : public Scene {
     ~MainScene();
     void init() override;
     void update() override;
-    void render(SDL_Renderer* r) override;
+    void render() override;
 };
 
 #endif

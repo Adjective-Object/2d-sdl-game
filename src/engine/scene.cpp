@@ -1,9 +1,10 @@
+#include <SDL.h>
 #include <algorithm>
 #include <iostream>
 
 #include "entity.hpp"
 #include "scene.hpp"
-#include <SDL.h>
+#include "renderer/abstractrenderer.hpp"
 
 Scene::Scene() {
     entities = std::vector<Entity*>();
@@ -31,8 +32,11 @@ void Scene::update() {
     }
 }
 
-void Scene::render(SDL_Renderer* r) {
+void Scene::render() {
     for (Entity* e : this->entities) {
-        e->render(r);
+        AbstractRenderer* r = e->getRenderer();
+        if (r) {
+            r->render();
+        }
     }
 }

@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include "engine/sprite.hpp"
+#include "engine/renderer/meshrenderer.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"
 #include "action.hpp"
@@ -16,6 +17,7 @@
 
 class Player : public Sprite {
     AnimationBank* bank;
+    MeshRenderer renderer;
 
    public:
     const Platform* currentPlatform = NULL;
@@ -81,6 +83,8 @@ class Player : public Sprite {
     double getXInput(int frames = 0) const;
     void setPosition(Pair newPosition);
     double getAttribute(char const* name) const;
+
+    AbstractRenderer* getRenderer() override;
 };
 
 #endif

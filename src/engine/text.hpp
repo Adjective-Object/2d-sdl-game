@@ -26,7 +26,7 @@ class Text : public Entity {
     virtual void update() override;
     virtual void preUpdate() override;
     virtual void postUpdate() override;
-    virtual void render(SDL_Renderer* ren) override;
+    virtual void render(SDL_Renderer* ren);
 };
 
 #endif

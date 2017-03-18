@@ -21,6 +21,10 @@ in with pkgs; let
     clang-tools
     gmock
     glibc
+    glm
+    libdrm
+    mesa
+    lzma
   ];
 
 in stdenv.mkDerivation {

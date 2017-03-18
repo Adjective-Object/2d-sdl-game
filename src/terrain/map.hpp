@@ -31,7 +31,6 @@ class Map {
     void moveRecursive(Player& player,
                        Ecb& currentEcb,
                        Ecb& projectedEcb) const;
-    void render(SDL_Renderer* r);
 
     bool getClosestCollision(
         Pair const& start,

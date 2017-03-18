@@ -2,6 +2,7 @@
 #define __ENGINE_ENTITY
 
 #include <SDL.h>
+#include "engine/renderer/abstractrenderer.hpp"
 
 class Entity {
    public:
@@ -12,7 +13,7 @@ class Entity {
     virtual void update() = 0;
     virtual void postUpdate() = 0;
 
-    virtual void render(SDL_Renderer* ren) = 0;
+    virtual AbstractRenderer* getRenderer();
 };
 
 #endif

@@ -157,7 +157,6 @@ void MainScene::update() {
     posText->updateText(tmp);
 }
 
-void MainScene::render(SDL_Renderer* r) {
-    Scene::render(r);
-    map->render(r);
+void MainScene::render() {
+    Scene::render();
 }
