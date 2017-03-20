@@ -44,6 +44,7 @@ class Game {
     void start();
 
     SDL_Renderer* getRenderer();
+    SDL_Window* getWindow();
 };
 
 #endif

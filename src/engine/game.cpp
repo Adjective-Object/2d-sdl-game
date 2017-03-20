@@ -7,10 +7,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/glu.h>
-#include <GL/gl.h>
+#include "engine/gl.h"
 
 Game* EnG = nullptr;
 SDL_Texture* FALLBACK_TEXTURE = nullptr;
@@ -49,6 +46,9 @@ Game::Game(unsigned int width,
     ctx = makeGlContext(win);
     ren = makeRenderer(win);
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
     // TODO replace this with a string constant
     FALLBACK_TEXTURE = loadPNG("assets/fallback.png");
 }
@@ -64,7 +64,8 @@ SDL_Window* Game::makeWindow(const std::string& name,
                              unsigned int width,
                              unsigned int height) {
     SDL_Window* win = SDL_CreateWindow(name.c_str(), 100, 100, (int)width,
-                                       (int)height, SDL_WINDOW_SHOWN);
+                                       (int)height,
+		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
     if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -153,25 +154,10 @@ void Game::start() {
 
         // update the frame buffer
         glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // figure out camera
-        glPushMatrix();
-        glLoadIdentity();
-
-        gluLookAt(
-                4,3,3,
-                0,0,0,
-                0,1,0
-                );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         currentScene->render();
 
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        glTranslatef(0, x/100.0f, y/100.0f);
-
-        glPopMatrix();
         SDL_GL_SwapWindow(win);
 
         // Cap framerate at 60fps
@@ -183,4 +169,8 @@ void Game::start() {
 
 SDL_Renderer* Game::getRenderer() {
     return ren;
+}
+
+SDL_Window * Game::getWindow() {
+    return win;
 }

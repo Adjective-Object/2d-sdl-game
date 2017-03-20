@@ -8,6 +8,7 @@
 #include "./collisiondatum.hpp"
 #include "widthbuf.hpp"
 #include "iterator_wrapper.hpp"
+#include "engine/renderer/meshrenderer.hpp"
 
 namespace Terrain {
 
@@ -22,8 +23,10 @@ typedef enum ENVIRONMENT_COLLISION_TYPE {
 class Map {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
+    MeshRenderer * renderer;
 
     void grabLedges(Player& player) const;
+    void makeMapMesh();
 
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
@@ -47,6 +50,7 @@ class Map {
                                  PlatformSegment* ignored) const;
 
     Platform* getPlatform(size_t index);
+    AbstractRenderer * getRenderer();
 
     IteratorChain<PlatformPointArray> getPoints() const;
     IteratorChain<PlatformSegmentArray> getSegments() const;

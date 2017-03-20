@@ -1,6 +1,8 @@
-#version 130
-out vec3 color;
-void main(){
-  color = vec3(1,0.5,0.1);
+#version 110
+
+varying vec3 fragmentColor;
+void main()
+{
+    gl_FragColor = vec4(fragmentColor, 1.0);
 }
 

@@ -20,6 +20,7 @@ PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
 PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
 PKG_SEARCH_MODULE(GLU REQUIRED glu)
+PKG_SEARCH_MODULE(GLM REQUIRED glm)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -33,6 +34,7 @@ SET(ALL_INCLUDE_DIRS
     ${YAML_CPP_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
+    ${GLM_INCLUDE_DIRS}
     "src")
 
 set(LIB_SRCS 
@@ -98,6 +100,11 @@ set(LIB_SRCS
     src/engine/renderer/meshrenderer.cpp
     src/engine/renderer/lib/loadshaders.hpp
     src/engine/renderer/lib/loadshaders.cpp
+    src/engine/gl.h
+    src/engine/model/cube.cpp
+    src/engine/model/cube.hpp
+    src/engine/model/staticmesh.hpp
+    src/engine/model/staticmesh.cpp
     )
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
@@ -147,7 +154,7 @@ target_include_directories(ctest PUBLIC
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIR}
+    ${GTEST_INCLUDE_DIRS}
     "src"
     )
 

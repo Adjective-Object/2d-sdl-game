@@ -1,4 +1,4 @@
-let pkgs = import <nixpkgs> {};
+let pkgs = import /home/adjective/Projects/nixpkgs/default.nix {};
 in with pkgs; let
 # build tools
   dependencies = [
@@ -6,9 +6,14 @@ in with pkgs; let
     SDL2_image
     SDL2_ttf
     SDL2_gfx
-    mesa
     libyamlcpp
     boost
+    glibc
+    glm
+    mesa
+    libdrm
+    lzma
+    xorg.libpciaccess
   ];
 
   devDependencies = [
@@ -20,11 +25,7 @@ in with pkgs; let
     pkgconfig
     clang-tools
     gmock
-    glibc
-    glm
-    libdrm
-    mesa
-    lzma
+    zsh
   ];
 
 in stdenv.mkDerivation {
@@ -33,6 +34,7 @@ in stdenv.mkDerivation {
   shellHook = ''
     export GTEST_DIR=${gtest}
     export LIBCXX_DIR=${libcxx}
+    export PCI_DIR=${xorg.libpciaccess}
   '';
 }
 

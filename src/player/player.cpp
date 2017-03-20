@@ -7,6 +7,11 @@
 #include "inputhandler.hpp"
 #include <algorithm>
 #include <iostream>
+#include "engine/model/cube.hpp"
+
+#define GL_GLEXT_PROTOTYPES 1
+#define GL3_PROTOTYPES 1
+#include <GL/gl.h>
 
 using namespace InputMapping;
 
@@ -14,7 +19,7 @@ Player::Player(PlayerConfig* config,
                InputHandler* input,
                AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank), input(input), config(config) {
+    : bank(animationBank), renderer(makeCube()), input(input), config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
@@ -25,14 +30,23 @@ Player::~Player() {}
 
 void Player::init() {}
 
+void Player::fixMeshOffset() {
+    glm::mat4 modelTransform;
+    modelTransform = glm::translate(
+            modelTransform, glm::vec3(position.x, position.y, 0));
+    renderer.setModelTransform(modelTransform);
+}
+
 void Player::moveTo(Pair newPos) {
     position = newPos;
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
+    fixMeshOffset();
 }
 
 void Player::moveTo(Ecb& ecb) {
     position = ecb.origin - PLAYER_ECB_OFFSET;
     currentCollision->reset(ecb);
+    fixMeshOffset();
 }
 
 void Player::update() {

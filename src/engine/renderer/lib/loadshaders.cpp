@@ -1,11 +1,9 @@
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <vector>
+#include "engine/gl.h"
 
 // cribbed from
 // http://www.opengl-tutorial.org/beginners-tutorials/tutorial-2-the-first-triangle/

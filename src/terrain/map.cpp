@@ -8,6 +8,11 @@
 #include "map_movement.hpp"
 #include "terrain/platform_point_iterator.hpp"
 #include "terrain/platform_segment_iterator.hpp"
+#include "engine/model/cube.hpp"
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // helpers for abusing template functions violently
 
@@ -21,8 +26,61 @@ using namespace Terrain;
 
 widthstream Terrain::out(255, std::cout);
 
+void Map::makeMapMesh() {
+    std::vector<float> *meshPoints = new std::vector<float>();
+    std::vector<float> *meshColors = new std::vector<float>();
+    for (PlatformSegment p : getSegments()) {
+        Pair a = *p.firstPoint();
+        Pair b = *p.secondPoint();
+
+        meshPoints->push_back(a.x);
+        meshPoints->push_back(a.y);
+        meshPoints->push_back(1);
+
+        meshPoints->push_back(a.x);
+        meshPoints->push_back(a.y);
+        meshPoints->push_back(0);
+
+        meshPoints->push_back(b.x);
+        meshPoints->push_back(b.y);
+        meshPoints->push_back(1);
+
+        meshPoints->push_back(b.x);
+        meshPoints->push_back(b.y);
+        meshPoints->push_back(1);
+
+        meshPoints->push_back(b.x);
+        meshPoints->push_back(b.y);
+        meshPoints->push_back(0);
+
+        meshPoints->push_back(a.x);
+        meshPoints->push_back(a.y);
+        meshPoints->push_back(1);
+
+        for (size_t i=0; i<6; i++) {
+            meshColors->push_back(0.5f);
+            meshColors->push_back(0.5f);
+            meshColors->push_back(0.5f);
+        }
+    }
+
+    StaticMesh m = makeStaticMesh(
+        &(*meshPoints)[0],
+        &(*meshColors)[0],
+        meshPoints->size() / 3
+        );
+
+    renderer = new MeshRenderer(m);
+
+    glm::mat4 baseTransform;
+    baseTransform = glm::translate(baseTransform, glm::vec3(0, 3, 1));
+    renderer->setModelTransform(baseTransform);
+}
+
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
-    : platforms(platforms), ledges(ledges){};
+    : platforms(platforms), ledges(ledges) {
+    renderer = new MeshRenderer(makeCube());
+    }
 
 #define PLATFORM_LAND_EPSILON 0.000001
 bool Map::getClosestCollision(
@@ -448,18 +506,6 @@ void Map::grabLedges(Player& player) const {
     }
 }
 
-/*
-void Map::render(SDL_Renderer* r) {
-    for (Platform& p : platforms) {
-        p.render(r);
-    }
-
-    for (Ledge& l : ledges) {
-        l.render(r);
-    }
-}
-*/
-
 Platform* Map::getPlatform(size_t index) {
     return &(platforms[index]);
 }
@@ -479,3 +525,8 @@ IteratorChain<PlatformSegmentArray> Map::getSegments() const {
     }
     return IteratorChain<PlatformSegmentArray>(arrays);
 }
+
+AbstractRenderer * Map::getRenderer() {
+    return renderer;
+}
+

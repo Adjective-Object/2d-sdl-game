@@ -1,53 +1,36 @@
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
 #include "meshrenderer.hpp"
 #include "./lib/loadshaders.hpp"
 #include <vector>
 #include <iostream>
+#include "engine/gl.h"
+#include "engine/game.hpp"
+#include "engine/model/staticmesh.hpp"
 
-// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive
-// vertices give a triangle.
-// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and
-// 12*3 vertices
-static const GLfloat g_vertex_buffer_data[] = {
-    0, 0, 0,
-    1, 0, 0,
-    0, 1, 0,
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-    -1.0f, -1.0f, -1.0f,                       // triangle 1 : begin
-    -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,   // triangle 1 : end
-    1.0f,  1.0f,  -1.0f,                       // triangle 2 : begin
-    -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,  // triangle 2 : end
-    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f,
-    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f,
-    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  1.0f,
-    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, -1.0f,
-    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-    1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f};
+using namespace glm;
 
-MeshRenderer::MeshRenderer() {
-    // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &vertexbuffer);
-    // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
-                 g_vertex_buffer_data, GL_STATIC_DRAW);
-
-    shaderId = LoadShaders("assets/shaders/id.vert", "assets/shaders/red.frag");
-	std::cout << "loaded shader " << shaderId << std::endl;
+BasicShader::BasicShader() {
+    programId = LoadShaders("assets/shaders/id.vert", "assets/shaders/red.frag");
+    attributes.position = glGetAttribLocation(programId, "position");
+    attributes.color = glGetAttribLocation(programId, "vertexColor");
+    uniforms.baseTransform = glGetUniformLocation(programId, "baseTransform");
+    std::cout << "attributes.position:" << attributes.position << std::endl;
+    std::cout << "attributes.color: " << attributes.color << std::endl;
+    std::cout << "uniforms.baseTransform: " << uniforms.baseTransform << std::endl;
 }
 
-void MeshRenderer::render() {
+MeshRenderer::MeshRenderer(StaticMesh mesh) : mesh(mesh) {}
 
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(0,         // attribute 0. No particular reason for 0
-                                     // but must match the layout in the shader.
+void MeshRenderer::render(mat4 & baseTransform) {
+    mat4 compoundTransform = baseTransform * modelTransform;
+    glUniformMatrix4fv(shader.uniforms.baseTransform, 1, GL_FALSE, &compoundTransform[0][0]);
+
+    glEnableVertexAttribArray(shader.attributes.position);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
+    glVertexAttribPointer(shader.attributes.position,
                           3,         // size
                           GL_FLOAT,  // type
                           GL_FALSE,  // normalized?
@@ -55,11 +38,24 @@ void MeshRenderer::render() {
                           (void*)0   // array buffer offset
                           );
 
-    // Draw the triangle
-    glUseProgram(shaderId);
-    glDrawArrays(GL_TRIANGLES, 0,
-                 3);  // Starting from vertex 0; 3 vertices total -> 1 triangle
-    glDisableVertexAttribArray(0);
+    glEnableVertexAttribArray(shader.attributes.color);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
+    glVertexAttribPointer(shader.attributes.color,
+                          3,         // size
+                          GL_FLOAT,  // typ& e
+                          GL_FALSE,  // normalized?
+                          0,         // stride
+                          (void*)0   // array buffer offset
+                          );
 
+    // Draw the triangles
+    glUseProgram(shader.programId);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.num_points * 3);
+    glDisableVertexAttribArray(shader.attributes.position);
+    glDisableVertexAttribArray(shader.attributes.color);
+}
+
+void MeshRenderer::setModelTransform(mat4 t) {
+    modelTransform = t;
 }
 

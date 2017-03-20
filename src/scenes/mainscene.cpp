@@ -12,6 +12,11 @@
 #include "player/player.hpp"
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
+#include "engine/model/cube.hpp"
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace Terrain;
 
@@ -73,6 +78,12 @@ MainScene::MainScene() : Scene() {
 MainScene::~MainScene() {}
 
 void MainScene::init() {
+    // set camera
+    glm::vec3 pos = glm::vec3(0.0f, 1.0f, -5.0f);
+    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(pos, target, up);
+
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
         joystick->calibrateAxis(0, -30000, 32800, 450);
@@ -157,6 +168,23 @@ void MainScene::update() {
     posText->updateText(tmp);
 }
 
+MeshRenderer renderer = MeshRenderer(makeCube());
+
 void MainScene::render() {
     Scene::render();
+    
+    SDL_Window * w = EnG->getWindow();
+    int width, height;
+    SDL_GetWindowSize(w, &width, &height);
+    projectionMatrix = glm::infinitePerspective(glm::half_pi<float>(), (float) width / (float) height, 0.0001f);
+
+    glm::mat4 matrix = projectionMatrix * cameraMatrix;
+    AbstractRenderer * r = map->getRenderer();
+
+    renderer.render(matrix);
+
+    if (r) {
+        //r->render(matrix);
+    }
 }
+

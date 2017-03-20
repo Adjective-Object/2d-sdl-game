@@ -83,6 +83,7 @@ class Player : public Sprite {
     double getXInput(int frames = 0) const;
     void setPosition(Pair newPosition);
     double getAttribute(char const* name) const;
+    void fixMeshOffset();
 
     AbstractRenderer* getRenderer() override;
 };
