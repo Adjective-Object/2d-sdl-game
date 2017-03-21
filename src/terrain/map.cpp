@@ -36,32 +36,46 @@ void Map::makeMapMesh() {
 
         meshPoints->push_back(a.x);
         meshPoints->push_back(a.y);
-        meshPoints->push_back(1);
+        meshPoints->push_back(0.5);
 
         meshPoints->push_back(a.x);
         meshPoints->push_back(a.y);
-        meshPoints->push_back(0);
+        meshPoints->push_back(-0.5);
 
         meshPoints->push_back(b.x);
         meshPoints->push_back(b.y);
-        meshPoints->push_back(1);
+        meshPoints->push_back(0.5);
 
         meshPoints->push_back(b.x);
         meshPoints->push_back(b.y);
-        meshPoints->push_back(1);
+        meshPoints->push_back(0.5);
 
         meshPoints->push_back(b.x);
         meshPoints->push_back(b.y);
-        meshPoints->push_back(0);
+        meshPoints->push_back(-0.5);
 
         meshPoints->push_back(a.x);
         meshPoints->push_back(a.y);
-        meshPoints->push_back(0);
+        meshPoints->push_back(-0.5);
 
         for (size_t i = 0; i < 6; i++) {
-            meshColors->push_back(0.5f);
-            meshColors->push_back(0.5f);
-            meshColors->push_back(0.5f);
+            if (p.getPlatform()->isPassable()) {
+                meshColors->push_back(0.39f);
+                meshColors->push_back(0.30f);
+                meshColors->push_back(1.0f);
+            } else if (Platform::isCeil(p.angle())) {
+                meshColors->push_back(0.78f);
+                meshColors->push_back(0.117f);
+                meshColors->push_back(0.117f);
+            } else if (Platform::isWall(p.angle())) {
+                meshColors->push_back(0.0f);
+                meshColors->push_back(0.78f);
+                meshColors->push_back(1.0f);
+            } else {
+                meshColors->push_back(0.5f);
+                meshColors->push_back(0.5f);
+                meshColors->push_back(0.5f);
+            }
         }
     }
 

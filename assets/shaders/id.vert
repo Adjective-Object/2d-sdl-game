@@ -7,5 +7,5 @@ uniform mat4 baseTransform;
 void main()
 {
     fragmentColor = vertexColor;
-    gl_Position = baseTransform * vec4(position.x, position.y, position.z, 1.0);
+    gl_Position = baseTransform * vec4(position, 1.0);
 }

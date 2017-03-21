@@ -53,5 +53,7 @@ StaticMesh makeCube() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data),
                  g_color_buffer_data, GL_STATIC_DRAW);
 
+    mesh.num_points = sizeof(g_vertex_buffer_data) / 3;
+
     return mesh;
 }

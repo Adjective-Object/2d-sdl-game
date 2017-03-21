@@ -27,6 +27,9 @@ BasicShader::BasicShader() {
 MeshRenderer::MeshRenderer(StaticMesh mesh) : mesh(mesh) {}
 
 void MeshRenderer::render(mat4& baseTransform) {
+    // Draw the triangles
+    glUseProgram(shader.programId);
+
     mat4 compoundTransform = baseTransform * modelTransform;
     glUniformMatrix4fv(shader.uniforms.baseTransform, 1, GL_FALSE,
                        &compoundTransform[0][0]);
@@ -51,8 +54,6 @@ void MeshRenderer::render(mat4& baseTransform) {
                           (void*)0   // array buffer offset
                           );
 
-    // Draw the triangles
-    glUseProgram(shader.programId);
     glDrawArrays(GL_TRIANGLES, 0, mesh.num_points * 3);
     glDisableVertexAttribArray(shader.attributes.position);
     glDisableVertexAttribArray(shader.attributes.color);
