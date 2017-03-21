@@ -2,6 +2,7 @@
 #define __GAME_MAP
 
 #include <vector>
+#include "engine/entity.hpp"
 #include "player/player.hpp"
 #include "./platform.hpp"
 #include "./ledge.hpp"
@@ -20,10 +21,10 @@ typedef enum ENVIRONMENT_COLLISION_TYPE {
     ENVIRONMENT_FLOOR_COLLISION,
 } ENVIRONMENT_COLLISION_TYPE;
 
-class Map {
+class Map : public Entity {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
-    MeshRenderer * renderer;
+    MeshRenderer* renderer;
 
     void grabLedges(Player& player) const;
     void makeMapMesh();
@@ -50,10 +51,15 @@ class Map {
                                  PlatformSegment* ignored) const;
 
     Platform* getPlatform(size_t index);
-    AbstractRenderer * getRenderer();
 
     IteratorChain<PlatformPointArray> getPoints() const;
     IteratorChain<PlatformSegmentArray> getSegments() const;
+
+    void init();
+    void preUpdate();
+    void update();
+    void postUpdate();
+    AbstractRenderer* getRenderer();
 };
 
 extern widthstream out;

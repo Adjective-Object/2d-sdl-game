@@ -6,11 +6,13 @@
 #include <GL/gl.h>
 
 class StaticMesh {
-    public:
+   public:
     GLuint vertexbuffer;
     GLuint colorbuffer;
     size_t num_points;
 };
 
-StaticMesh makeStaticMesh(const GLfloat *verts, const GLfloat * colors, size_t num);
+StaticMesh makeStaticMesh(const GLfloat* verts,
+                          const GLfloat* colors,
+                          size_t num);
 #endif

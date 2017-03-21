@@ -7,7 +7,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 
-
 class Scene {
    protected:
     // SCENE INTERNAL STATE

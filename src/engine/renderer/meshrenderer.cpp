@@ -13,20 +13,23 @@
 using namespace glm;
 
 BasicShader::BasicShader() {
-    programId = LoadShaders("assets/shaders/id.vert", "assets/shaders/red.frag");
+    programId =
+        LoadShaders("assets/shaders/id.vert", "assets/shaders/red.frag");
     attributes.position = glGetAttribLocation(programId, "position");
     attributes.color = glGetAttribLocation(programId, "vertexColor");
     uniforms.baseTransform = glGetUniformLocation(programId, "baseTransform");
     std::cout << "attributes.position:" << attributes.position << std::endl;
     std::cout << "attributes.color: " << attributes.color << std::endl;
-    std::cout << "uniforms.baseTransform: " << uniforms.baseTransform << std::endl;
+    std::cout << "uniforms.baseTransform: " << uniforms.baseTransform
+              << std::endl;
 }
 
 MeshRenderer::MeshRenderer(StaticMesh mesh) : mesh(mesh) {}
 
-void MeshRenderer::render(mat4 & baseTransform) {
+void MeshRenderer::render(mat4& baseTransform) {
     mat4 compoundTransform = baseTransform * modelTransform;
-    glUniformMatrix4fv(shader.uniforms.baseTransform, 1, GL_FALSE, &compoundTransform[0][0]);
+    glUniformMatrix4fv(shader.uniforms.baseTransform, 1, GL_FALSE,
+                       &compoundTransform[0][0]);
 
     glEnableVertexAttribArray(shader.attributes.position);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
@@ -58,4 +61,3 @@ void MeshRenderer::render(mat4 & baseTransform) {
 void MeshRenderer::setModelTransform(mat4 t) {
     modelTransform = t;
 }
-

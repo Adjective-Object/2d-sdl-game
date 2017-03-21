@@ -127,6 +127,7 @@ void MainScene::init() {
     entities.push_back(player);
     entities.push_back(stateText);
     entities.push_back(posText);
+    entities.push_back(map);
     Scene::init();
 }
 
@@ -168,23 +169,6 @@ void MainScene::update() {
     posText->updateText(tmp);
 }
 
-MeshRenderer renderer = MeshRenderer(makeCube());
-
 void MainScene::render() {
     Scene::render();
-    
-    SDL_Window * w = EnG->getWindow();
-    int width, height;
-    SDL_GetWindowSize(w, &width, &height);
-    projectionMatrix = glm::infinitePerspective(glm::half_pi<float>(), (float) width / (float) height, 0.0001f);
-
-    glm::mat4 matrix = projectionMatrix * cameraMatrix;
-    AbstractRenderer * r = map->getRenderer();
-
-    renderer.render(matrix);
-
-    if (r) {
-        //r->render(matrix);
-    }
 }
-

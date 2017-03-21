@@ -46,8 +46,8 @@ Game::Game(unsigned int width,
     ctx = makeGlContext(win);
     ren = makeRenderer(win);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     // TODO replace this with a string constant
     FALLBACK_TEXTURE = loadPNG("assets/fallback.png");
@@ -63,9 +63,9 @@ Game::~Game() {
 SDL_Window* Game::makeWindow(const std::string& name,
                              unsigned int width,
                              unsigned int height) {
-    SDL_Window* win = SDL_CreateWindow(name.c_str(), 100, 100, (int)width,
-                                       (int)height,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    SDL_Window* win =
+        SDL_CreateWindow(name.c_str(), 100, 100, (int)width, (int)height,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
     if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -171,6 +171,6 @@ SDL_Renderer* Game::getRenderer() {
     return ren;
 }
 
-SDL_Window * Game::getWindow() {
+SDL_Window* Game::getWindow() {
     return win;
 }

@@ -12,8 +12,8 @@
 #include <GL/gl.h>
 
 class BasicShader {
-public:
-	GLuint programId;
+   public:
+    GLuint programId;
     struct {
         GLint baseTransform;
     } uniforms;
@@ -21,7 +21,7 @@ public:
         GLint color;
         GLint position;
     } attributes;
-	BasicShader();
+    BasicShader();
 };
 
 class MeshRenderer : public AbstractRenderer {
@@ -31,7 +31,7 @@ class MeshRenderer : public AbstractRenderer {
 
    public:
     MeshRenderer(StaticMesh mesh);
-    virtual void render(glm::mat4 & baseTransform) override;
+    virtual void render(glm::mat4& baseTransform) override;
     void setModelTransform(glm::mat4 newModelTransform);
 };
 

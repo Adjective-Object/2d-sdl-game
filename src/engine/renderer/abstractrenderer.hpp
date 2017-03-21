@@ -7,7 +7,7 @@
 
 class AbstractRenderer {
    public:
-    virtual void render(glm::mat4 & baseTransform) = 0;
+    virtual void render(glm::mat4& baseTransform) = 0;
 };
 
 #endif

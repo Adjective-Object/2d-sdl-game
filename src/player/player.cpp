@@ -32,8 +32,8 @@ void Player::init() {}
 
 void Player::fixMeshOffset() {
     glm::mat4 modelTransform;
-    modelTransform = glm::translate(
-            modelTransform, glm::vec3(position.x, position.y, 0));
+    modelTransform =
+        glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
     renderer.setModelTransform(modelTransform);
 }
 
