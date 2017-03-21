@@ -32,7 +32,7 @@ void Map::makeMapMesh() {
     for (PlatformSegment p : getSegments()) {
         Pair a = *p.firstPoint();
         Pair b = *p.secondPoint();
-        std::cout << a << ".." << b << std::endl;
+        std::cout << p.getPlatform() << "  " << a << ".." << b << std::endl;
 
         meshPoints->push_back(a.x);
         meshPoints->push_back(a.y);
@@ -78,6 +78,8 @@ void Map::makeMapMesh() {
             }
         }
     }
+
+    std::cout << meshPoints->size();
 
     StaticMesh m = makeStaticMesh(&(*meshPoints)[0], &(*meshColors)[0],
                                   meshPoints->size() - 1);

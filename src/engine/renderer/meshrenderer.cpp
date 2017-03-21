@@ -54,7 +54,7 @@ void MeshRenderer::render(mat4& baseTransform) {
                           (void*)0   // array buffer offset
                           );
 
-    glDrawArrays(GL_TRIANGLES, 0, mesh.num_points * 3);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.num_points);
     glDisableVertexAttribArray(shader.attributes.position);
     glDisableVertexAttribArray(shader.attributes.color);
 }

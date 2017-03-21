@@ -45,7 +45,7 @@ void Scene::render() {
     int width, height;
     SDL_GetWindowSize(w, &width, &height);
     projectionMatrix = glm::infinitePerspective(
-        glm::half_pi<float>(), (float)width / (float)height, 0.0001f);
+        glm::pi<float>() * 0.4f, (float)width / (float)height, 0.0001f);
 
     glm::mat4 matrix = projectionMatrix * cameraMatrix;
 

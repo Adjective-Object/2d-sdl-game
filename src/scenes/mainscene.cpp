@@ -79,10 +79,9 @@ MainScene::~MainScene() {}
 
 void MainScene::init() {
     // set camera
-    glm::vec3 pos = glm::vec3(0.0f, 0.0f, -4.0f);
-    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    cameraMatrix = glm::lookAt(pos, target, up);
+    glm::vec3 target = glm::vec3(player->position.x, player->position.y, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(cameraPosition, target, up);
 
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
@@ -123,6 +122,9 @@ void MainScene::init() {
                            .r = 255, .g = 255, .b = 255, .a = 255,
                        },
                        ".");
+
+    cameraPosition = glm::vec3(player->position.x, player->position.y, -2);
+    cameraTarget = glm::vec3(player->position.x, player->position.y, 0);
 
     entities.push_back(player);
     entities.push_back(stateText);
@@ -170,5 +172,26 @@ void MainScene::update() {
 }
 
 void MainScene::render() {
+    glm::vec3 projectedPos =
+        glm::vec3(player->position.x, player->position.y - 0.25, -2.0f);
+
+    glm::vec3 projectedTarget =
+        glm::vec3(player->position.x, player->position.y, 0);
+
+    float easingSpeed = 5;
+
+    cameraPosition = cameraPosition +
+                     (projectedPos - cameraPosition) *
+                         std::min(1.0f, (float)EnG->elapsed * easingSpeed);
+
+    cameraTarget = cameraTarget +
+                   (projectedTarget - cameraTarget) *
+                       std::min(1.0f, (float)EnG->elapsed * easingSpeed);
+
+    glm::vec3 target = glm::vec3(player->position.x, player->position.y, 0.0f);
+
+    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(cameraPosition, target, up);
+
     Scene::render();
 }
