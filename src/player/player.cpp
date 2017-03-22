@@ -19,34 +19,40 @@ Player::Player(PlayerConfig* config,
                InputHandler* input,
                AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank), renderer(makeCube()), input(input), config(config) {
+    : bank(animationBank), renderer(&mesh), input(input), config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
     changeAction(FALL);
+    mesh.init(currentCollision->postCollision);
 }
 
 Player::~Player() {}
 
 void Player::init() {}
 
-void Player::fixMeshOffset() {
+void Player::updateMesh() {
+    // update ecb
+    mesh.update(currentCollision->postCollision);
+
+    // update location
     glm::mat4 modelTransform;
-    modelTransform =
-        glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
+    modelTransform = glm::translate(
+        modelTransform, glm::vec3(position.x + PLAYER_ECB_OFFSET.x,
+                                  position.y + PLAYER_ECB_OFFSET.y, 0));
     renderer.setModelTransform(modelTransform);
 }
 
 void Player::moveTo(Pair newPos) {
     position = newPos;
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
-    fixMeshOffset();
+    updateMesh();
 }
 
 void Player::moveTo(Ecb& ecb) {
     position = ecb.origin - PLAYER_ECB_OFFSET;
     currentCollision->reset(ecb);
-    fixMeshOffset();
+    updateMesh();
 }
 
 void Player::update() {

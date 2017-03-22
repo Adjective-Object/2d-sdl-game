@@ -53,6 +53,8 @@ set(LIB_SRCS
     src/player/animationbank.cpp
     src/player/ecb.hpp
     src/player/ecb.cpp
+    src/player/ecbmesh.hpp
+    src/player/ecbmesh.cpp
     src/player/playercollision.hpp
     src/player/playercollision.cpp
     src/player/inputhandler.hpp

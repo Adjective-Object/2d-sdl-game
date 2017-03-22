@@ -7,12 +7,12 @@
 
 class StaticMesh {
    public:
+    void init(const GLfloat* verts, const GLfloat* colors, size_t num);
+    void updateMesh(const GLfloat* verts, const GLfloat* colors);
+
     GLuint vertexbuffer;
     GLuint colorbuffer;
     size_t num_points;
 };
 
-StaticMesh makeStaticMesh(const GLfloat* verts,
-                          const GLfloat* colors,
-                          size_t num);
 #endif

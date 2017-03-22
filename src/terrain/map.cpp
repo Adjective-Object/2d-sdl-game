@@ -81,8 +81,8 @@ void Map::makeMapMesh() {
 
     std::cout << meshPoints->size();
 
-    StaticMesh m = makeStaticMesh(&(*meshPoints)[0], &(*meshColors)[0],
-                                  meshPoints->size() - 1);
+    StaticMesh* m = new StaticMesh();
+    m->init(&(*meshPoints)[0], &(*meshColors)[0], (meshPoints->size()) / 3);
 
     renderer = new MeshRenderer(m);
 }

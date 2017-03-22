@@ -24,7 +24,7 @@ BasicShader::BasicShader() {
               << std::endl;
 }
 
-MeshRenderer::MeshRenderer(StaticMesh mesh) : mesh(mesh) {}
+MeshRenderer::MeshRenderer(StaticMesh* mesh) : mesh(mesh) {}
 
 void MeshRenderer::render(mat4& baseTransform) {
     // Draw the triangles
@@ -35,7 +35,7 @@ void MeshRenderer::render(mat4& baseTransform) {
                        &compoundTransform[0][0]);
 
     glEnableVertexAttribArray(shader.attributes.position);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexbuffer);
     glVertexAttribPointer(shader.attributes.position,
                           3,         // size
                           GL_FLOAT,  // type
@@ -45,7 +45,7 @@ void MeshRenderer::render(mat4& baseTransform) {
                           );
 
     glEnableVertexAttribArray(shader.attributes.color);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->colorbuffer);
     glVertexAttribPointer(shader.attributes.color,
                           3,         // size
                           GL_FLOAT,  // typ& e
@@ -54,7 +54,7 @@ void MeshRenderer::render(mat4& baseTransform) {
                           (void*)0   // array buffer offset
                           );
 
-    glDrawArrays(GL_TRIANGLES, 0, mesh.num_points);
+    glDrawArrays(GL_TRIANGLES, 0, mesh->num_points);
     glDisableVertexAttribArray(shader.attributes.position);
     glDisableVertexAttribArray(shader.attributes.color);
 }

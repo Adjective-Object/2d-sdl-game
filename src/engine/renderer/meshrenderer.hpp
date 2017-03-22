@@ -25,12 +25,12 @@ class BasicShader {
 };
 
 class MeshRenderer : public AbstractRenderer {
-    StaticMesh mesh;
+    StaticMesh* mesh;
     BasicShader shader;
     glm::mat4 modelTransform;
 
    public:
-    MeshRenderer(StaticMesh mesh);
+    MeshRenderer(StaticMesh* mesh);
     virtual void render(glm::mat4& baseTransform) override;
     void setModelTransform(glm::mat4 newModelTransform);
 };

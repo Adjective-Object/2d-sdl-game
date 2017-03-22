@@ -1,23 +1,29 @@
 #include "staticmesh.hpp"
 #include "engine/gl.h"
 
-StaticMesh makeStaticMesh(const GLfloat* verts,
-                          const GLfloat* colors,
-                          size_t num_tris) {
-    StaticMesh mesh;
+void StaticMesh::init(const GLfloat* verts,
+                      const GLfloat* colors,
+                      size_t num_points) {
+    this->num_points = num_points;
 
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &mesh.vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, num_tris * 3 * sizeof(float), verts,
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
                  GL_STATIC_DRAW);
 
-    glGenBuffers(1, &mesh.colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, num_tris * 3 * sizeof(float), colors,
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), colors,
+                 GL_STATIC_DRAW);
+}
+
+void StaticMesh::updateMesh(const GLfloat* verts, const GLfloat* colors) {
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
                  GL_STATIC_DRAW);
 
-    mesh.num_points = num_tris;
-
-    return mesh;
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), colors,
+                 GL_STATIC_DRAW);
 }
