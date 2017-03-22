@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include "engine/model/cube.hpp"
+#include "engine/shader/basicshader.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
 #define GL3_PROTOTYPES 1
@@ -19,17 +20,21 @@ Player::Player(PlayerConfig* config,
                InputHandler* input,
                AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank), renderer(&mesh), input(input), config(config) {
+    : bank(animationBank),
+      renderer(&basicShader, &mesh),
+      input(input),
+      config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
     changeAction(FALL);
-    mesh.init(currentCollision->postCollision);
 }
 
 Player::~Player() {}
 
-void Player::init() {}
+void Player::init() {
+    mesh.init(currentCollision->postCollision);
+}
 
 void Player::updateMesh() {
     // update ecb

@@ -12,7 +12,7 @@
 #include "player/player.hpp"
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
-#include "engine/model/cube.hpp"
+#include "engine/shader/basicshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -78,11 +78,6 @@ MainScene::MainScene() : Scene() {
 MainScene::~MainScene() {}
 
 void MainScene::init() {
-    // set camera
-    glm::vec3 target = glm::vec3(player->position.x, player->position.y, 0.0f);
-    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
-    cameraMatrix = glm::lookAt(cameraPosition, target, up);
-
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
         joystick->calibrateAxis(0, -30000, 32800, 450);
@@ -130,6 +125,14 @@ void MainScene::init() {
     entities.push_back(stateText);
     entities.push_back(posText);
     entities.push_back(map);
+
+    // set camera
+    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
+
+    // load shaders we plan on using
+    basicShader.init();
+
     Scene::init();
 }
 
@@ -188,10 +191,8 @@ void MainScene::render() {
                    (projectedTarget - cameraTarget) *
                        std::min(1.0f, (float)EnG->elapsed * easingSpeed);
 
-    glm::vec3 target = glm::vec3(player->position.x, player->position.y, 0.0f);
-
     glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
-    cameraMatrix = glm::lookAt(cameraPosition, target, up);
+    cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
 
     Scene::render();
 }

@@ -100,13 +100,15 @@ set(LIB_SRCS
     src/engine/renderer/abstractrenderer.hpp
     src/engine/renderer/meshrenderer.hpp
     src/engine/renderer/meshrenderer.cpp
-    src/engine/renderer/lib/loadshaders.hpp
-    src/engine/renderer/lib/loadshaders.cpp
     src/engine/gl.h
     src/engine/model/cube.cpp
     src/engine/model/cube.hpp
     src/engine/model/staticmesh.hpp
     src/engine/model/staticmesh.cpp
+    src/engine/shader/lib/loadshaders.hpp
+    src/engine/shader/lib/loadshaders.cpp
+    src/engine/shader/basicshader.cpp
+    src/engine/shader/basicshader.hpp
     )
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC

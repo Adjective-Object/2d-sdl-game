@@ -9,6 +9,7 @@
 #include "terrain/platform_point_iterator.hpp"
 #include "terrain/platform_segment_iterator.hpp"
 #include "engine/model/cube.hpp"
+#include "engine/shader/basicshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -84,7 +85,7 @@ void Map::makeMapMesh() {
     StaticMesh* m = new StaticMesh();
     m->init(&(*meshPoints)[0], &(*meshColors)[0], (meshPoints->size()) / 3);
 
-    renderer = new MeshRenderer(m);
+    renderer = new MeshRenderer(&basicShader, m);
 }
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)
