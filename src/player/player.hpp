@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "engine/sprite.hpp"
 #include "engine/renderer/meshrenderer.hpp"
+#include "engine/renderer/multirenderer.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"
 #include "action.hpp"
@@ -18,8 +19,10 @@
 
 class Player : public Sprite {
     AnimationBank* bank;
-    MeshRenderer renderer;
+    MeshRenderer ecbMeshRenderer, modelMeshRenderer;
+    MultiRenderer multiRenderer;
     EcbMesh mesh;
+    StaticMesh modelMesh;
 
     void updateMesh();
 

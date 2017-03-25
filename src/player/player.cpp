@@ -1,14 +1,16 @@
-#include "player.hpp"
+#include <algorithm>
+#include <iostream>
+#include <vector>
 #include "../engine/game.hpp"
 #include "../util.hpp"
 #include "constants.hpp"
 #include "action.hpp"
 #include "playerconfig.hpp"
 #include "inputhandler.hpp"
-#include <algorithm>
-#include <iostream>
 #include "engine/model/cube.hpp"
+#include "engine/model/modelloader.hpp"
 #include "engine/shader/basicshader.hpp"
+#include "player.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
 #define GL3_PROTOTYPES 1
@@ -21,7 +23,10 @@ Player::Player(PlayerConfig* config,
                AnimationBank* animationBank,
                Pair initialPosition)
     : bank(animationBank),
-      renderer(&basicShader, &mesh),
+      ecbMeshRenderer(&basicShader, &mesh),
+      modelMeshRenderer(&basicShader, &modelMesh),
+      multiRenderer(std::vector<AbstractRenderer*>(
+          {&ecbMeshRenderer, &modelMeshRenderer})),
       input(input),
       config(config) {
     position = initialPosition;
@@ -34,6 +39,18 @@ Player::~Player() {}
 
 void Player::init() {
     mesh.init(currentCollision->postCollision);
+    StaticMeshLoader loader;
+    StaticMesh* loadedMesh = NULL;
+    if (loader.load("assets/cube.obj")) {
+        loadedMesh = loader.queryScene("Player");
+    }
+
+    if (loadedMesh != NULL) {
+        std::cout << "loaded mesh!";
+        modelMesh = *loadedMesh;
+    } else {
+        modelMesh = makeCube();
+    }
 }
 
 void Player::updateMesh() {
@@ -45,7 +62,13 @@ void Player::updateMesh() {
     modelTransform = glm::translate(
         modelTransform, glm::vec3(position.x + PLAYER_ECB_OFFSET.x,
                                   position.y + PLAYER_ECB_OFFSET.y, 0));
-    renderer.setModelTransform(modelTransform);
+    ecbMeshRenderer.setModelTransform(modelTransform);
+
+    // update model base transform
+    modelTransform = glm::mat4();
+    modelTransform =
+        glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
+    modelMeshRenderer.setModelTransform(modelTransform);
 }
 
 void Player::moveTo(Pair newPos) {
@@ -334,5 +357,5 @@ double Player::getAttribute(char const* name) const {
 }
 
 AbstractRenderer* Player::getRenderer() {
-    return &renderer;
+    return &multiRenderer;
 }

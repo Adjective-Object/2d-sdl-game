@@ -14,6 +14,7 @@ in with pkgs; let
     libdrm
     lzma
     xorg.libpciaccess
+    assimp
   ];
 
   devDependencies = [

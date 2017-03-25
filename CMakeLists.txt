@@ -21,6 +21,7 @@ PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
 PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
 PKG_SEARCH_MODULE(GLU REQUIRED glu)
 PKG_SEARCH_MODULE(GLM REQUIRED glm)
+PKG_SEARCH_MODULE(ASSIMP REQUIRED assimp)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -35,6 +36,7 @@ SET(ALL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src")
 
 set(LIB_SRCS 
@@ -100,11 +102,15 @@ set(LIB_SRCS
     src/engine/renderer/abstractrenderer.hpp
     src/engine/renderer/meshrenderer.hpp
     src/engine/renderer/meshrenderer.cpp
+    src/engine/renderer/multirenderer.hpp
+    src/engine/renderer/multirenderer.cpp
     src/engine/gl.h
     src/engine/model/cube.cpp
     src/engine/model/cube.hpp
     src/engine/model/staticmesh.hpp
     src/engine/model/staticmesh.cpp
+    src/engine/model/modelloader.cpp
+    src/engine/model/modelloader.hpp
     src/engine/shader/lib/loadshaders.hpp
     src/engine/shader/lib/loadshaders.cpp
     src/engine/shader/basicshader.cpp
@@ -151,6 +157,7 @@ target_link_libraries(ctest
     ${GTEST_LIBRARY_MAIN}
     ${TEST_LIB}
     ${SDL_GAME_LIB}
+    ${ASSIMP_LIBRARIES}
     )
 target_include_directories(ctest PUBLIC
     ${SDL2_INCLUDE_DIRS}
@@ -159,6 +166,7 @@ target_include_directories(ctest PUBLIC
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src"
     )
 
@@ -173,6 +181,7 @@ target_link_libraries(sdl_game
     ${YAML_CPP_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${GLU_LIBRARIES}
+    ${ASSIMP_LIBRARIES}
     ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC
@@ -181,6 +190,7 @@ target_include_directories(sdl_game PUBLIC
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src"
     )
 

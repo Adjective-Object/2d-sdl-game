@@ -10,8 +10,9 @@ class StaticMesh {
     void init(const GLfloat* verts, const GLfloat* colors, size_t num);
     void updateMesh(const GLfloat* verts, const GLfloat* colors);
 
-    GLuint vertexbuffer;
-    GLuint colorbuffer;
+    GLuint vertexbuffer = -1;
+    GLuint colorbuffer = -1;
+    GLuint uvBuffer = -1;
     size_t num_points;
 };
 
