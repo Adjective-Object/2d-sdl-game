@@ -2,12 +2,14 @@
 #define __GAME_MAP
 
 #include <vector>
+#include "engine/entity.hpp"
 #include "player/player.hpp"
 #include "./platform.hpp"
 #include "./ledge.hpp"
 #include "./collisiondatum.hpp"
 #include "widthbuf.hpp"
 #include "iterator_wrapper.hpp"
+#include "engine/renderer/meshrenderer.hpp"
 
 namespace Terrain {
 
@@ -19,11 +21,13 @@ typedef enum ENVIRONMENT_COLLISION_TYPE {
     ENVIRONMENT_FLOOR_COLLISION,
 } ENVIRONMENT_COLLISION_TYPE;
 
-class Map {
+class Map : public Entity {
     std::vector<Platform> platforms;
     std::vector<Ledge> ledges;
+    MeshRenderer* renderer;
 
     void grabLedges(Player& player) const;
+    void makeMapMesh();
 
    public:
     Map(std::vector<Platform> platforms, std::vector<Ledge> ledges);
@@ -31,7 +35,6 @@ class Map {
     void moveRecursive(Player& player,
                        Ecb& currentEcb,
                        Ecb& projectedEcb) const;
-    void render(SDL_Renderer* r);
 
     bool getClosestCollision(
         Pair const& start,
@@ -51,6 +54,12 @@ class Map {
 
     IteratorChain<PlatformPointArray> getPoints() const;
     IteratorChain<PlatformSegmentArray> getSegments() const;
+
+    void init();
+    void preUpdate();
+    void update();
+    void postUpdate();
+    AbstractRenderer* getRenderer();
 };
 
 extern widthstream out;

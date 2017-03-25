@@ -7,6 +7,8 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#include "engine/gl.h"
+
 Game* EnG = nullptr;
 SDL_Texture* FALLBACK_TEXTURE = nullptr;
 
@@ -41,7 +43,11 @@ Game::Game(unsigned int width,
 
     // create the game stuff
     win = makeWindow("poop", width, height);
+    ctx = makeGlContext(win);
     ren = makeRenderer(win);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     // TODO replace this with a string constant
     FALLBACK_TEXTURE = loadPNG("assets/fallback.png");
@@ -57,8 +63,9 @@ Game::~Game() {
 SDL_Window* Game::makeWindow(const std::string& name,
                              unsigned int width,
                              unsigned int height) {
-    SDL_Window* win = SDL_CreateWindow(name.c_str(), 100, 100, (int)width,
-                                       (int)height, SDL_WINDOW_SHOWN);
+    SDL_Window* win =
+        SDL_CreateWindow(name.c_str(), 100, 100, (int)width, (int)height,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 
     if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -67,6 +74,11 @@ SDL_Window* Game::makeWindow(const std::string& name,
     }
 
     return win;
+}
+
+SDL_GLContext Game::makeGlContext(SDL_Window* win) {
+    SDL_GLContext context = SDL_GL_CreateContext(win);
+    return context;
 }
 
 /**
@@ -141,12 +153,12 @@ void Game::start() {
         currentScene->update();
 
         // update the frame buffer
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-        SDL_RenderClear(ren);
-        currentScene->render(ren);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Update the screen
-        SDL_RenderPresent(ren);
+        currentScene->render();
+
+        SDL_GL_SwapWindow(win);
 
         // Cap framerate at 60fps
         long int ticks = (SDL_GetTicks() - thisTick);
@@ -157,4 +169,8 @@ void Game::start() {
 
 SDL_Renderer* Game::getRenderer() {
     return ren;
+}
+
+SDL_Window* Game::getWindow() {
+    return win;
 }

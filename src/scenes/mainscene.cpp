@@ -12,6 +12,11 @@
 #include "player/player.hpp"
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
+#include "engine/shader/basicshader.hpp"
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace Terrain;
 
@@ -113,9 +118,21 @@ void MainScene::init() {
                        },
                        ".");
 
+    cameraPosition = glm::vec3(player->position.x, player->position.y, -2);
+    cameraTarget = glm::vec3(player->position.x, player->position.y, 0);
+
     entities.push_back(player);
     entities.push_back(stateText);
     entities.push_back(posText);
+    entities.push_back(map);
+
+    // set camera
+    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
+
+    // load shaders we plan on using
+    basicShader.init();
+
     Scene::init();
 }
 
@@ -157,7 +174,25 @@ void MainScene::update() {
     posText->updateText(tmp);
 }
 
-void MainScene::render(SDL_Renderer* r) {
-    Scene::render(r);
-    map->render(r);
+void MainScene::render() {
+    glm::vec3 projectedPos =
+        glm::vec3(player->position.x, player->position.y - 0.25, -2.0f);
+
+    glm::vec3 projectedTarget =
+        glm::vec3(player->position.x, player->position.y, 0);
+
+    float easingSpeed = 5;
+
+    cameraPosition = cameraPosition +
+                     (projectedPos - cameraPosition) *
+                         std::min(1.0f, (float)EnG->elapsed * easingSpeed);
+
+    cameraTarget = cameraTarget +
+                   (projectedTarget - cameraTarget) *
+                       std::min(1.0f, (float)EnG->elapsed * easingSpeed);
+
+    glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
+    cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
+
+    Scene::render();
 }

@@ -4,11 +4,15 @@
 #include <vector>
 
 #include "entity.hpp"
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
 
 class Scene {
    protected:
     // SCENE INTERNAL STATE
     std::vector<Entity*> entities;
+    glm::mat4 projectionMatrix;
+    glm::mat4 cameraMatrix;
 
    public:
     // INTERFACE
@@ -29,7 +33,7 @@ class Scene {
     /**
      * Render step of the scene's main loop
      **/
-    virtual void render(SDL_Renderer* r);
+    virtual void render();
 
     Scene();
     ~Scene();

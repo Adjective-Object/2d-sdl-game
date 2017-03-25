@@ -5,6 +5,7 @@
 #include "input/input.hpp"
 #include "scene.hpp"
 #include <SDL_image.h>
+#include <SDL.h>
 #include <string>
 
 class Game;
@@ -15,12 +16,14 @@ class Game {
    private:
     SDL_Window* win;
     SDL_Renderer* ren;
+    SDL_GLContext ctx;
     bool readyToExit = false;
 
     SDL_Window* makeWindow(const std::string& name,
                            unsigned int width,
                            unsigned int height);
     SDL_Renderer* makeRenderer(SDL_Window* win);
+    SDL_GLContext makeGlContext(SDL_Window* win);
 
    public:
     // FlxG convenience values
@@ -41,6 +44,7 @@ class Game {
     void start();
 
     SDL_Renderer* getRenderer();
+    SDL_Window* getWindow();
 };
 
 #endif

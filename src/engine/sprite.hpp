@@ -33,7 +33,7 @@ class Sprite : public Entity {
     virtual void preUpdate() override;
     virtual void postUpdate() override;
     void updateMotion();
-    virtual void render(SDL_Renderer* ren) override;
+    virtual void render(SDL_Renderer* ren);
 };
 
 #endif

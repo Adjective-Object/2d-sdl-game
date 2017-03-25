@@ -6,7 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++17")
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 
 #########################
 # external dependencies #
@@ -16,8 +16,12 @@ INCLUDE(FindPkgConfig)
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
-PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx>=1.0.1)
+PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
+PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
+PKG_SEARCH_MODULE(GLU REQUIRED glu)
+PKG_SEARCH_MODULE(GLM REQUIRED glm)
+PKG_SEARCH_MODULE(ASSIMP REQUIRED assimp)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -29,6 +33,10 @@ SET(ALL_INCLUDE_DIRS
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIRS}
+    ${GLM_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src")
 
 set(LIB_SRCS 
@@ -47,6 +55,8 @@ set(LIB_SRCS
     src/player/animationbank.cpp
     src/player/ecb.hpp
     src/player/ecb.cpp
+    src/player/ecbmesh.hpp
+    src/player/ecbmesh.cpp
     src/player/playercollision.hpp
     src/player/playercollision.cpp
     src/player/inputhandler.hpp
@@ -88,7 +98,24 @@ set(LIB_SRCS
     src/engine/pair.hpp
     src/engine/pair.cpp
     src/engine/scene.hpp
-    src/engine/scene.cpp)
+    src/engine/scene.cpp
+    src/engine/renderer/abstractrenderer.hpp
+    src/engine/renderer/meshrenderer.hpp
+    src/engine/renderer/meshrenderer.cpp
+    src/engine/renderer/multirenderer.hpp
+    src/engine/renderer/multirenderer.cpp
+    src/engine/gl.h
+    src/engine/model/cube.cpp
+    src/engine/model/cube.hpp
+    src/engine/model/staticmesh.hpp
+    src/engine/model/staticmesh.cpp
+    src/engine/model/modelloader.cpp
+    src/engine/model/modelloader.hpp
+    src/engine/shader/lib/loadshaders.hpp
+    src/engine/shader/lib/loadshaders.cpp
+    src/engine/shader/basicshader.cpp
+    src/engine/shader/basicshader.hpp
+    )
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}
@@ -124,10 +151,13 @@ target_link_libraries(ctest
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${GLU_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
     ${TEST_LIB}
     ${SDL_GAME_LIB}
+    ${ASSIMP_LIBRARIES}
     )
 target_include_directories(ctest PUBLIC
     ${SDL2_INCLUDE_DIRS}
@@ -135,7 +165,8 @@ target_include_directories(ctest PUBLIC
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIR}
+    ${GTEST_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src"
     )
 
@@ -148,6 +179,9 @@ target_link_libraries(sdl_game
     ${SDL2TTF_LIBRARIES} 
     ${SDL2GFX_LIBRARIES} 
     ${YAML_CPP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${GLU_LIBRARIES}
+    ${ASSIMP_LIBRARIES}
     ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC
@@ -156,6 +190,7 @@ target_include_directories(sdl_game PUBLIC
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
     "src"
     )
 

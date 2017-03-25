@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 #include "engine/sprite.hpp"
+#include "engine/renderer/meshrenderer.hpp"
+#include "engine/renderer/multirenderer.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"
 #include "action.hpp"
@@ -10,12 +12,19 @@
 #include "playerconfig.hpp"
 #include "playercollision.hpp"
 #include "inputhandler.hpp"
+#include "ecbmesh.hpp"
 
 #define FACE_LEFT -1;
 #define FACE_RIGHT 1;
 
 class Player : public Sprite {
     AnimationBank* bank;
+    MeshRenderer ecbMeshRenderer, modelMeshRenderer;
+    MultiRenderer multiRenderer;
+    EcbMesh mesh;
+    StaticMesh modelMesh;
+
+    void updateMesh();
 
    public:
     const Platform* currentPlatform = NULL;
@@ -81,6 +90,8 @@ class Player : public Sprite {
     double getXInput(int frames = 0) const;
     void setPosition(Pair newPosition);
     double getAttribute(char const* name) const;
+
+    AbstractRenderer* getRenderer() override;
 };
 
 #endif

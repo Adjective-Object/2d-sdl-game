@@ -15,6 +15,8 @@
 using namespace Terrain;
 
 class MainScene : public Scene {
+    glm::vec3 cameraPosition;
+    glm::vec3 cameraTarget;
     Player* player;
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;
@@ -28,7 +30,7 @@ class MainScene : public Scene {
     ~MainScene();
     void init() override;
     void update() override;
-    void render(SDL_Renderer* r) override;
+    void render() override;
 };
 
 #endif

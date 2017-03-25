@@ -1,12 +1,20 @@
-#include "player.hpp"
+#include <algorithm>
+#include <iostream>
+#include <vector>
 #include "../engine/game.hpp"
 #include "../util.hpp"
 #include "constants.hpp"
 #include "action.hpp"
 #include "playerconfig.hpp"
 #include "inputhandler.hpp"
-#include <algorithm>
-#include <iostream>
+#include "engine/model/cube.hpp"
+#include "engine/model/modelloader.hpp"
+#include "engine/shader/basicshader.hpp"
+#include "player.hpp"
+
+#define GL_GLEXT_PROTOTYPES 1
+#define GL3_PROTOTYPES 1
+#include <GL/gl.h>
 
 using namespace InputMapping;
 
@@ -14,7 +22,13 @@ Player::Player(PlayerConfig* config,
                InputHandler* input,
                AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank), input(input), config(config) {
+    : bank(animationBank),
+      ecbMeshRenderer(&basicShader, &mesh),
+      modelMeshRenderer(&basicShader, &modelMesh),
+      multiRenderer(std::vector<AbstractRenderer*>(
+          {&ecbMeshRenderer, &modelMeshRenderer})),
+      input(input),
+      config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
@@ -23,16 +37,50 @@ Player::Player(PlayerConfig* config,
 
 Player::~Player() {}
 
-void Player::init() {}
+void Player::init() {
+    mesh.init(currentCollision->postCollision);
+    StaticMeshLoader loader;
+    StaticMesh* loadedMesh = NULL;
+    if (loader.load("assets/cube.obj")) {
+        loadedMesh = loader.queryScene("Player");
+    }
+
+    if (loadedMesh != NULL) {
+        std::cout << "loaded mesh!";
+        modelMesh = *loadedMesh;
+    } else {
+        modelMesh = makeCube();
+    }
+}
+
+void Player::updateMesh() {
+    // update ecb
+    mesh.update(currentCollision->postCollision);
+
+    // update location
+    glm::mat4 modelTransform;
+    modelTransform = glm::translate(
+        modelTransform, glm::vec3(position.x + PLAYER_ECB_OFFSET.x,
+                                  position.y + PLAYER_ECB_OFFSET.y, 0));
+    ecbMeshRenderer.setModelTransform(modelTransform);
+
+    // update model base transform
+    modelTransform = glm::mat4();
+    modelTransform =
+        glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
+    modelMeshRenderer.setModelTransform(modelTransform);
+}
 
 void Player::moveTo(Pair newPos) {
     position = newPos;
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
+    updateMesh();
 }
 
 void Player::moveTo(Ecb& ecb) {
     position = ecb.origin - PLAYER_ECB_OFFSET;
     currentCollision->reset(ecb);
+    updateMesh();
 }
 
 void Player::update() {
@@ -306,4 +354,8 @@ void Player::setPosition(Pair newPosition) {
 
 double Player::getAttribute(char const* name) const {
     return config->getAttribute(name);
+}
+
+AbstractRenderer* Player::getRenderer() {
+    return &multiRenderer;
 }
