@@ -10,7 +10,7 @@
     {                      \
         out[i++] = x;      \
         out[i++] = y;      \
-        out[i++] = 0;      \
+        out[i++] = -0.5;      \
     }
 
 void updateMeshToEcb(Ecb& e, GLfloat* out) {
@@ -44,7 +44,7 @@ void EcbMesh::init(Ecb& e) {
     updateMeshToEcb(e, vectorBuffer);
     fillMeshColors(glm::vec3(212 / 255.0f, 112 / 255.0f, 95 / 255.0f),
                    colorBuffer);
-    StaticMesh::init(vectorBuffer, colorBuffer, 12);
+    StaticMesh::init(vectorBuffer, colorBuffer, NULL, 12);
 }
 
 void EcbMesh::update(Ecb& e) {

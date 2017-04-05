@@ -7,7 +7,7 @@
 #include "action.hpp"
 #include "playerconfig.hpp"
 #include "inputhandler.hpp"
-#include "engine/model/cube.hpp"
+#include "engine/mesh/cube.hpp"
 #include "engine/model/modelloader.hpp"
 #include "engine/shader/basicshader.hpp"
 #include "player.hpp"
@@ -23,10 +23,6 @@ Player::Player(PlayerConfig* config,
                AnimationBank* animationBank,
                Pair initialPosition)
     : bank(animationBank),
-      ecbMeshRenderer(&basicShader, &mesh),
-      modelMeshRenderer(&basicShader, &modelMesh),
-      multiRenderer(std::vector<AbstractRenderer*>(
-          {&ecbMeshRenderer, &modelMeshRenderer})),
       input(input),
       config(config) {
     position = initialPosition;
@@ -39,18 +35,32 @@ Player::~Player() {}
 
 void Player::init() {
     mesh.init(currentCollision->postCollision);
-    StaticMeshLoader loader;
-    StaticMesh* loadedMesh = NULL;
-    if (loader.load("assets/cube.obj")) {
-        loadedMesh = loader.queryScene("Player");
+    ecbMeshRenderer = new MeshRenderer(&basicShader, &mesh);
+
+    ModelLoader loader;
+    Model* loadedModel = NULL;
+    if (loader.load("assets/Crate/Crate1.obj")) {
+        loadedModel = loader.queryScene("Player");
     }
 
-    if (loadedMesh != NULL) {
-        std::cout << "loaded mesh!";
-        modelMesh = *loadedMesh;
+    if (loadedModel) {
+        std::cout << "loaded mesh. making player renderer" << std::endl;
+        modelMeshRenderer = loadedModel->makeRenderer();
+        std::cout << "generatedi " << modelMeshRenderer << std::endl;
     } else {
-        modelMesh = makeCube();
+        std::cout << "failed loading mesh. using fallback cube" << std::endl;
+        StaticMesh * cube = new StaticMesh();
+        *cube = makeCube();
+        modelMeshRenderer = new MultiMeshRenderer(
+            std::vector<MeshRenderer *>({ new MeshRenderer(&basicShader, cube ) })
+            );
     }
+
+    multiRenderer = new AbstractMultiRenderer({
+        modelMeshRenderer,
+        ecbMeshRenderer
+    });
+
 }
 
 void Player::updateMesh() {
@@ -62,13 +72,13 @@ void Player::updateMesh() {
     modelTransform = glm::translate(
         modelTransform, glm::vec3(position.x + PLAYER_ECB_OFFSET.x,
                                   position.y + PLAYER_ECB_OFFSET.y, 0));
-    ecbMeshRenderer.setModelTransform(modelTransform);
+    ecbMeshRenderer->setModelTransform(modelTransform);
 
     // update model base transform
     modelTransform = glm::mat4();
     modelTransform =
         glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
-    modelMeshRenderer.setModelTransform(modelTransform);
+    modelMeshRenderer->setModelTransform(modelTransform);
 }
 
 void Player::moveTo(Pair newPos) {
@@ -357,5 +367,5 @@ double Player::getAttribute(char const* name) const {
 }
 
 AbstractRenderer* Player::getRenderer() {
-    return &multiRenderer;
+    return multiRenderer;
 }

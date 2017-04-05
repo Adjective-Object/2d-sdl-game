@@ -1,5 +1,5 @@
 #include "engine/gl.h"
-#include "engine/model/staticmesh.hpp"
+#include "engine/mesh/staticmesh.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

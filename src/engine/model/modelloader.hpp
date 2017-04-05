@@ -4,17 +4,16 @@
 // assimp
 #include <scene.h>
 #include <Importer.hpp>
-// mesh loaders
-#include "staticmesh.hpp"
+#include "model.hpp"
 
-class StaticMeshLoader {
+class ModelLoader {
     const aiScene* scene = NULL;
     Assimp::Importer importer;
 
    public:
-    StaticMeshLoader();
+    ModelLoader();
     bool load(const char* fpath);
-    StaticMesh* queryScene(const char* scenepath);
+    Model* queryScene(const char* scenepath);
 };
 
 #endif

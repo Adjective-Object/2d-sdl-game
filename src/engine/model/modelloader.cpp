@@ -2,20 +2,24 @@
 #include <cstring>
 #include <iostream>
 #include <random>
+// sdl
+#include <SDL.h>
+#include <SDL_image.h>
 // assimp
 #include <Importer.hpp>
 #include <scene.h>
 #include <postprocess.h>
 // locals
-#include "staticmesh.hpp"
+#include "engine/mesh/staticmesh.hpp"
+#include "engine/material/material.hpp"
 #include "modelloader.hpp"
 
 using namespace std;
 using namespace Assimp;
 
-StaticMeshLoader::StaticMeshLoader() {}
+ModelLoader::ModelLoader() {}
 
-bool StaticMeshLoader::load(const char* fpath) {
+bool ModelLoader::load(const char* fpath) {
     std::cout << "load(" << fpath << ")" << std::endl;
 
     scene = importer.ReadFile(
@@ -25,9 +29,21 @@ bool StaticMeshLoader::load(const char* fpath) {
     return scene != NULL;
 }
 
-StaticMesh* makeMesh(const aiMesh* mesh) {
+Model* makeModel(const aiScene * scene, const aiMesh* mesh) {
     GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
-    GLfloat* colors = new GLfloat[mesh->mNumFaces * 9];
+    GLfloat* colors = NULL;
+    GLfloat* uvs = NULL;
+
+    if (mesh->HasVertexColors(0)) {
+        std::cout << "mesh has vertex colors" << std::endl;
+        colors = new GLfloat[mesh->mNumFaces * 9];
+    }
+
+    if (mesh->HasTextureCoords(0)) {
+        std::cout << "mesh has uvs" << std::endl;
+        uvs = new GLfloat[mesh->mNumFaces * 6];
+    }
+
     size_t tri = 0;
     for (size_t f = 0; f < mesh->mNumFaces; f++) {
         aiFace face = mesh->mFaces[f];
@@ -39,24 +55,53 @@ StaticMesh* makeMesh(const aiMesh* mesh) {
             verts[tri * 3 + 1] = vert.y;
             verts[tri * 3 + 2] = vert.z;
 
-            colors[tri * 3] = ((double)rand() / (RAND_MAX));
-            colors[tri * 3 + 1] = ((double)rand() / (RAND_MAX));
-            colors[tri * 3 + 2] = ((double)rand() / (RAND_MAX));
+            if (colors) {
+                aiColor4D color = mesh->mColors[0][vertexIndex];
+                colors[tri * 3 ] = color.r;
+                colors[tri * 3 + 1] = color.g;
+                colors[tri * 3 + 2] = color.b;
+            }
+
+            if (uvs) {
+                aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
+                std::cout << uv.x << ", " << uv.y << std::endl;
+                uvs[tri * 2 ] = uv.x;
+                uvs[tri * 2 + 1] = uv.y;
+            }
+
             tri++;
         }
     }
 
-    for (size_t k = 0; k < tri; k += 3) {
-        std::cout << verts[k] << ", " << verts[k + 1] << ", " << verts[k + 2]
-                  << std::endl;
+    StaticMesh* outMesh = new StaticMesh();
+    outMesh->init(verts, colors, uvs, tri);
+
+    // construct a material from the corresponding aiMaterial
+    aiMaterial * loadedMaterial = scene->mMaterials[mesh->mMaterialIndex];
+    Material * material = new Material();
+    if (loadedMaterial->GetTextureCount(aiTextureType_AMBIENT)) {
+        std::cout << "material has an ambient texture" << std::endl;
+        aiString path;
+        if (loadedMaterial->GetTexture(
+                    aiTextureType_AMBIENT,
+                    0,
+                    & path
+                    )) {
+            std::cout << "failed to load texture" << std::endl;
+        } else {
+            std::cout << "ambient texture @ " << path.C_Str() << std::endl;
+            SDL_Surface * loadedTexture = IMG_Load(path.C_Str());
+            material->setAmbientTexture(loadedTexture);
+        }
     }
 
-    StaticMesh* m = new StaticMesh();
-    m->init(verts, colors, tri);
-    return m;
+    return new Model(std::vector<MaterialMesh>({
+        {.material = material,
+         .mesh = outMesh}
+    }));
 }
 
-StaticMesh* StaticMeshLoader::queryScene(const char* scenePath) {
+Model* ModelLoader::queryScene(const char* scenePath) {
     std::cout << "queryScene(" << scenePath << ")" << std::endl;
     if (scene == NULL) {
         return NULL;
@@ -75,7 +120,7 @@ StaticMesh* StaticMeshLoader::queryScene(const char* scenePath) {
             ;
 
             if (mesh->mNumFaces != 0) {
-                return makeMesh(mesh);
+                return makeModel(scene, mesh);
             }
         }
     }

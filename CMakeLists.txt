@@ -103,14 +103,19 @@ set(LIB_SRCS
     src/engine/renderer/meshrenderer.hpp
     src/engine/renderer/meshrenderer.cpp
     src/engine/renderer/multirenderer.hpp
-    src/engine/renderer/multirenderer.cpp
+    src/engine/renderer/multimeshrenderer.cpp
+    src/engine/renderer/multimeshrenderer.hpp
+    src/engine/material/material.hpp
+    src/engine/material/material.cpp
     src/engine/gl.h
-    src/engine/model/cube.cpp
-    src/engine/model/cube.hpp
-    src/engine/model/staticmesh.hpp
-    src/engine/model/staticmesh.cpp
+    src/engine/mesh/cube.cpp
+    src/engine/mesh/cube.hpp
+    src/engine/mesh/staticmesh.hpp
+    src/engine/mesh/staticmesh.cpp
     src/engine/model/modelloader.cpp
     src/engine/model/modelloader.hpp
+    src/engine/model/model.cpp
+    src/engine/model/model.hpp
     src/engine/shader/lib/loadshaders.hpp
     src/engine/shader/lib/loadshaders.cpp
     src/engine/shader/basicshader.cpp

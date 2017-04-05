@@ -8,7 +8,7 @@
 #include "map_movement.hpp"
 #include "terrain/platform_point_iterator.hpp"
 #include "terrain/platform_segment_iterator.hpp"
-#include "engine/model/cube.hpp"
+#include "engine/mesh/cube.hpp"
 #include "engine/shader/basicshader.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -83,7 +83,7 @@ void Map::makeMapMesh() {
     std::cout << meshPoints->size();
 
     StaticMesh* m = new StaticMesh();
-    m->init(&(*meshPoints)[0], &(*meshColors)[0], (meshPoints->size()) / 3);
+    m->init(&(*meshPoints)[0], &(*meshColors)[0], NULL, (meshPoints->size()) / 3);
 
     renderer = new MeshRenderer(&basicShader, m);
 }

@@ -1,7 +1,8 @@
 #ifndef __ENGINE_MESH_RENDERER
 #define __ENGINE_MESH_RENDERER
 #include "abstractrenderer.hpp"
-#include "engine/model/staticmesh.hpp"
+#include "engine/mesh/staticmesh.hpp"
+#include "engine/material/material.hpp"
 #include "engine/shader/basicshader.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -15,10 +16,15 @@
 class MeshRenderer : public AbstractRenderer {
     StaticMesh* mesh;
     BasicShader* shader;
+    Material* material;
     glm::mat4 modelTransform;
 
    public:
-    MeshRenderer(BasicShader* shader, StaticMesh* mesh);
+    MeshRenderer(
+            BasicShader* shader,
+            StaticMesh* mesh,
+            Material * material = NULL
+            );
     virtual void render(glm::mat4& baseTransform) override;
     void setModelTransform(glm::mat4 newModelTransform);
 };

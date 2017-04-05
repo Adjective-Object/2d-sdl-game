@@ -1,7 +1,7 @@
 #ifndef __GAME_MESH_ECB
 #define __GAME_MESH_ECB
 
-#include "engine/model/staticmesh.hpp"
+#include "engine/mesh/staticmesh.hpp"
 #include "player/ecb.hpp"
 #include "engine/gl.h"
 
