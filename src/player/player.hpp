@@ -20,9 +20,9 @@
 
 class Player : public Sprite {
     AnimationBank* bank;
-    MeshRenderer *ecbMeshRenderer;
-    MultiMeshRenderer *modelMeshRenderer;
-    AbstractMultiRenderer *multiRenderer;
+    MeshRenderer* ecbMeshRenderer;
+    MultiMeshRenderer* modelMeshRenderer;
+    AbstractMultiRenderer* multiRenderer;
     EcbMesh mesh;
     StaticMesh modelMesh;
 

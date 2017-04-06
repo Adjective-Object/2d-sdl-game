@@ -23,8 +23,9 @@ void StaticMesh::init(const GLfloat* verts,
     updateMesh(verts, colors, uvs);
 }
 
-
-void StaticMesh::updateMesh(const GLfloat* verts, const GLfloat* colors, const GLfloat * uvs) {
+void StaticMesh::updateMesh(const GLfloat* verts,
+                            const GLfloat* colors,
+                            const GLfloat* uvs) {
     if (verts) {
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
@@ -39,8 +40,9 @@ void StaticMesh::updateMesh(const GLfloat* verts, const GLfloat* colors, const G
 
     if (uvs) {
         std::cout << "buffering uvs" << std::endl;
-        for (int i=0; i<num_points * 2; i+=2) {
-            std::cout << "uv " << i/2 << ": " << uvs[i] << ", " << uvs[i + 1] << std::endl;
+        for (int i = 0; i < num_points * 2; i += 2) {
+            std::cout << "uv " << i / 2 << ": " << uvs[i] << ", " << uvs[i + 1]
+                      << std::endl;
         }
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
         glBufferData(GL_ARRAY_BUFFER, num_points * 2 * sizeof(GLfloat), uvs,
@@ -55,5 +57,3 @@ bool StaticMesh::hasUvs() {
 bool StaticMesh::hasVertexColors() {
     return colorbuffer != -1;
 }
-
-

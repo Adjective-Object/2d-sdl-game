@@ -9,13 +9,13 @@
 #include <GL/glu.h>
 
 class Material {
-    SDL_Surface * ambientTexture;
-    public:
-    GLuint glAmbientTexture = 0;
+    SDL_Surface* ambientSurface = NULL;
 
-    void setAmbientTexture(SDL_Surface * ambientTexture);
+   public:
+    SDL_Texture* ambientTexture = NULL;
+
+    void setAmbientTexture(SDL_Texture* texture);
     bool hasTexture();
 };
 
 #endif
-

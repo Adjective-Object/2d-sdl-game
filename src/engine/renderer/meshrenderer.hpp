@@ -20,11 +20,9 @@ class MeshRenderer : public AbstractRenderer {
     glm::mat4 modelTransform;
 
    public:
-    MeshRenderer(
-            BasicShader* shader,
-            StaticMesh* mesh,
-            Material * material = NULL
-            );
+    MeshRenderer(BasicShader* shader,
+                 StaticMesh* mesh,
+                 Material* material = NULL);
     virtual void render(glm::mat4& baseTransform) override;
     void setModelTransform(glm::mat4 newModelTransform);
 };

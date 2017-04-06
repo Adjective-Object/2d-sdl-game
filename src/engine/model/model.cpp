@@ -7,16 +7,13 @@
 
 Model::Model(std::vector<MaterialMesh> meshes) : meshes(meshes) {}
 
-MultiMeshRenderer * Model::makeRenderer() {
+MultiMeshRenderer* Model::makeRenderer() {
     std::cout << "making renderer for model" << std::endl;
-    std::vector<MeshRenderer *> renderers;
+    std::vector<MeshRenderer*> renderers;
     for (MaterialMesh m : meshes) {
-        BasicShader * s = m.material->hasTexture() ? &textureShader : &basicShader;
-        renderers.push_back(new MeshRenderer(
-                    s,
-                    m.mesh,
-                    m.material
-                ));
+        BasicShader* s =
+            m.material->hasTexture() ? &textureShader : &basicShader;
+        renderers.push_back(new MeshRenderer(s, m.mesh, m.material));
     }
 
     return new MultiMeshRenderer(renderers);

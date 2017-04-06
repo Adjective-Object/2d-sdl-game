@@ -9,9 +9,10 @@
 class ModelLoader {
     const aiScene* scene = NULL;
     Assimp::Importer importer;
+    SDL_Renderer* renderCtx;
 
    public:
-    ModelLoader();
+    ModelLoader(SDL_Renderer* renderCtx);
     bool load(const char* fpath);
     Model* queryScene(const char* scenepath);
 };

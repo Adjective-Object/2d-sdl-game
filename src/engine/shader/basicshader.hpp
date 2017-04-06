@@ -4,8 +4,9 @@
 #include "engine/gl.h"
 
 class BasicShader {
-    const char * vec;
-    const char * frag;
+    const char* vec;
+    const char* frag;
+
    public:
     GLuint programId;
 
@@ -20,7 +21,7 @@ class BasicShader {
         GLint uvs;
     } attributes;
 
-    BasicShader(const char * vec, const char * frag);
+    BasicShader(const char* vec, const char* frag);
     void init();
 };
 

@@ -11,7 +11,9 @@
 
 using namespace glm;
 
-MeshRenderer::MeshRenderer(BasicShader* shader, StaticMesh* mesh, Material * material)
+MeshRenderer::MeshRenderer(BasicShader* shader,
+                           StaticMesh* mesh,
+                           Material* material)
     : mesh(mesh), shader(shader), material(material) {}
 
 void MeshRenderer::render(mat4& baseTransform) {
@@ -23,14 +25,11 @@ void MeshRenderer::render(mat4& baseTransform) {
     glUniformMatrix4fv(shader->uniforms.baseTransform, 1, GL_FALSE,
                        &compoundTransform[0][0]);
 
-
     // if the shader has a texture and the model has UVs, load them
     if (material && material->hasTexture() && mesh->hasUvs()) {
-        glActiveTexture(GL_TEXTURE0); 
-        glBindTexture(GL_TEXTURE_2D, material->glAmbientTexture);
-        glUniform1i(
-                shader->uniforms.ambientTexture,
-                0);
+        glActiveTexture(GL_TEXTURE0);
+        SDL_GL_BindTexture(material->ambientTexture, NULL, NULL);
+        glUniform1i(shader->uniforms.ambientTexture, 0);
 
         glEnableVertexAttribArray(shader->attributes.uvs);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer);

@@ -11,24 +11,20 @@
 
 template <class T>
 class MultiRenderer : public AbstractRenderer {
-    protected:
+   protected:
     std::vector<T*> renderers;
 
    public:
-    MultiRenderer(std::vector<T*> renderers)
-        : renderers(renderers) {}
+    MultiRenderer(std::vector<T*> renderers) : renderers(renderers) {}
 
-    MultiRenderer(T* renderer[])
-        : renderers(std::vector<T*>(renderers)) {}
+    MultiRenderer(T* renderer[]) : renderers(std::vector<T*>(renderers)) {}
 
     void render(glm::mat4& baseTransform) override {
         for (AbstractRenderer* r : renderers) {
             r->render(baseTransform);
         }
     }
-
 };
-
 
 typedef MultiRenderer<AbstractRenderer> AbstractMultiRenderer;
 

@@ -10,7 +10,7 @@
     {                      \
         out[i++] = x;      \
         out[i++] = y;      \
-        out[i++] = -0.5;      \
+        out[i++] = -0.5;   \
     }
 
 void updateMeshToEcb(Ecb& e, GLfloat* out) {

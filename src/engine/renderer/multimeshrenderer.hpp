@@ -9,10 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 class MultiMeshRenderer : public MultiRenderer<MeshRenderer> {
-    public:
-        MultiMeshRenderer(std::vector<MeshRenderer *>);
-        void setModelTransform(glm::mat4 & newModelTransform);
+   public:
+    MultiMeshRenderer(std::vector<MeshRenderer*>);
+    void setModelTransform(glm::mat4& newModelTransform);
 };
 
 #endif
-

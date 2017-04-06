@@ -7,16 +7,16 @@
 #include <vector>
 
 struct MaterialMesh {
-    Material * material;
-    StaticMesh * mesh;
+    Material* material;
+    StaticMesh* mesh;
 };
 
 class Model {
     std::vector<MaterialMesh> meshes;
-    public:
+
+   public:
     Model(std::vector<MaterialMesh>);
-    MultiMeshRenderer * makeRenderer();
+    MultiMeshRenderer* makeRenderer();
 };
 
 #endif
-

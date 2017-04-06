@@ -22,9 +22,7 @@ Player::Player(PlayerConfig* config,
                InputHandler* input,
                AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank),
-      input(input),
-      config(config) {
+    : bank(animationBank), input(input), config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
@@ -37,7 +35,7 @@ void Player::init() {
     mesh.init(currentCollision->postCollision);
     ecbMeshRenderer = new MeshRenderer(&basicShader, &mesh);
 
-    ModelLoader loader;
+    ModelLoader loader(EnG->getRenderer());
     Model* loadedModel = NULL;
     if (loader.load("assets/Crate/Crate1.obj")) {
         loadedModel = loader.queryScene("Player");
@@ -49,18 +47,14 @@ void Player::init() {
         std::cout << "generatedi " << modelMeshRenderer << std::endl;
     } else {
         std::cout << "failed loading mesh. using fallback cube" << std::endl;
-        StaticMesh * cube = new StaticMesh();
+        StaticMesh* cube = new StaticMesh();
         *cube = makeCube();
         modelMeshRenderer = new MultiMeshRenderer(
-            std::vector<MeshRenderer *>({ new MeshRenderer(&basicShader, cube ) })
-            );
+            std::vector<MeshRenderer*>({new MeshRenderer(&basicShader, cube)}));
     }
 
-    multiRenderer = new AbstractMultiRenderer({
-        modelMeshRenderer,
-        ecbMeshRenderer
-    });
-
+    multiRenderer =
+        new AbstractMultiRenderer({modelMeshRenderer, ecbMeshRenderer});
 }
 
 void Player::updateMesh() {

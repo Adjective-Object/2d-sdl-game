@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Assimp;
 
-ModelLoader::ModelLoader() {}
+ModelLoader::ModelLoader(SDL_Renderer* renderCtx) : renderCtx(renderCtx) {}
 
 bool ModelLoader::load(const char* fpath) {
     std::cout << "load(" << fpath << ")" << std::endl;
@@ -29,7 +29,9 @@ bool ModelLoader::load(const char* fpath) {
     return scene != NULL;
 }
 
-Model* makeModel(const aiScene * scene, const aiMesh* mesh) {
+Model* makeModel(SDL_Renderer* renderCtx,
+                 const aiScene* scene,
+                 const aiMesh* mesh) {
     GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
     GLfloat* colors = NULL;
     GLfloat* uvs = NULL;
@@ -57,7 +59,7 @@ Model* makeModel(const aiScene * scene, const aiMesh* mesh) {
 
             if (colors) {
                 aiColor4D color = mesh->mColors[0][vertexIndex];
-                colors[tri * 3 ] = color.r;
+                colors[tri * 3] = color.r;
                 colors[tri * 3 + 1] = color.g;
                 colors[tri * 3 + 2] = color.b;
             }
@@ -65,7 +67,7 @@ Model* makeModel(const aiScene * scene, const aiMesh* mesh) {
             if (uvs) {
                 aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
                 std::cout << uv.x << ", " << uv.y << std::endl;
-                uvs[tri * 2 ] = uv.x;
+                uvs[tri * 2] = uv.x;
                 uvs[tri * 2 + 1] = uv.y;
             }
 
@@ -77,28 +79,24 @@ Model* makeModel(const aiScene * scene, const aiMesh* mesh) {
     outMesh->init(verts, colors, uvs, tri);
 
     // construct a material from the corresponding aiMaterial
-    aiMaterial * loadedMaterial = scene->mMaterials[mesh->mMaterialIndex];
-    Material * material = new Material();
+    aiMaterial* loadedMaterial = scene->mMaterials[mesh->mMaterialIndex];
+    Material* material = new Material();
     if (loadedMaterial->GetTextureCount(aiTextureType_AMBIENT)) {
         std::cout << "material has an ambient texture" << std::endl;
         aiString path;
-        if (loadedMaterial->GetTexture(
-                    aiTextureType_AMBIENT,
-                    0,
-                    & path
-                    )) {
+        if (loadedMaterial->GetTexture(aiTextureType_AMBIENT, 0, &path)) {
             std::cout << "failed to load texture" << std::endl;
         } else {
             std::cout << "ambient texture @ " << path.C_Str() << std::endl;
-            SDL_Surface * loadedTexture = IMG_Load(path.C_Str());
+            SDL_Surface* loadedSurface = IMG_Load(path.C_Str());
+            SDL_Texture* loadedTexture =
+                SDL_CreateTextureFromSurface(renderCtx, loadedSurface);
             material->setAmbientTexture(loadedTexture);
         }
     }
 
-    return new Model(std::vector<MaterialMesh>({
-        {.material = material,
-         .mesh = outMesh}
-    }));
+    return new Model(
+        std::vector<MaterialMesh>({{.material = material, .mesh = outMesh}}));
 }
 
 Model* ModelLoader::queryScene(const char* scenePath) {
@@ -117,10 +115,9 @@ Model* ModelLoader::queryScene(const char* scenePath) {
             std::cout << "loading a mesh with " << mesh->mNumVertices
                       << " verts"
                       << ", " << mesh->mNumFaces << " faces" << std::endl;
-            ;
 
             if (mesh->mNumFaces != 0) {
-                return makeModel(scene, mesh);
+                return makeModel(renderCtx, scene, mesh);
             }
         }
     }
