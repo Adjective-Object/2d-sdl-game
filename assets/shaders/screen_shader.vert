@@ -6,8 +6,13 @@ attribute vec2 uvs;
 varying vec2 texCoord;
 void main()
 {
-    vec2 fracPosition = pixelPosition.xy / screenDimensions;
-    gl_Position = vec4(fracPosition, 1.0 , 1.0);
+    vec2 fracPosition = vec2(2, 2) * pixelPosition.xy / screenDimensions;
+    gl_Position = vec4(
+            -1.0 + fracPosition.x,
+            1.0 - fracPosition.y,
+            0,
+            1.0);
+
     texCoord = uvs;
 }
 

@@ -134,7 +134,7 @@ void MainScene::init() {
     // load shaders we plan on using
     basicShader.init();
     textureShader.init();
-    // screenShader.init();
+    screenShader.init();
 
     Scene::init();
 }

@@ -15,8 +15,12 @@ class ScreenRenderer : public AbstractRenderer {
     StaticMesh mesh;
     SDL_Texture* texture;
     SDL_Rect screenBoundsPixels;
+    GLfloat *verts, *uvs;
+
+    void makeBoundsMesh(SDL_Rect& bounds);
 
    public:
+    void updateMesh(SDL_Rect& bounds);
     ScreenRenderer(SDL_Texture* texture, SDL_Rect bounds);
     void render(glm::mat4& baseTransform) override;
 };

@@ -39,11 +39,6 @@ void StaticMesh::updateMesh(const GLfloat* verts,
     }
 
     if (uvs) {
-        std::cout << "buffering uvs" << std::endl;
-        for (int i = 0; i < num_points * 2; i += 2) {
-            std::cout << "uv " << i / 2 << ": " << uvs[i] << ", " << uvs[i + 1]
-                      << std::endl;
-        }
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
         glBufferData(GL_ARRAY_BUFFER, num_points * 2 * sizeof(GLfloat), uvs,
                      GL_STATIC_DRAW);

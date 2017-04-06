@@ -14,11 +14,12 @@ class Text : public Entity {
     Pair position;
     TTF_Font* font;
     SDL_Color color;
-    SDL_Surface* surface;
     SDL_Texture* texture;
     SDL_Rect rect;
     SDL_Renderer* ren;
     ScreenRenderer* renderer;
+    const char* text;
+
     Text(SDL_Renderer* r,
          Pair position,
          TTF_Font* font,

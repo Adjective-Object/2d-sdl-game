@@ -6,8 +6,6 @@
 
 class BasicShader : public PrimitiveShader {
    public:
-    GLuint programId;
-
     struct {
         GLint baseTransform;
         GLint ambientTexture;
