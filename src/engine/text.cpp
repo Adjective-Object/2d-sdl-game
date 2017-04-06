@@ -1,3 +1,4 @@
+#include "engine/renderer/screenrenderer.hpp"
 #include "text.hpp"
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -18,14 +19,27 @@ Text::~Text() {
 
 void Text::updateText(const char* newText) {
     surface = TTF_RenderText_Solid(font, newText, color);
-    texture = SDL_CreateTextureFromSurface(ren, surface);
+    if (texture == NULL) {
+        texture = SDL_CreateTextureFromSurface(ren, surface);
+    } else {
+        SDL_UpdateTexture(texture, NULL, surface->pixels,
+                          surface->format->BytesPerPixel * surface->w);
+    }
     rect = {.x = (int)position.x,
             .y = (int)position.y,
             .w = surface->w,
             .h = surface->h};
 }
 
-void Text::init() {}
+void Text::init() {
+    SDL_Rect r;
+    r.x = (int)position.x;
+    r.y = (int)position.y;
+    r.w = surface->w;
+    r.h = surface->h;
+
+    renderer = new ScreenRenderer(texture, r);
+}
 
 void Text::update() {}
 
@@ -35,4 +49,8 @@ void Text::postUpdate() {}
 
 void Text::render(SDL_Renderer* ren) {
     SDL_RenderCopy(ren, texture, NULL, &rect);
+}
+
+AbstractRenderer* Text::getRenderer() {
+    return NULL;
 }

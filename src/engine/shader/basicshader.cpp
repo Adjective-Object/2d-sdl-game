@@ -1,11 +1,12 @@
 #include "engine/gl.h"
 #include "engine/shader/basicshader.hpp"
 #include <iostream>
-#include "./lib/loadshaders.hpp"
 
-BasicShader::BasicShader(const char* v, const char* f) : vec(v), frag(f) {}
+BasicShader::BasicShader(const char* v, const char* f)
+    : PrimitiveShader(v, f) {}
 void BasicShader::init() {
-    programId = LoadShaders(vec, frag);
+    PrimitiveShader::init();
+
     attributes.position = glGetAttribLocation(programId, "position");
     attributes.uvs = glGetAttribLocation(programId, "uvs");
     attributes.color = glGetAttribLocation(programId, "vertexColor");

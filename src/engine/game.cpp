@@ -38,6 +38,11 @@ Game::Game(unsigned int width,
         EnG = this;
     }
 
+    screenBounds.x = 0;
+    screenBounds.y = 0;
+    screenBounds.w = width;
+    screenBounds.h = height;
+
     // init input system
     input.init();
 
@@ -142,8 +147,16 @@ void Game::start() {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             // If user closes the window, ready to exit
-            if (e.type == SDL_QUIT) {
-                readyToExit = true;
+            switch (e.type) {
+                case SDL_QUIT:
+                    readyToExit = true;
+                    break;
+                case SDL_WINDOWEVENT:
+                    SDL_GetWindowSize(win, &(screenBounds.w),
+                                      &(screenBounds.h));
+                    break;
+                default:
+                    break;
             }
 
             input.processEvent(&e);
@@ -173,4 +186,8 @@ SDL_Renderer* Game::getRenderer() {
 
 SDL_Window* Game::getWindow() {
     return win;
+}
+
+SDL_Rect Game::getScreenBounds() {
+    return screenBounds;
 }

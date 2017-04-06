@@ -24,6 +24,7 @@ class Game {
                            unsigned int height);
     SDL_Renderer* makeRenderer(SDL_Window* win);
     SDL_GLContext makeGlContext(SDL_Window* win);
+    SDL_Rect screenBounds;
 
    public:
     // FlxG convenience values
@@ -45,6 +46,7 @@ class Game {
 
     SDL_Renderer* getRenderer();
     SDL_Window* getWindow();
+    SDL_Rect getScreenBounds();
 };
 
 #endif

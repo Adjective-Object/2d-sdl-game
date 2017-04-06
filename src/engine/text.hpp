@@ -1,6 +1,9 @@
 #ifndef __ENGINE_TEXT
 #define __ENGINE_TEXT
 
+#include "engine/renderer/abstractrenderer.hpp"
+#include "engine/renderer/screenrenderer.hpp"
+
 #include "entity.hpp"
 #include "pair.hpp"
 #include <SDL.h>
@@ -15,6 +18,7 @@ class Text : public Entity {
     SDL_Texture* texture;
     SDL_Rect rect;
     SDL_Renderer* ren;
+    ScreenRenderer* renderer;
     Text(SDL_Renderer* r,
          Pair position,
          TTF_Font* font,
@@ -27,6 +31,7 @@ class Text : public Entity {
     virtual void preUpdate() override;
     virtual void postUpdate() override;
     virtual void render(SDL_Renderer* ren);
+    AbstractRenderer* getRenderer() override;
 };
 
 #endif

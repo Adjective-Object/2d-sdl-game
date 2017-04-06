@@ -105,6 +105,8 @@ set(LIB_SRCS
     src/engine/renderer/multirenderer.hpp
     src/engine/renderer/multimeshrenderer.cpp
     src/engine/renderer/multimeshrenderer.hpp
+    src/engine/renderer/screenrenderer.cpp
+    src/engine/renderer/screenrenderer.hpp
     src/engine/material/material.hpp
     src/engine/material/material.cpp
     src/engine/gl.h
@@ -118,8 +120,12 @@ set(LIB_SRCS
     src/engine/model/model.hpp
     src/engine/shader/lib/loadshaders.hpp
     src/engine/shader/lib/loadshaders.cpp
+    src/engine/shader/primitiveshader.cpp
+    src/engine/shader/primitiveshader.hpp
     src/engine/shader/basicshader.cpp
     src/engine/shader/basicshader.hpp
+    src/engine/shader/screenspaceshader.cpp
+    src/engine/shader/screenspaceshader.hpp
     )
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC

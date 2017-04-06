@@ -13,6 +13,7 @@
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
 #include "engine/shader/basicshader.hpp"
+#include "engine/shader/screenspaceshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -133,6 +134,7 @@ void MainScene::init() {
     // load shaders we plan on using
     basicShader.init();
     textureShader.init();
+    // screenShader.init();
 
     Scene::init();
 }

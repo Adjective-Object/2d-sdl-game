@@ -2,11 +2,9 @@
 #define __GAME_BASICSHADER
 
 #include "engine/gl.h"
+#include "primitiveshader.hpp"
 
-class BasicShader {
-    const char* vec;
-    const char* frag;
-
+class BasicShader : public PrimitiveShader {
    public:
     GLuint programId;
 
