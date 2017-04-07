@@ -18,6 +18,7 @@ class Text : public Entity {
     SDL_Rect rect;
     SDL_Renderer* ren;
     ScreenRenderer* renderer;
+    ScreenSpaceQuad* model;
     const char* text;
 
     Text(SDL_Renderer* r,

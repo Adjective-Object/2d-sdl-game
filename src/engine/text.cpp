@@ -9,12 +9,15 @@ Text::Text(SDL_Renderer* ren,
            TTF_Font* font,
            SDL_Color color,
            const char* text)
-    : ren(ren), color(color), position(position), font(font), text(text) {}
+    : position(position), font(font), color(color), ren(ren), text(text) {}
 
 Text::~Text() {
     // SDL_DestorySurface(surface);
     // SDL_DestoryTexture(texture);
 }
+
+#define INITIAL_TEXTURE_WIDTH 400
+#define INITIAL_TEXTURE_HEIGHT 50
 
 void Text::updateText(const char* newText) {
     SDL_Surface* surface = TTF_RenderText_Solid(font, newText, color);
@@ -26,6 +29,7 @@ void Text::updateText(const char* newText) {
         texture = SDL_CreateTextureFromSurface(ren, surface);
     } else {
         SDL_Rect updateRect = {.x = 0, .y = 0, .w = rect.w, .h = rect.h};
+
         uint8_t* pixels;
         int pitch;
 
@@ -51,15 +55,22 @@ void Text::updateText(const char* newText) {
         }
         SDL_UnlockTexture(texture);
     }
-    renderer->updateMesh(rect);
+    model->updateMesh(rect, INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);
     text = newText;
     SDL_FreeSurface(surface);
 }
 
 void Text::init() {
     texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA32,
-                                SDL_TEXTUREACCESS_STREAMING, 400, 100);
-    renderer = new ScreenRenderer(texture, rect);
+                                SDL_TEXTUREACCESS_STREAMING,
+                                INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);
+
+    rect = {
+        .x = 0, .y = 0, .w = INITIAL_TEXTURE_WIDTH, .h = INITIAL_TEXTURE_HEIGHT,
+    };
+    model = new ScreenSpaceQuad();
+    model->init(rect, INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);
+    renderer = new ScreenRenderer(texture, model);
     this->updateText(text);
 }
 

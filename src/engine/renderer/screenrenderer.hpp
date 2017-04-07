@@ -9,19 +9,14 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <engine/mesh/screenspacequad.hpp>
 
 class ScreenRenderer : public AbstractRenderer {
     Material material;
-    WorldspaceMesh mesh;
-    SDL_Texture* texture;
-    SDL_Rect screenBoundsPixels;
-    GLfloat *verts, *uvs;
-
-    void makeBoundsMesh(SDL_Rect& bounds);
+    ScreenSpaceQuad* mesh;
 
    public:
-    void updateMesh(SDL_Rect& bounds);
-    ScreenRenderer(SDL_Texture* texture, SDL_Rect bounds);
+    ScreenRenderer(SDL_Texture* texture, ScreenSpaceQuad* bounds);
     void render(glm::mat4& baseTransform) override;
 };
 
