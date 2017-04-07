@@ -11,7 +11,7 @@
 
 using namespace glm;
 
-MeshRenderer::MeshRenderer(BasicShader* shader,
+MeshRenderer::MeshRenderer(MeshShader* shader,
                            StaticMesh* mesh,
                            Material* material)
     : mesh(mesh), shader(shader), material(material) {}

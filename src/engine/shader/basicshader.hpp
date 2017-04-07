@@ -4,7 +4,7 @@
 #include "engine/gl.h"
 #include "primitiveshader.hpp"
 
-class BasicShader : public PrimitiveShader {
+class MeshShader : public PrimitiveShader {
    public:
     struct {
         GLint baseTransform;
@@ -17,11 +17,11 @@ class BasicShader : public PrimitiveShader {
         GLint uvs;
     } attributes;
 
-    BasicShader(const char* vec, const char* frag);
+    MeshShader(const char* vec, const char* frag);
     void init();
 };
 
-extern BasicShader basicShader;
-extern BasicShader textureShader;
+extern MeshShader basicShader;
+extern MeshShader textureShader;
 
 #endif

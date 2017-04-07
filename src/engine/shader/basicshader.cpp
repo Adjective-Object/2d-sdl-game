@@ -2,9 +2,8 @@
 #include "engine/shader/basicshader.hpp"
 #include <iostream>
 
-BasicShader::BasicShader(const char* v, const char* f)
-    : PrimitiveShader(v, f) {}
-void BasicShader::init() {
+MeshShader::MeshShader(const char* v, const char* f) : PrimitiveShader(v, f) {}
+void MeshShader::init() {
     PrimitiveShader::init();
 
     attributes.position = glGetAttribLocation(programId, "position");
@@ -20,7 +19,7 @@ void BasicShader::init() {
               << std::endl;
 }
 
-BasicShader basicShader =
-    BasicShader("assets/shaders/id.vert", "assets/shaders/red.frag");
-BasicShader textureShader = BasicShader("assets/shaders/id_texture.vert",
-                                        "assets/shaders/texture.frag");
+MeshShader basicShader =
+    MeshShader("assets/shaders/id.vert", "assets/shaders/red.frag");
+MeshShader textureShader =
+    MeshShader("assets/shaders/id_texture.vert", "assets/shaders/texture.frag");
