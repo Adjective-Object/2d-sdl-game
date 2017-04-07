@@ -122,8 +122,8 @@ set(LIB_SRCS
     src/engine/shader/lib/loadshaders.cpp
     src/engine/shader/primitiveshader.cpp
     src/engine/shader/primitiveshader.hpp
-    src/engine/shader/basicshader.cpp
-    src/engine/shader/basicshader.hpp
+        src/engine/shader/meshshader.cpp
+        src/engine/shader/meshshader.hpp
     src/engine/shader/screenspaceshader.cpp
     src/engine/shader/screenspaceshader.hpp
     )

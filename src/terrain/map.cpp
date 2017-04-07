@@ -9,7 +9,7 @@
 #include "terrain/platform_point_iterator.hpp"
 #include "terrain/platform_segment_iterator.hpp"
 #include "engine/mesh/cube.hpp"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

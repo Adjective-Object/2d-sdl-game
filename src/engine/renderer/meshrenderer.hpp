@@ -3,7 +3,7 @@
 #include "abstractrenderer.hpp"
 #include "engine/mesh/staticmesh.hpp"
 #include "engine/material/material.hpp"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

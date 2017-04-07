@@ -1,5 +1,5 @@
 #include "engine/gl.h"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 #include <iostream>
 
 MeshShader::MeshShader(const char* v, const char* f) : PrimitiveShader(v, f) {}

@@ -1,4 +1,4 @@
-#include "basicshader.hpp"
+#include "meshshader.hpp"
 #include "primitiveshader.hpp"
 #include "./lib/loadshaders.hpp"
 

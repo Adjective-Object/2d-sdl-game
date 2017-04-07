@@ -12,7 +12,7 @@
 #include "player/player.hpp"
 #include "terrain/map.hpp"
 #include "./mainscene.hpp"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 #include "engine/shader/screenspaceshader.hpp"
 
 #define GLM_FORCE_RADIANS

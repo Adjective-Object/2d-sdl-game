@@ -2,7 +2,7 @@
 #include <vector>
 #include "engine/renderer/multimeshrenderer.hpp"
 #include "engine/renderer/meshrenderer.hpp"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 #include "model.hpp"
 
 Model::Model(std::vector<MaterialMesh> meshes) : meshes(meshes) {}

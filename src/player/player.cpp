@@ -9,7 +9,7 @@
 #include "inputhandler.hpp"
 #include "engine/mesh/cube.hpp"
 #include "engine/model/modelloader.hpp"
-#include "engine/shader/basicshader.hpp"
+#include "engine/shader/meshshader.hpp"
 #include "player.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
