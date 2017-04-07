@@ -19,7 +19,9 @@ void MeshShader::init() {
               << std::endl;
 }
 
-MeshShader basicShader =
+MeshShader vertexColorShader =
     MeshShader("assets/shaders/id.vert", "assets/shaders/red.frag");
 MeshShader textureShader =
     MeshShader("assets/shaders/id_texture.vert", "assets/shaders/texture.frag");
+MeshShader fallbackShader = MeshShader("assets/shaders/id_texture.vert",
+                                       "assets/shaders/fallback.frag");

@@ -86,7 +86,7 @@ void Map::makeMapMesh() {
     m->init(&(*meshPoints)[0], &(*meshColors)[0], NULL,
             (meshPoints->size()) / 3);
 
-    renderer = new MeshRenderer(&basicShader, m);
+    renderer = new MeshRenderer(&vertexColorShader, m);
 }
 
 Map::Map(std::vector<Platform> platforms, std::vector<Ledge> ledges)

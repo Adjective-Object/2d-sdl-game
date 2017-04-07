@@ -33,12 +33,12 @@ Player::~Player() {}
 
 void Player::init() {
     mesh.init(currentCollision->postCollision);
-    ecbMeshRenderer = new MeshRenderer(&basicShader, &mesh);
+    ecbMeshRenderer = new MeshRenderer(&vertexColorShader, &mesh);
 
     ModelLoader loader(EnG->getRenderer());
     Model* loadedModel = NULL;
-    if (loader.load("assets/Crate/Crate1.obj")) {
-        loadedModel = loader.queryScene("Player");
+    if (loader.load("assets/Chicken/chickenV2.dae")) {
+        loadedModel = loader.queryScene("Cylinder.001");
     }
 
     if (loadedModel) {
@@ -49,8 +49,8 @@ void Player::init() {
         std::cout << "failed loading mesh. using fallback cube" << std::endl;
         WorldspaceMesh* cube = new WorldspaceMesh();
         *cube = makeCube();
-        modelMeshRenderer = new MultiMeshRenderer(
-            std::vector<MeshRenderer*>({new MeshRenderer(&basicShader, cube)}));
+        modelMeshRenderer = new MultiMeshRenderer(std::vector<MeshRenderer*>(
+            {new MeshRenderer(&vertexColorShader, cube)}));
     }
 
     multiRenderer =
@@ -72,6 +72,10 @@ void Player::updateMesh() {
     modelTransform = glm::mat4();
     modelTransform =
         glm::translate(modelTransform, glm::vec3(position.x, position.y, 0));
+    modelTransform =
+        glm::rotate(modelTransform, (float)face * glm::half_pi<float>(),
+                    glm::vec3(0, 1, 0));
+    modelTransform = glm::scale(modelTransform, glm::vec3(0.1, -0.1, 0.1));
     modelMeshRenderer->setModelTransform(modelTransform);
 }
 

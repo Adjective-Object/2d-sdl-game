@@ -29,9 +29,9 @@ bool ModelLoader::load(const char* fpath) {
     return scene != NULL;
 }
 
-Model* makeModel(SDL_Renderer* renderCtx,
-                 const aiScene* scene,
-                 const aiMesh* mesh) {
+MaterialMesh makeModel(SDL_Renderer* renderCtx,
+                       const aiScene* scene,
+                       const aiMesh* mesh) {
     GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
     GLfloat* colors = NULL;
     GLfloat* uvs = NULL;
@@ -66,7 +66,6 @@ Model* makeModel(SDL_Renderer* renderCtx,
 
             if (uvs) {
                 aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
-                std::cout << uv.x << ", " << uv.y << std::endl;
                 uvs[tri * 2] = uv.x;
                 uvs[tri * 2 + 1] = uv.y;
             }
@@ -95,8 +94,7 @@ Model* makeModel(SDL_Renderer* renderCtx,
         }
     }
 
-    return new Model(
-        std::vector<MaterialMesh>({{.material = material, .mesh = outMesh}}));
+    return {.material = material, .mesh = outMesh};
 }
 
 Model* ModelLoader::queryScene(const char* scenePath) {
@@ -105,11 +103,12 @@ Model* ModelLoader::queryScene(const char* scenePath) {
         return NULL;
     }
 
+    std::vector<MaterialMesh> meshes;
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
         std::cout << "querying mesh" << i << " of " << scene->mNumMeshes
                   << std::endl;
         const aiMesh* mesh = scene->mMeshes[i];
-        std::cout << "query" << mesh->mName.C_Str() << "? " << scenePath
+        std::cout << "query " << mesh->mName.C_Str() << "? " << scenePath
                   << std::endl;
         if (0 == strcmp(mesh->mName.C_Str(), scenePath)) {
             std::cout << "loading a mesh with " << mesh->mNumVertices
@@ -117,9 +116,14 @@ Model* ModelLoader::queryScene(const char* scenePath) {
                       << ", " << mesh->mNumFaces << " faces" << std::endl;
 
             if (mesh->mNumFaces != 0) {
-                return makeModel(renderCtx, scene, mesh);
+                meshes.push_back(makeModel(renderCtx, scene, mesh));
             }
         }
     }
-    return NULL;
+
+    if (meshes.size() == 0) {
+        return NULL;
+    }
+
+    return new Model(meshes);
 }

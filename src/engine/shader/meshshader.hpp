@@ -21,7 +21,8 @@ class MeshShader : public PrimitiveShader {
     void init();
 };
 
-extern MeshShader basicShader;
+extern MeshShader vertexColorShader;
 extern MeshShader textureShader;
+extern MeshShader fallbackShader;
 
 #endif

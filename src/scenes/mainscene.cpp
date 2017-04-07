@@ -132,9 +132,10 @@ void MainScene::init() {
     cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
 
     // load shaders we plan on using
-    basicShader.init();
+    vertexColorShader.init();
     textureShader.init();
     screenShader.init();
+    fallbackShader.init();
 
     Scene::init();
 }
