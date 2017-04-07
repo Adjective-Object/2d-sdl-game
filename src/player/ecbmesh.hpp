@@ -1,11 +1,11 @@
 #ifndef __GAME_MESH_ECB
 #define __GAME_MESH_ECB
 
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 #include "player/ecb.hpp"
 #include "engine/gl.h"
 
-class EcbMesh : public StaticMesh {
+class EcbMesh : public WorldspaceMesh {
     GLfloat vectorBuffer[36];
     GLfloat colorBuffer[36];
 

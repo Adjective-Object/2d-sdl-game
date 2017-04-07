@@ -82,7 +82,7 @@ void Map::makeMapMesh() {
 
     std::cout << meshPoints->size();
 
-    StaticMesh* m = new StaticMesh();
+    WorldspaceMesh* m = new WorldspaceMesh();
     m->init(&(*meshPoints)[0], &(*meshColors)[0], NULL,
             (meshPoints->size()) / 3);
 

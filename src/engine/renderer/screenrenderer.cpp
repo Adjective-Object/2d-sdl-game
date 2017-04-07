@@ -3,7 +3,7 @@
 #include "abstractrenderer.hpp"
 #include "screenrenderer.hpp"
 #include "engine/shader/screenspaceshader.hpp"
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 #include "engine/game.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1

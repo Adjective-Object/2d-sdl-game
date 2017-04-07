@@ -1,5 +1,5 @@
 #include "engine/gl.h"
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -38,8 +38,8 @@ static const GLfloat g_color_buffer_data[] = {
     0.517f, 0.713f, 0.338f, 0.053f, 0.959f, 0.120f, 0.393f, 0.621f, 0.362f,
     0.673f, 0.211f, 0.457f, 0.820f, 0.883f, 0.371f, 0.982f, 0.099f, 0.879f};
 
-StaticMesh makeCube() {
-    StaticMesh mesh;
+WorldspaceMesh makeCube() {
+    WorldspaceMesh mesh;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
     glGenBuffers(1, &mesh.vertexbuffer);
     // The following commands will talk about our 'vertexbuffer' buffer

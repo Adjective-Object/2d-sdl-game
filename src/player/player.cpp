@@ -47,7 +47,7 @@ void Player::init() {
         std::cout << "generatedi " << modelMeshRenderer << std::endl;
     } else {
         std::cout << "failed loading mesh. using fallback cube" << std::endl;
-        StaticMesh* cube = new StaticMesh();
+        WorldspaceMesh* cube = new WorldspaceMesh();
         *cube = makeCube();
         modelMeshRenderer = new MultiMeshRenderer(
             std::vector<MeshRenderer*>({new MeshRenderer(&basicShader, cube)}));

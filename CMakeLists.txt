@@ -112,8 +112,8 @@ set(LIB_SRCS
     src/engine/gl.h
     src/engine/mesh/cube.cpp
     src/engine/mesh/cube.hpp
-    src/engine/mesh/staticmesh.hpp
-    src/engine/mesh/staticmesh.cpp
+        src/engine/mesh/worldspacemesh.hpp
+        src/engine/mesh/worldspacemesh.cpp
     src/engine/model/modelloader.cpp
     src/engine/model/modelloader.hpp
     src/engine/model/model.cpp

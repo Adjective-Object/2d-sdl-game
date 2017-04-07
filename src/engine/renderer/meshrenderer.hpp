@@ -1,7 +1,7 @@
 #ifndef __ENGINE_MESH_RENDERER
 #define __ENGINE_MESH_RENDERER
 #include "abstractrenderer.hpp"
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 #include "engine/material/material.hpp"
 #include "engine/shader/meshshader.hpp"
 
@@ -14,14 +14,14 @@
 #include <GL/gl.h>
 
 class MeshRenderer : public AbstractRenderer {
-    StaticMesh* mesh;
+    WorldspaceMesh* mesh;
     MeshShader* shader;
     Material* material;
     glm::mat4 modelTransform;
 
    public:
     MeshRenderer(MeshShader* shader,
-                 StaticMesh* mesh,
+                 WorldspaceMesh* mesh,
                  Material* material = NULL);
     virtual void render(glm::mat4& baseTransform) override;
     void setModelTransform(glm::mat4 newModelTransform);

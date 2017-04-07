@@ -10,7 +10,7 @@
 #include <scene.h>
 #include <postprocess.h>
 // locals
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 #include "engine/material/material.hpp"
 #include "modelloader.hpp"
 
@@ -75,7 +75,7 @@ Model* makeModel(SDL_Renderer* renderCtx,
         }
     }
 
-    StaticMesh* outMesh = new StaticMesh();
+    WorldspaceMesh* outMesh = new WorldspaceMesh();
     outMesh->init(verts, colors, uvs, tri);
 
     // construct a material from the corresponding aiMaterial

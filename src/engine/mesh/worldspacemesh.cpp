@@ -1,11 +1,11 @@
-#include "staticmesh.hpp"
+#include "worldspacemesh.hpp"
 #include "engine/gl.h"
 #include <iostream>
 
-void StaticMesh::init(const GLfloat* verts,
-                      const GLfloat* colors,
-                      const GLfloat* uvs,
-                      size_t num_points) {
+void WorldspaceMesh::init(const GLfloat* verts,
+                          const GLfloat* colors,
+                          const GLfloat* uvs,
+                          size_t num_points) {
     this->num_points = num_points;
 
     if (verts) {
@@ -23,9 +23,9 @@ void StaticMesh::init(const GLfloat* verts,
     updateMesh(verts, colors, uvs);
 }
 
-void StaticMesh::updateMesh(const GLfloat* verts,
-                            const GLfloat* colors,
-                            const GLfloat* uvs) {
+void WorldspaceMesh::updateMesh(const GLfloat* verts,
+                                const GLfloat* colors,
+                                const GLfloat* uvs) {
     if (verts) {
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
@@ -45,10 +45,10 @@ void StaticMesh::updateMesh(const GLfloat* verts,
     }
 }
 
-bool StaticMesh::hasUvs() {
+bool WorldspaceMesh::hasUvs() {
     return uvBuffer != -1;
 }
 
-bool StaticMesh::hasVertexColors() {
+bool WorldspaceMesh::hasVertexColors() {
     return colorbuffer != -1;
 }

@@ -24,7 +24,7 @@ class Player : public Sprite {
     MultiMeshRenderer* modelMeshRenderer;
     AbstractMultiRenderer* multiRenderer;
     EcbMesh mesh;
-    StaticMesh modelMesh;
+    WorldspaceMesh modelMesh;
 
     void updateMesh();
 

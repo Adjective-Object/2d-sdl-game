@@ -3,7 +3,7 @@
 #include <iostream>
 #include "engine/gl.h"
 #include "engine/game.hpp"
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -12,7 +12,7 @@
 using namespace glm;
 
 MeshRenderer::MeshRenderer(MeshShader* shader,
-                           StaticMesh* mesh,
+                           WorldspaceMesh* mesh,
                            Material* material)
     : mesh(mesh), shader(shader), material(material) {}
 

@@ -5,7 +5,7 @@
 #define GL3_PROTOTYPES 1
 #include <GL/gl.h>
 
-class StaticMesh {
+class WorldspaceMesh {
    public:
     void init(const GLfloat* verts,
               const GLfloat* colors,

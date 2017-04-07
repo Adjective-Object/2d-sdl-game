@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include "abstractrenderer.hpp"
 #include "engine/material/material.hpp"
-#include "engine/mesh/staticmesh.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -12,7 +12,7 @@
 
 class ScreenRenderer : public AbstractRenderer {
     Material material;
-    StaticMesh mesh;
+    WorldspaceMesh mesh;
     SDL_Texture* texture;
     SDL_Rect screenBoundsPixels;
     GLfloat *verts, *uvs;

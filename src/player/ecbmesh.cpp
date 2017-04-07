@@ -44,7 +44,7 @@ void EcbMesh::init(Ecb& e) {
     updateMeshToEcb(e, vectorBuffer);
     fillMeshColors(glm::vec3(212 / 255.0f, 112 / 255.0f, 95 / 255.0f),
                    colorBuffer);
-    StaticMesh::init(vectorBuffer, colorBuffer, NULL, 12);
+    WorldspaceMesh::init(vectorBuffer, colorBuffer, NULL, 12);
 }
 
 void EcbMesh::update(Ecb& e) {
