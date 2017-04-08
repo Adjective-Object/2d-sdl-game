@@ -7,6 +7,12 @@ set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+    message("debug mode build")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+endif (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+
+
 
 #########################
 # external dependencies #
@@ -112,8 +118,8 @@ set(LIB_SRCS
     src/engine/gl.h
     src/engine/mesh/cube.cpp
     src/engine/mesh/cube.hpp
-        src/engine/mesh/worldspacemesh.hpp
-        src/engine/mesh/worldspacemesh.cpp
+    src/engine/mesh/worldspacemesh.hpp
+    src/engine/mesh/worldspacemesh.cpp
     src/engine/model/modelloader.cpp
     src/engine/model/modelloader.hpp
     src/engine/model/model.cpp
@@ -122,11 +128,15 @@ set(LIB_SRCS
     src/engine/shader/lib/loadshaders.cpp
     src/engine/shader/primitiveshader.cpp
     src/engine/shader/primitiveshader.hpp
-        src/engine/shader/meshshader.cpp
-        src/engine/shader/meshshader.hpp
+    src/engine/shader/meshshader.cpp
+    src/engine/shader/meshshader.hpp
     src/engine/shader/screenspaceshader.cpp
     src/engine/shader/screenspaceshader.hpp
-        src/engine/mesh/screenspacequad.cpp src/engine/mesh/screenspacequad.hpp src/engine/meshanim/meshanim.cpp)
+    src/engine/mesh/screenspacequad.cpp
+    src/engine/mesh/screenspacequad.hpp
+    src/engine/meshanim/meshanim.cpp
+    src/engine/model/boneweightset.hpp
+    src/engine/model/boneweightset.cpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}
@@ -138,6 +148,7 @@ set(TEST_SRCS
     tests/ecb.cpp
     tests/map.cpp
     tests/util.cpp
+    tests/modelloader.cpp
     tests/lib/mock-player.cpp
     tests/lib/mock-player.hpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})

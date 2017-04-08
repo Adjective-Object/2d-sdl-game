@@ -17,6 +17,7 @@
 #include "engine/material/material.hpp"
 #include "modelloader.hpp"
 #include "engine/meshanim/meshanim.hpp"
+#include "boneweightset.hpp"
 
 using namespace std;
 using namespace Assimp;
@@ -37,57 +38,6 @@ LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
     : loadedMesh(m), sourceMesh(a) {}
 
 #define MAX_BONES_PER_VERT 16
-bool ModelLoader::loadMeshBoneWeights(aiMesh* mesh,
-                                      uint8_t*& vertBoneCounts,
-                                      uint16_t*& vertBoneIndecies,
-                                      GLfloat*& vertBoneWeights, ) {
-    int numBones = -1;
-    if (mesh->HasBones()) {
-        numBones = mesh->mNumBones;
-        size_t numWeights = mesh->mNumVertices * MAX_BONES_PER_VERT;
-
-        // prepare bone count matrix
-        vertBoneCounts = new uint8_t[mesh->mNumVertices];
-        memset(vertBoneCounts, 0, sizeof(uint8_t) * mesh->mNumVertices);
-
-        // prepare bone index matrix
-        vertBoneIndecies = new uint16_t[numWeights];
-        memset(vertBoneIndecies, -1, numWeights);
-
-        // prepare bone weight matrix
-        vertBoneWeights = new GLfloat[numWeights];
-        memset(vertBoneWeights, 0, numWeights * sizeof(GLfloat));
-
-        uint16_t numBones = mesh->mNumBones;
-        if (mesh->mNumBones > 0xFFFF) {
-            std::cout << "error: mesh has more than 0xFFFF bones" << std::endl;
-            numBones = 0xFFFF;
-        }
-
-        for (uint16_t boneIndex = 0; boneIndex < numBones; boneIndex++) {
-            aiBone* bone = mesh->mBones[boneIndex];
-            for (size_t weightIndex = 0; weightIndex < bone->mNumWeights;
-                 weightIndex++) {
-                aiVertexWeight weight = bone->mWeights[weightIndex];
-                size_t currBones = vertBoneCounts[weight.mVertexId];
-                if (currBones == MAX_BONES_PER_VERT) {
-                    std::cout << "error: vertex " << weight.mVertexId
-                              << "has more than " << MAX_BONES_PER_VERT
-                              << " bone weights. "
-                              << "Discarding additional bone weights "
-                              << "(bone " << boneIndex << ")" << std::endl;
-                    continue;
-                }
-
-                vertBoneIndecies[currBones] = boneIndex;
-                vertBoneCounts[weight.mVertexId]++;
-                vertBoneWeights[boneIndex * MAX_BONES_PER_VERT + currBones] =
-                    weight.mWeight;
-            }
-        }
-    }
-}
-
 LoadedMesh* makeModel(SDL_Renderer* renderCtx,
                       const aiScene* scene,
                       const aiMesh* mesh) {
@@ -134,18 +84,17 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
     }
 
     // build an array of bone weights if the model has bones
-    uint8_t* vertBoneCounts = NULL;
-    uint16_t* vertBoneIndecies = NULL;
-    GLfloat* vertBoneWeights = NULL;
-    ModelLoader::loadMeshBoneWeights(mesh, vertBoneCounts, vertBoneIndecies,
-                                     vertBoneWeights);
+    BoneWeightSet boneWeights;
+    boneWeights.loadMeshBoneWeights(mesh, MAX_BONES_PER_VERT);
 
     // assemble the final mesh
     WorldspaceMesh* outMesh = new WorldspaceMesh();
     outMesh->init(verts, colors, uvs, tri);
-    if (vertBoneWeights) {
-        outMesh->initSkeleton(vertBoneCounts, vertBoneIndecies, vertBoneWeights,
-                              MAX_BONES_PER_VERT, numBones);
+    if (boneWeights.isInitialized()) {
+        outMesh->initSkeleton(
+            boneWeights.getBoneCounts(), boneWeights.getBoneIndecies(),
+            boneWeights.getBoneWeights(), boneWeights.max_bones_per_vert,
+            boneWeights.numBones);
     }
 
     // construct a material from the corresponding aiMaterial
