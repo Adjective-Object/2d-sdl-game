@@ -3,8 +3,14 @@
 
 // assimp
 #include <scene.h>
+#include <mesh.h>
 #include <Importer.hpp>
 #include "model.hpp"
+
+typedef struct {
+    ModelMesh loadedMesh;
+    const aiMesh* sourceMesh;
+} LoadedMesh;
 
 class ModelLoader {
     const aiScene* scene = NULL;

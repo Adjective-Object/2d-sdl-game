@@ -126,7 +126,7 @@ set(LIB_SRCS
         src/engine/shader/meshshader.hpp
     src/engine/shader/screenspaceshader.cpp
     src/engine/shader/screenspaceshader.hpp
-        src/engine/mesh/screenspacequad.cpp src/engine/mesh/screenspacequad.hpp)
+        src/engine/mesh/screenspacequad.cpp src/engine/mesh/screenspacequad.hpp src/engine/meshanim/meshanim.cpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}

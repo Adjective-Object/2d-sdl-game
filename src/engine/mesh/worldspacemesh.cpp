@@ -23,6 +23,13 @@ void WorldspaceMesh::init(const GLfloat* verts,
     updateMesh(verts, colors, uvs);
 }
 
+void WorldspaceMesh::initSkeleton(const GLfloat* boneWeights,
+                                  size_t num_bones) {
+    glGenBuffers(1, &boneWeightBuffer);
+    this->num_bones = num_bones;
+    updateSkeleton(boneWeights, num_bones);
+}
+
 void WorldspaceMesh::updateMesh(const GLfloat* verts,
                                 const GLfloat* colors,
                                 const GLfloat* uvs) {
@@ -43,6 +50,12 @@ void WorldspaceMesh::updateMesh(const GLfloat* verts,
         glBufferData(GL_ARRAY_BUFFER, num_points * 2 * sizeof(GLfloat), uvs,
                      GL_STATIC_DRAW);
     }
+}
+
+void WorldspaceMesh::updateSkeleton(const GLfloat* verts, size_t num_bones) {
+    glBindBuffer(GL_ARRAY_BUFFER, boneWeightBuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * num_bones * sizeof(GLfloat),
+                 verts, GL_STATIC_DRAW);
 }
 
 bool WorldspaceMesh::hasUvs() {
