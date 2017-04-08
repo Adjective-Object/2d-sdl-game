@@ -2,7 +2,7 @@
 
 set -e
 
-rm -rf nix_libs
+sudo rm -rf nix_libs
 mkdir -p ./nix_libs
 rsync -aszvi /usr/lib/x86_64-linux-gnu/mesa/libGL.* ./nix_libs/
 # rsync -aszvi /usr/lib/x86_64-linux-gnu/mesa/* ./nix_libs

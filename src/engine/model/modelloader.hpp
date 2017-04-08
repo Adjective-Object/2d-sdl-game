@@ -7,10 +7,12 @@
 #include <Importer.hpp>
 #include "model.hpp"
 
-typedef struct {
+class LoadedMesh {
+   public:
+    LoadedMesh(ModelMesh, const aiMesh*);
     ModelMesh loadedMesh;
     const aiMesh* sourceMesh;
-} LoadedMesh;
+};
 
 class ModelLoader {
     const aiScene* scene = NULL;

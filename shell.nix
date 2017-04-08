@@ -27,6 +27,7 @@ in with pkgs; let
     clang-tools
     gmock
     zsh
+    patchelf
   ];
 
 in stdenv.mkDerivation {

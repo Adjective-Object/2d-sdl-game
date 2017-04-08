@@ -23,11 +23,16 @@ void WorldspaceMesh::init(const GLfloat* verts,
     updateMesh(verts, colors, uvs);
 }
 
-void WorldspaceMesh::initSkeleton(const GLfloat* boneWeights,
+void WorldspaceMesh::initSkeleton(const uint8_t* vertBoneCounts,
+                                  const uint16_t* vertBoneIndecies,
+                                  const GLfloat* boneWeights,
+                                  size_t num_weights_per_point,
                                   size_t num_bones) {
     glGenBuffers(1, &boneWeightBuffer);
-    this->num_bones = num_bones;
-    updateSkeleton(boneWeights, num_bones);
+    glGenBuffers(1, &boneIndexBuffer);
+    glGenBuffers(1, &boneCountBuffer);
+    updateSkeleton(vertBoneCounts, vertBoneIndecies, boneWeights,
+                   num_weights_per_point, num_bones);
 }
 
 void WorldspaceMesh::updateMesh(const GLfloat* verts,
@@ -52,16 +57,37 @@ void WorldspaceMesh::updateMesh(const GLfloat* verts,
     }
 }
 
-void WorldspaceMesh::updateSkeleton(const GLfloat* verts, size_t num_bones) {
+void WorldspaceMesh::updateSkeleton(const uint8_t* vertBoneCounts,
+                                    const uint16_t* vertBoneIndecies,
+                                    const GLfloat* vertBoneWeights,
+                                    size_t num_weights_per_point,
+                                    size_t num_bones) {
+    this->num_bones = num_bones;
+    this->num_weights_per_point = num_weights_per_point;
+
+    glBindBuffer(GL_ARRAY_BUFFER, boneCountBuffer);
+    glBufferData(GL_ARRAY_BUFFER, num_points * sizeof(uint8_t), vertBoneCounts,
+                 GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, boneIndexBuffer);
+    glBufferData(GL_ARRAY_BUFFER,
+                 num_weights_per_point * num_points * sizeof(uint16_t),
+                 vertBoneIndecies, GL_STATIC_DRAW);
+
     glBindBuffer(GL_ARRAY_BUFFER, boneWeightBuffer);
-    glBufferData(GL_ARRAY_BUFFER, num_points * num_bones * sizeof(GLfloat),
-                 verts, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 num_weights_per_point * num_points * sizeof(GLfloat),
+                 vertBoneWeights, GL_STATIC_DRAW);
 }
 
-bool WorldspaceMesh::hasUvs() {
+bool WorldspaceMesh::hasUvs() const {
     return uvBuffer != -1;
 }
 
-bool WorldspaceMesh::hasVertexColors() {
+bool WorldspaceMesh::hasVertexColors() const {
     return colorbuffer != -1;
+}
+
+bool WorldspaceMesh::hasSkeleton() const {
+    return boneWeightBuffer != -1;
 }

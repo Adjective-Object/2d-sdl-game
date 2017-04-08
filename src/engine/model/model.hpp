@@ -9,11 +9,12 @@
 #include <vector>
 #include "engine/meshanim/meshanim.hpp"
 
-typedef struct {
+class ModelMesh {
+   public:
     Material* material;
     WorldspaceMesh* mesh;
     std::map<std::string, MeshAnim*> animations;
-} ModelMesh;
+};
 
 class Model {
     std::vector<ModelMesh> meshes;

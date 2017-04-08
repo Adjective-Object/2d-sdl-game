@@ -33,6 +33,10 @@ bool ModelLoader::load(const char* fpath) {
     return scene != NULL;
 }
 
+LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
+    : loadedMesh(m), sourceMesh(a) {}
+
+#define MAX_BONES_PER_VERT 16
 LoadedMesh* makeModel(SDL_Renderer* renderCtx,
                       const aiScene* scene,
                       const aiMesh* mesh) {
@@ -79,20 +83,51 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
     }
 
     // build an array of bone names if the model has bones
-    GLfloat* boneWeights = NULL;
+    uint8_t* vertBoneCounts = NULL;
+    uint16_t* vertBoneIndecies = NULL;
+    GLfloat* vertBoneWeights = NULL;
     int numBones = -1;
     if (mesh->HasBones()) {
         numBones = mesh->mNumBones;
-        size_t numWeights = numBones * mesh->mNumVertices;
-        boneWeights = new GLfloat[numWeights];
-        memset(boneWeights, 0, numWeights);
-        for (size_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
+        size_t numWeights = mesh->mNumVertices * MAX_BONES_PER_VERT;
+
+        // prepare bone count matrix
+        vertBoneCounts = new uint8_t[mesh->mNumVertices];
+        memset(vertBoneCounts, 0, sizeof(uint8_t) * mesh->mNumVertices);
+
+        // prepare bone index matrix
+        vertBoneIndecies = new uint16_t[numWeights];
+        memset(vertBoneIndecies, -1, numWeights);
+
+        // prepare bone weight matrix
+        vertBoneWeights = new GLfloat[numWeights];
+        memset(vertBoneWeights, 0, numWeights * sizeof(GLfloat));
+
+        uint16_t numBones = mesh->mNumBones;
+        if (mesh->mNumBones > 0xFFFF) {
+            std::cout << "error: mesh has more than 0xFFFF bones" << std::endl;
+            numBones = 0xFFFF;
+        }
+
+        for (uint16_t boneIndex = 0; boneIndex < numBones; boneIndex++) {
             aiBone* bone = mesh->mBones[boneIndex];
-            GLfloat* baseOffset = boneWeights + (numBones * mesh->mNumVertices);
             for (size_t weightIndex = 0; weightIndex < bone->mNumWeights;
                  weightIndex++) {
                 aiVertexWeight weight = bone->mWeights[weightIndex];
-                baseOffset[weight.mVertexId] = weight.mWeight;
+                size_t currBones = vertBoneCounts[weight.mVertexId];
+                if (currBones == MAX_BONES_PER_VERT) {
+                    std::cout << "error: vertex " << weight.mVertexId
+                              << "has more than " << MAX_BONES_PER_VERT
+                              << " bone weights. "
+                              << "Discarding additional bone weights "
+                              << "(bone " << boneIndex << ")" << std::endl;
+                    continue;
+                }
+
+                vertBoneIndecies[currBones] = boneIndex;
+                vertBoneCounts[weight.mVertexId]++;
+                vertBoneWeights[boneIndex * MAX_BONES_PER_VERT + currBones] =
+                    weight.mWeight;
             }
         }
     }
@@ -100,8 +135,9 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
     // assemble the final mesh
     WorldspaceMesh* outMesh = new WorldspaceMesh();
     outMesh->init(verts, colors, uvs, tri);
-    if (boneWeights) {
-        outMesh->initSkeleton(boneWeights, numBones);
+    if (vertBoneWeights) {
+        outMesh->initSkeleton(vertBoneCounts, vertBoneIndecies, vertBoneWeights,
+                              MAX_BONES_PER_VERT, numBones);
     }
 
     // construct a material from the corresponding aiMaterial
@@ -121,16 +157,33 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
         }
     }
 
-    LoadedMesh* m = (LoadedMesh*)malloc(sizeof(LoadedMesh));
-    *m = {
-        .loadedMesh = {.material = material, .mesh = outMesh},
-        .sourceMesh = mesh,
-    };
+    LoadedMesh* m = new LoadedMesh(
+        ModelMesh{
+            .material = material,
+            .mesh = outMesh,
+            .animations = std::map<std::string, MeshAnim*>(),
+        },
+        mesh);
     return m;
 }
 
+const aiBone* getBoneFromNodeName(const aiMesh* mesh, const aiString name) {
+    for (size_t i = 0; i < mesh->mNumBones; i++) {
+        if (mesh->mBones[i]->mName == name) {
+            return mesh->mBones[i];
+        }
+    }
+    return NULL;
+}
+
+glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
+    return glm::mat4(mat.a1, mat.a2, mat.a3, mat.a4, mat.b1, mat.b2, mat.b3,
+                     mat.b4, mat.c1, mat.c2, mat.c3, mat.c4, mat.d1, mat.d2,
+                     mat.d3, mat.d4);
+}
+
 MeshAnim* makeModelAnimation(LoadedMesh* mesh, aiAnimation* animation) {
-    // get times of all keyframes
+    // get times of all keyframes in a way we can actually iterate over
     size_t numPosKeys[animation->mNumChannels];
     size_t curPosKeys[animation->mNumChannels] = {0};
     size_t numRotKeys[animation->mNumChannels];
@@ -160,13 +213,26 @@ MeshAnim* makeModelAnimation(LoadedMesh* mesh, aiAnimation* animation) {
               std::back_inserter(keyframeTimesOrdered));
     std::sort(keyframeTimesOrdered.begin(), keyframeTimesOrdered.end());
 
-    float lastTime = 0;
     std::vector<glm::mat4> frameTransforms[keyframeTimesOrdered.size()];
     for (int t = 0; t < keyframeTimesOrdered.size(); t++) {
         float keyTime = keyframeTimesOrdered[t];
         for (size_t i = 0; i < animation->mNumChannels; i++) {
             aiNodeAnim* nodeAnim = animation->mChannels[i];
             float ratio;
+
+            const aiBone* bone =
+                getBoneFromNodeName(mesh->sourceMesh, nodeAnim->mNodeName);
+            if (bone == NULL) {
+                // we ignore animation keys for bones not inside this mesh
+                continue;
+            }
+            aiMatrix4x4 baseTransformAi = bone->mOffsetMatrix;
+            glm::mat4 baseTransform = glmMat4FromAiMat4(baseTransformAi);
+            if (numRotKeys[i] == 0) {
+                // no keyframes, push the base transform matrix
+                frameTransforms[t].push_back(baseTransform);
+                continue;
+            }
 
             aiQuatKey curRotKey = nodeAnim->mRotationKeys[curRotKeys[i]];
             aiQuatKey nextRotKey =
@@ -204,14 +270,10 @@ MeshAnim* makeModelAnimation(LoadedMesh* mesh, aiAnimation* animation) {
             aiMatrix4x4::Translation(position, positionMatrix);
 
             aiMatrix4x4 transform = rotateMatrix * scaleMatrix * positionMatrix;
+            glm::mat4 animTransform = glmMat4FromAiMat4(transform);
 
-            frameTransforms[t].push_back(glm::mat4(
-                transform.a1, transform.a2, transform.a3, transform.a4,
-                transform.b1, transform.b2, transform.b3, transform.b4,
-                transform.c1, transform.c2, transform.c3, transform.c4,
-                transform.d1, transform.d2, transform.d3, transform.d4));
+            frameTransforms[t].push_back(animTransform * baseTransform);
         }
-        lastTime = keyTime;
     }
 
     std::vector<Keyframe*> frames(keyframeTimesOrdered.size());
