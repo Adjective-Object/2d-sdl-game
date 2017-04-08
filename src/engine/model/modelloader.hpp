@@ -23,6 +23,16 @@ class ModelLoader {
     ModelLoader(SDL_Renderer* renderCtx);
     bool load(const char* fpath);
     Model* queryScene(const char* scenepath);
+
+    // utility methods exposed for testing
+
+    static bool loadMeshBoneWeights(aiMesh* mesh,
+                                    uint8_t*& vertBoneCounts,
+                                    uint16_t*& vertBoneIndecies,
+                                    GLfloat*& vertBoneWeights, );
+
+    static MeshAnim* makeModelAnimation(LoadedMesh* mesh,
+                                        aiAnimation* animation);
 };
 
 #endif

@@ -37,55 +37,10 @@ LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
     : loadedMesh(m), sourceMesh(a) {}
 
 #define MAX_BONES_PER_VERT 16
-LoadedMesh* makeModel(SDL_Renderer* renderCtx,
-                      const aiScene* scene,
-                      const aiMesh* mesh) {
-    GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
-    GLfloat* colors = NULL;
-    GLfloat* uvs = NULL;
-
-    if (mesh->HasVertexColors(0)) {
-        std::cout << "mesh has vertex colors" << std::endl;
-        colors = new GLfloat[mesh->mNumFaces * 9];
-    }
-
-    if (mesh->HasTextureCoords(0)) {
-        std::cout << "mesh has uvs" << std::endl;
-        uvs = new GLfloat[mesh->mNumFaces * 6];
-    }
-
-    size_t tri = 0;
-    for (size_t f = 0; f < mesh->mNumFaces; f++) {
-        aiFace face = mesh->mFaces[f];
-        for (size_t ind = 0; ind < face.mNumIndices; ind++) {
-            size_t vertexIndex = face.mIndices[ind];
-
-            aiVector3D vert = mesh->mVertices[vertexIndex];
-            verts[tri * 3] = vert.x;
-            verts[tri * 3 + 1] = vert.y;
-            verts[tri * 3 + 2] = vert.z;
-
-            if (colors) {
-                aiColor4D color = mesh->mColors[0][vertexIndex];
-                colors[tri * 3] = color.r;
-                colors[tri * 3 + 1] = color.g;
-                colors[tri * 3 + 2] = color.b;
-            }
-
-            if (uvs) {
-                aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
-                uvs[tri * 2] = uv.x;
-                uvs[tri * 2 + 1] = uv.y;
-            }
-
-            tri++;
-        }
-    }
-
-    // build an array of bone names if the model has bones
-    uint8_t* vertBoneCounts = NULL;
-    uint16_t* vertBoneIndecies = NULL;
-    GLfloat* vertBoneWeights = NULL;
+bool ModelLoader::loadMeshBoneWeights(aiMesh* mesh,
+                                      uint8_t*& vertBoneCounts,
+                                      uint16_t*& vertBoneIndecies,
+                                      GLfloat*& vertBoneWeights, ) {
     int numBones = -1;
     if (mesh->HasBones()) {
         numBones = mesh->mNumBones;
@@ -131,6 +86,59 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
             }
         }
     }
+}
+
+LoadedMesh* makeModel(SDL_Renderer* renderCtx,
+                      const aiScene* scene,
+                      const aiMesh* mesh) {
+    GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
+    GLfloat* colors = NULL;
+    GLfloat* uvs = NULL;
+
+    if (mesh->HasVertexColors(0)) {
+        std::cout << "mesh has vertex colors" << std::endl;
+        colors = new GLfloat[mesh->mNumFaces * 9];
+    }
+
+    if (mesh->HasTextureCoords(0)) {
+        std::cout << "mesh has uvs" << std::endl;
+        uvs = new GLfloat[mesh->mNumFaces * 6];
+    }
+
+    size_t tri = 0;
+    for (size_t f = 0; f < mesh->mNumFaces; f++) {
+        aiFace face = mesh->mFaces[f];
+        for (size_t ind = 0; ind < face.mNumIndices; ind++) {
+            size_t vertexIndex = face.mIndices[ind];
+
+            aiVector3D vert = mesh->mVertices[vertexIndex];
+            verts[tri * 3] = vert.x;
+            verts[tri * 3 + 1] = vert.y;
+            verts[tri * 3 + 2] = vert.z;
+
+            if (colors) {
+                aiColor4D color = mesh->mColors[0][vertexIndex];
+                colors[tri * 3] = color.r;
+                colors[tri * 3 + 1] = color.g;
+                colors[tri * 3 + 2] = color.b;
+            }
+
+            if (uvs) {
+                aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
+                uvs[tri * 2] = uv.x;
+                uvs[tri * 2 + 1] = uv.y;
+            }
+
+            tri++;
+        }
+    }
+
+    // build an array of bone weights if the model has bones
+    uint8_t* vertBoneCounts = NULL;
+    uint16_t* vertBoneIndecies = NULL;
+    GLfloat* vertBoneWeights = NULL;
+    ModelLoader::loadMeshBoneWeights(mesh, vertBoneCounts, vertBoneIndecies,
+                                     vertBoneWeights);
 
     // assemble the final mesh
     WorldspaceMesh* outMesh = new WorldspaceMesh();
@@ -182,7 +190,8 @@ glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
                      mat.d3, mat.d4);
 }
 
-MeshAnim* makeModelAnimation(LoadedMesh* mesh, aiAnimation* animation) {
+MeshAnim* ModelLoader::makeModelAnimation(LoadedMesh* mesh,
+                                          aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
     size_t numPosKeys[animation->mNumChannels];
     size_t curPosKeys[animation->mNumChannels] = {0};
