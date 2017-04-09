@@ -148,9 +148,9 @@ set(TEST_SRCS
     tests/ecb.cpp
     tests/map.cpp
     tests/util.cpp
-        tests/modelloader.cpp
+        tests/boneweightloader.cpp
     tests/lib/mock-player.cpp
-    tests/lib/mock-player.hpp)
+    tests/lib/mock-player.hpp tests/animationloader.cpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}

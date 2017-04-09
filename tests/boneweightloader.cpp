@@ -33,7 +33,7 @@ void makeMesh(aiMesh& mesh,
 // appropriately
 // note that when using assimp bones, we must always be using heaped values, as
 // the destructors for these objects free their internal buffers.
-TEST(ModelLoader, loadMeshBoneWeights_SingleBone) {
+TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
         {// vertex 1
@@ -81,7 +81,7 @@ TEST(ModelLoader, loadMeshBoneWeights_SingleBone) {
     EXPECT_EQ(boneWeights.getBoneWeightsVec(), expectedBoneWeights);
 }
 
-TEST(ModelLoader, loadMeshBoneWeights_MultiBone) {
+TEST(BoneWeightLoader, loadMeshBoneWeights_MultiBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
         {// vertex 1

@@ -17,10 +17,6 @@ class ModelLoader {
     ModelLoader(SDL_Renderer* renderCtx);
     bool load(const char* fpath);
     Model* queryScene(const char* scenepath);
-
-    // utility methods exposed for testing
-    static MeshAnim* makeModelAnimation(const aiMesh* mesh,
-                                        const aiAnimation* animation);
 };
 
 #endif
