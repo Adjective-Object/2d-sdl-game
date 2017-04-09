@@ -15,7 +15,7 @@
 // locals
 #include "engine/mesh/worldspacemesh.hpp"
 #include "engine/material/material.hpp"
-#include "modelloader.hpp"
+#include "boneweigthset.hpp"
 #include "engine/meshanim/meshanim.hpp"
 #include "boneweightset.hpp"
 

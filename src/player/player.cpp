@@ -8,7 +8,7 @@
 #include "playerconfig.hpp"
 #include "inputhandler.hpp"
 #include "engine/mesh/cube.hpp"
-#include "engine/model/modelloader.hpp"
+#include "engine/model/boneweigthset.hpp"
 #include "engine/shader/meshshader.hpp"
 #include "player.hpp"
 

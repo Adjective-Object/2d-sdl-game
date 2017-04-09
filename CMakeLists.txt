@@ -121,7 +121,7 @@ set(LIB_SRCS
     src/engine/mesh/worldspacemesh.hpp
     src/engine/mesh/worldspacemesh.cpp
     src/engine/model/modelloader.cpp
-    src/engine/model/modelloader.hpp
+        src/engine/model/boneweigthset.hpp
     src/engine/model/model.cpp
     src/engine/model/model.hpp
     src/engine/shader/lib/loadshaders.hpp
@@ -148,7 +148,7 @@ set(TEST_SRCS
     tests/ecb.cpp
     tests/map.cpp
     tests/util.cpp
-    tests/modelloader.cpp
+        tests/boneweigthset.cpp
     tests/lib/mock-player.cpp
     tests/lib/mock-player.hpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
