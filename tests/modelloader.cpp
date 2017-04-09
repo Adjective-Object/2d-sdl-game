@@ -2,10 +2,12 @@
 #include "engine/gl.h"
 // assimp includes
 #include <mesh.h>
-#include <engine/model/boneweightset.hpp>
+#include <engine/model/loader/boneweightloader.hpp>
 
-aiBone * makeBone(const char * name, aiVertexWeight weights[], unsigned int numWeights) {
-    aiVertexWeight * heapedWeights = new aiVertexWeight[numWeights];
+aiBone* makeBone(const char* name,
+                 aiVertexWeight weights[],
+                 unsigned int numWeights) {
+    aiVertexWeight* heapedWeights = new aiVertexWeight[numWeights];
     memcpy(heapedWeights, weights, numWeights * sizeof(aiVertexWeight));
 
     aiBone* bone = new aiBone();
@@ -17,7 +19,10 @@ aiBone * makeBone(const char * name, aiVertexWeight weights[], unsigned int numW
     return bone;
 }
 
-void makeMesh(aiMesh & mesh, unsigned int numPoints, aiBone *bonesStack[], unsigned int numBones) {
+void makeMesh(aiMesh& mesh,
+              unsigned int numPoints,
+              aiBone* bonesStack[],
+              unsigned int numBones) {
     mesh.mNumVertices = numPoints;
     mesh.mNumBones = numBones;
     mesh.mBones = new aiBone*[numBones];
@@ -43,15 +48,13 @@ TEST(ModelLoader, loadMeshBoneWeights_SingleBone) {
          .mVertexId = 0,
          .mWeight = 0.2},
     };
-    aiBone * b1 = makeBone("bone1", bone1Weights, 3);
-    aiBone* bonesStack[] = {
-            b1
-    };
+    aiBone* b1 = makeBone("bone1", bone1Weights, 3);
+    aiBone* bonesStack[] = {b1};
     makeMesh(mesh, 4, bonesStack, 1);
 
     // initialize the bone weight set
 
-    BoneWeightSet boneWeights;
+    BoneWeightLoader boneWeights;
     bool loaded = boneWeights.loadMeshBoneWeights(&mesh, 8);
     ASSERT_TRUE(loaded);
 
@@ -81,58 +84,56 @@ TEST(ModelLoader, loadMeshBoneWeights_SingleBone) {
 TEST(ModelLoader, loadMeshBoneWeights_MultiBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
-            {// vertex 1
-                    .mVertexId = 1,
-                    .mWeight = 0.5},
+        {// vertex 1
+         .mVertexId = 1,
+         .mWeight = 0.5},
 
-            {// vertex 2
-                    .mVertexId = 3,
-                    .mWeight = 0.3},
+        {// vertex 2
+         .mVertexId = 3,
+         .mWeight = 0.3},
 
-            {// vertex 3
-                    .mVertexId = 0,
-                    .mWeight = 0.2},
+        {// vertex 3
+         .mVertexId = 0,
+         .mWeight = 0.2},
     };
-    aiBone * b1 = makeBone("bone1", bone1Weights, 3);
+    aiBone* b1 = makeBone("bone1", bone1Weights, 3);
 
     aiVertexWeight bone2Weights[] = {
-            {// vertex 2
-                    .mVertexId = 3,
-                    .mWeight = 0.9},
+        {// vertex 2
+         .mVertexId = 3,
+         .mWeight = 0.9},
 
-            {// vertex 3
-                    .mVertexId = 0,
-                    .mWeight = 1.0},
+        {// vertex 3
+         .mVertexId = 0,
+         .mWeight = 1.0},
     };
-    aiBone * b2 = makeBone("bone2", bone2Weights, 2);
-    aiBone* bonesStack[] = {
-            b1, b2
-    };
+    aiBone* b2 = makeBone("bone2", bone2Weights, 2);
+    aiBone* bonesStack[] = {b1, b2};
 
     makeMesh(mesh, 4, bonesStack, 2);
 
     // initialize the bone weight set
 
-    BoneWeightSet boneWeights;
+    BoneWeightLoader boneWeights;
     bool loaded = boneWeights.loadMeshBoneWeights(&mesh, 8);
     ASSERT_TRUE(loaded);
 
     // check output is valid
 
     std::vector<uint8_t> expectedBoneCounts = {
-            2, 1, 0, 2,
+        2, 1, 0, 2,
     };
 
     std::vector<uint16_t> expectedBoneIndecies = {
-            0,      1,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-            0,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-            0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-            0,      1,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+        0,      1,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+        0,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+        0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+        0,      1,      0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     };
 
     std::vector<GLfloat> expectedBoneWeights = {
-            0.2, 1.0, 0, 0, 0, 0, 0, 0, 0.5, 0.0, 0, 0, 0, 0, 0, 0,
-            0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.3, 0.9, 0, 0, 0, 0, 0, 0,
+        0.2, 1.0, 0, 0, 0, 0, 0, 0, 0.5, 0.0, 0, 0, 0, 0, 0, 0,
+        0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.3, 0.9, 0, 0, 0, 0, 0, 0,
     };
 
     EXPECT_EQ(boneWeights.getBoneCountsVec(), expectedBoneCounts);

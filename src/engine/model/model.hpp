@@ -8,13 +8,7 @@
 #include "engine/renderer/multimeshrenderer.hpp"
 #include <vector>
 #include "engine/meshanim/meshanim.hpp"
-
-class ModelMesh {
-   public:
-    Material* material;
-    WorldspaceMesh* mesh;
-    std::map<std::string, MeshAnim*> animations;
-};
+#include "modelmesh.h"
 
 class Model {
     std::vector<ModelMesh> meshes;

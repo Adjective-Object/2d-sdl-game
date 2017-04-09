@@ -5,14 +5,8 @@
 #include <scene.h>
 #include <mesh.h>
 #include <Importer.hpp>
-#include "model.hpp"
-
-class LoadedMesh {
-   public:
-    LoadedMesh(ModelMesh, const aiMesh*);
-    ModelMesh loadedMesh;
-    const aiMesh* sourceMesh;
-};
+#include "engine/model/model.hpp"
+#include "loadedmesh.hpp"
 
 class ModelLoader {
     const aiScene* scene = NULL;
@@ -25,8 +19,8 @@ class ModelLoader {
     Model* queryScene(const char* scenepath);
 
     // utility methods exposed for testing
-    static MeshAnim* makeModelAnimation(LoadedMesh* mesh,
-                                        aiAnimation* animation);
+    static MeshAnim* makeModelAnimation(const aiMesh* mesh,
+                                        const aiAnimation* animation);
 };
 
 #endif

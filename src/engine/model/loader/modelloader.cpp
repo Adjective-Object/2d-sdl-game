@@ -15,9 +15,9 @@
 // locals
 #include "engine/mesh/worldspacemesh.hpp"
 #include "engine/material/material.hpp"
-#include "boneweigthset.hpp"
+#include "modelloader.hpp"
 #include "engine/meshanim/meshanim.hpp"
-#include "boneweightset.hpp"
+#include "boneweightloader.hpp"
 
 using namespace std;
 using namespace Assimp;
@@ -84,7 +84,7 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
     }
 
     // build an array of bone weights if the model has bones
-    BoneWeightSet boneWeights;
+    BoneWeightLoader boneWeights;
     boneWeights.loadMeshBoneWeights(mesh, MAX_BONES_PER_VERT);
 
     // assemble the final mesh
@@ -139,8 +139,8 @@ glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
                      mat.d3, mat.d4);
 }
 
-MeshAnim* ModelLoader::makeModelAnimation(LoadedMesh* mesh,
-                                          aiAnimation* animation) {
+MeshAnim* ModelLoader::makeModelAnimation(const aiMesh* mesh,
+                                          const aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
     size_t numPosKeys[animation->mNumChannels];
     size_t curPosKeys[animation->mNumChannels] = {0};
@@ -178,8 +178,7 @@ MeshAnim* ModelLoader::makeModelAnimation(LoadedMesh* mesh,
             aiNodeAnim* nodeAnim = animation->mChannels[i];
             float ratio;
 
-            const aiBone* bone =
-                getBoneFromNodeName(mesh->sourceMesh, nodeAnim->mNodeName);
+            const aiBone* bone = getBoneFromNodeName(mesh, nodeAnim->mNodeName);
             if (bone == NULL) {
                 // we ignore animation keys for bones not inside this mesh
                 continue;
@@ -277,7 +276,8 @@ Model* ModelLoader::queryScene(const char* scenePath) {
     for (LoadedMesh* mesh : loadedMeshes) {
         for (size_t i = 0; i < scene->mNumAnimations; i++) {
             aiAnimation* animation = scene->mAnimations[i];
-            MeshAnim* modelAnimation = makeModelAnimation(mesh, animation);
+            MeshAnim* modelAnimation =
+                makeModelAnimation(mesh->sourceMesh, animation);
             std::string name = std::string(animation->mName.C_Str());
             mesh->loadedMesh.animations[name] = modelAnimation;
             meshes.push_back(mesh->loadedMesh);

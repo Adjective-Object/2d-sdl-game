@@ -4,40 +4,40 @@
 #include <mesh.h>
 // locals
 #include "engine/gl.h"
-#include "boneweightset.hpp"
+#include "boneweightloader.hpp"
 
-BoneWeightSet::BoneWeightSet() {}
-BoneWeightSet::~BoneWeightSet() {}
-bool BoneWeightSet::isInitialized() const {
+BoneWeightLoader::BoneWeightLoader() {}
+BoneWeightLoader::~BoneWeightLoader() {}
+bool BoneWeightLoader::isInitialized() const {
     return initialized;
 }
 
-const uint8_t* BoneWeightSet::getBoneCounts() const {
+const uint8_t* BoneWeightLoader::getBoneCounts() const {
     return &vertBoneCounts[0];
 }
 
-const uint16_t* BoneWeightSet::getBoneIndecies() const {
+const uint16_t* BoneWeightLoader::getBoneIndecies() const {
     return &vertBoneIndecies[0];
 }
 
-const GLfloat* BoneWeightSet::getBoneWeights() const {
+const GLfloat* BoneWeightLoader::getBoneWeights() const {
     return &vertBoneWeights[0];
 }
 
-const std::vector<uint8_t> BoneWeightSet::getBoneCountsVec() const {
+const std::vector<uint8_t> BoneWeightLoader::getBoneCountsVec() const {
     return vertBoneCounts;
 }
 
-const std::vector<uint16_t> BoneWeightSet::getBoneIndeciesVec() const {
+const std::vector<uint16_t> BoneWeightLoader::getBoneIndeciesVec() const {
     return vertBoneIndecies;
 }
 
-const std::vector<GLfloat> BoneWeightSet::getBoneWeightsVec() const {
+const std::vector<GLfloat> BoneWeightLoader::getBoneWeightsVec() const {
     return vertBoneWeights;
 }
 
-bool BoneWeightSet::loadMeshBoneWeights(const aiMesh* mesh,
-                                        const size_t max_bones_per_vert) {
+bool BoneWeightLoader::loadMeshBoneWeights(const aiMesh* mesh,
+                                           const size_t max_bones_per_vert) {
     if (mesh->HasBones()) {
         this->max_bones_per_vert = max_bones_per_vert;
         size_t numWeights = mesh->mNumVertices * max_bones_per_vert;

@@ -6,7 +6,7 @@
 // assimp
 #include <mesh.h>
 
-class BoneWeightSet {
+class BoneWeightLoader {
     bool initialized = false;
     std::vector<uint8_t> vertBoneCounts;
     std::vector<uint16_t> vertBoneIndecies;
@@ -18,8 +18,8 @@ class BoneWeightSet {
 
     //---
 
-    BoneWeightSet();
-    ~BoneWeightSet();
+    BoneWeightLoader();
+    ~BoneWeightLoader();
     bool loadMeshBoneWeights(const aiMesh* mesh,
                              const size_t max_bones_per_vert);
     bool isInitialized() const;
