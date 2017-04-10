@@ -1,6 +1,7 @@
 #include <vector>
 #include <cmath>
 #include "meshanim.hpp"
+#include <iostream>
 
 MeshAnim::MeshAnim(std::vector<Keyframe*> frames) : frames(frames) {}
 
@@ -11,6 +12,7 @@ void MeshAnim::getTransform(const float time, glm::mat4* out) const {
             break;
         }
     }
+    std::cout << "found frame " << i << std::endl;
     int previousFrame = std::max(i - 1, 0);
     float prevTime = frames[previousFrame]->time;
     float curTime = frames[i]->time;
@@ -27,4 +29,12 @@ void MeshAnim::getTransform(const float time, glm::mat4* out) const {
         out[x] = frames[i]->transforms[x] * ratio +
                  frames[prevTime]->transforms[x] * (1 - ratio);
     }
+}
+
+float MeshAnim::getDuration() const {
+    return frames[frames.size() - 1]->time;
+}
+
+size_t MeshAnim::getNumFrames() const {
+    return frames.size();
 }

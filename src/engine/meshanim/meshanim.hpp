@@ -14,10 +14,13 @@ typedef struct {
 } Keyframe;
 
 class MeshAnim {
+    float duration;
     public:
     MeshAnim(std::vector<Keyframe *> frames);
     std::vector<Keyframe *> frames;
     void getTransform(const float time, glm::mat4 * out) const;
+    float getDuration() const;
+    size_t getNumFrames() const;
 };
 
 #endif

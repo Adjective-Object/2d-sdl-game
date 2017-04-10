@@ -1,5 +1,7 @@
 #include <set>
 #include "AnimationLoader.hpp"
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 
 const aiBone* getBoneFromNodeName(const aiMesh* mesh, const aiString name) {
     for (size_t i = 0; i < mesh->mNumBones; i++) {
@@ -19,23 +21,26 @@ glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
 MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                                               const aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
-    size_t numPosKeys[animation->mNumChannels];
+    size_t numPosKeys[animation->mNumChannels] = {0};
     size_t curPosKeys[animation->mNumChannels] = {0};
-    size_t numRotKeys[animation->mNumChannels];
+    size_t numRotKeys[animation->mNumChannels] = {0};
     size_t curRotKeys[animation->mNumChannels] = {0};
-    size_t numSclKeys[animation->mNumChannels];
+    size_t numSclKeys[animation->mNumChannels] = {0};
     size_t curSclKeys[animation->mNumChannels] = {0};
     std::set<float> keyframeTimes;
     for (size_t i = 0; i < animation->mNumChannels; i++) {
         aiNodeAnim* nodeAnim = animation->mChannels[i];
+        numPosKeys[i] = nodeAnim->mNumPositionKeys;
         for (size_t y = 0; y < nodeAnim->mNumPositionKeys; y++) {
             float time = (float)(nodeAnim->mPositionKeys[y].mTime);
             keyframeTimes.insert(time);
         }
+        numRotKeys[i] = nodeAnim->mNumRotationKeys;
         for (size_t y = 0; y < nodeAnim->mNumRotationKeys; y++) {
             float time = (float)(nodeAnim->mRotationKeys[y].mTime);
             keyframeTimes.insert(time);
         }
+        numSclKeys[i] = nodeAnim->mNumScalingKeys;
         for (size_t y = 0; y < nodeAnim->mNumScalingKeys; y++) {
             float time = (float)(nodeAnim->mScalingKeys[y].mTime);
             keyframeTimes.insert(time);
@@ -61,48 +66,96 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                 continue;
             }
             aiMatrix4x4 baseTransformAi = bone->mOffsetMatrix;
-            glm::mat4 baseTransform = glmMat4FromAiMat4(baseTransformAi);
-            if (numRotKeys[i] == 0) {
-                // no keyframes, push the base transform matrix
-                frameTransforms[t].push_back(baseTransform);
-                continue;
+            aiVector3D position, scaling;
+            aiQuaternion rotation;
+            baseTransformAi.Decompose(scaling, rotation, position);
+            if (numRotKeys[i] != 0) {
+                aiQuatKey curRotKey = nodeAnim->mRotationKeys[curRotKeys[i]];
+                aiQuatKey nextRotKey = nodeAnim->mRotationKeys[std::min(
+                    curRotKeys[i] + 1, numRotKeys[i] - 1)];
+                std::cout << curRotKey.mTime << std::endl;
+                std::cout << keyTime << std::endl;
+                std::cout << nextRotKey.mTime << std::endl;
+                ratio = (float)((keyTime - curRotKey.mTime) /
+                                (nextRotKey.mTime - curRotKey.mTime));
+                aiQuaternion::Interpolate(rotation, curRotKey.mValue,
+                                          nextRotKey.mValue, ratio);
+
+                // if we reached this keyframe's timestamp, advance
+                if (nextRotKey.mTime <= keyTime &&
+                    curRotKeys[i] < numRotKeys[i] - 1) {
+                    std::cout << "adnvance rotation from " << curRotKeys[i]
+                              << " to ";
+                    curRotKeys[i]++;
+                    std::cout << curRotKeys[i] << std::endl;
+                }
             }
 
-            aiQuatKey curRotKey = nodeAnim->mRotationKeys[curRotKeys[i]];
-            aiQuatKey nextRotKey = nodeAnim->mRotationKeys[std::min(
-                curRotKeys[i] + 1, numRotKeys[i] - 1)];
-            ratio = (float)((curRotKey.mTime - keyTime) /
-                            (nextRotKey.mTime - curRotKey.mTime));
-            aiQuaternion rotation;
-            aiQuaternion::Interpolate(rotation, curRotKey.mValue,
-                                      nextRotKey.mValue, ratio);
+            if (numPosKeys[i] != 0) {
+                aiVectorKey curPosKey = nodeAnim->mPositionKeys[curPosKeys[i]];
+                aiVectorKey nextPosKey = nodeAnim->mPositionKeys[std::min(
+                    curPosKeys[i] + 1, numPosKeys[i] - 1)];
+                ratio = (float)((keyTime - curPosKey.mTime) /
+                                (nextPosKey.mTime - curPosKey.mTime));
+                position =
+                    (1 - ratio) * curPosKey.mValue + ratio * nextPosKey.mValue;
 
-            aiVectorKey curPosKey = nodeAnim->mPositionKeys[curPosKeys[i]];
-            aiVectorKey nextPosKey = nodeAnim->mPositionKeys[std::min(
-                curPosKeys[i] + 1, numPosKeys[i] - 1)];
-            ratio = (float)((curPosKey.mTime - keyTime) /
-                            (nextPosKey.mTime - curPosKey.mTime));
-            aiVector3D position =
-                ratio * curPosKey.mValue + (1 - ratio) * nextPosKey.mValue;
+                std::cout << "cur: " << curPosKeys[i] << std::endl;
+                std::cout << "next: "
+                          << std::min(curPosKeys[i] + 1, numPosKeys[i] - 1)
+                          << std::endl;
+                std::cout << "ratio: " << ratio << std::endl;
 
-            aiVectorKey curSclKey = nodeAnim->mScalingKeys[curSclKeys[i]];
-            aiVectorKey nextSclKey =
-                nodeAnim
-                    ->mScalingKeys[min(curSclKeys[i] + 1, numSclKeys[i] - 1)];
-            ratio = (float)((curSclKey.mTime - keyTime) /
-                            (nextSclKey.mTime - curSclKey.mTime));
-            aiVector3D scale =
-                ratio * curSclKey.mValue + (1 - ratio) * nextSclKey.mValue;
+                // if we reached this keyframe's timestamp, advance
+                if (nextPosKey.mTime <= keyframeTimesOrdered[t] &&
+                    curPosKeys[i] < numPosKeys[i] - 1) {
+                    std::cout << "adnvance position from " << curPosKeys[i]
+                              << " to ";
+                    curPosKeys[i]++;
+                    std::cout << curPosKeys[i] << std::endl;
+                }
+            }
+
+            if (numSclKeys[i] != 0) {
+                aiVectorKey curSclKey = nodeAnim->mScalingKeys[curSclKeys[i]];
+                aiVectorKey nextSclKey = nodeAnim->mScalingKeys[std::min(
+                    curSclKeys[i] + 1, numSclKeys[i] - 1)];
+                ratio = (float)((keyTime - curSclKey.mTime) /
+                                (nextSclKey.mTime - curSclKey.mTime));
+                scaling =
+                    (1 - ratio) * curSclKey.mValue + ratio * nextSclKey.mValue;
+
+                // if we reached this keyframe's timestamp, advance
+                if (nextSclKey.mTime <= keyframeTimesOrdered[t] &&
+                    curSclKeys[i] < numSclKeys[i] - 1) {
+                    curSclKeys[i]++;
+                }
+            }
 
             aiMatrix3x3 rotateMatrix3 = rotation.GetMatrix();
             aiMatrix4x4 rotateMatrix = aiMatrix4x4(rotateMatrix3);
 
             aiMatrix4x4 scaleMatrix, positionMatrix;
-            aiMatrix4x4::Scaling(scale, scaleMatrix);
+            aiMatrix4x4::Scaling(scaling, scaleMatrix);
             aiMatrix4x4::Translation(position, positionMatrix);
 
-            aiMatrix4x4 transform = rotateMatrix * scaleMatrix * positionMatrix;
-            glm::mat4 animTransform = glmMat4FromAiMat4(transform);
+            aiMatrix4x4 composedTransform =
+                rotateMatrix * scaleMatrix * positionMatrix;
+            glm::mat4 animTransform = glmMat4FromAiMat4(composedTransform);
+            glm::mat4 baseTransform = glmMat4FromAiMat4(baseTransformAi);
+
+            glm::mat4 r = glmMat4FromAiMat4(rotateMatrix);
+            glm::mat4 s = glmMat4FromAiMat4(scaleMatrix);
+            glm::mat4 p = glmMat4FromAiMat4(positionMatrix);
+
+            std::cout << "t: " << t << " (" << keyTime << ")" << std::endl;
+            std::cout << "  r: " << glm::to_string(r) << std::endl;
+            std::cout << "  s: " << glm::to_string(s) << std::endl;
+            std::cout << "  p: " << glm::to_string(p) << std::endl;
+            std::cout << "  anim: " << glm::to_string(animTransform)
+                      << std::endl;
+            std::cout << "  base: " << glm::to_string(baseTransform)
+                      << std::endl;
 
             frameTransforms[t].push_back(animTransform * baseTransform);
         }

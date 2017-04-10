@@ -7,10 +7,7 @@ set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
-if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
-    message("debug mode build")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-endif (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 
 
@@ -217,6 +214,7 @@ target_include_directories(sdl_game PUBLIC
     )
 
 copy_files(sdl_game ${PROJECT_SOURCE_DIR}/assets/* ${CMAKE_BINARY_DIR}/assets)
+copy_files(ctest ${PROJECT_SOURCE_DIR}/test-assets/* ${CMAKE_BINARY_DIR}/test-assets)
 
 ########################################
 # Code formatting and linting commands #
