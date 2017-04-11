@@ -1,6 +1,5 @@
 #include <set>
 #include "AnimationLoader.hpp"
-#include <iostream>
 #include <glm/gtx/string_cast.hpp>
 
 const aiBone* getBoneFromNodeName(const aiMesh* mesh, const aiString name) {
@@ -73,9 +72,6 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                 aiQuatKey curRotKey = nodeAnim->mRotationKeys[curRotKeys[i]];
                 aiQuatKey nextRotKey = nodeAnim->mRotationKeys[std::min(
                     curRotKeys[i] + 1, numRotKeys[i] - 1)];
-                std::cout << curRotKey.mTime << std::endl;
-                std::cout << keyTime << std::endl;
-                std::cout << nextRotKey.mTime << std::endl;
                 ratio = (float)((keyTime - curRotKey.mTime) /
                                 (nextRotKey.mTime - curRotKey.mTime));
                 aiQuaternion::Interpolate(rotation, curRotKey.mValue,
@@ -84,10 +80,7 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                 // if we reached this keyframe's timestamp, advance
                 if (nextRotKey.mTime <= keyTime &&
                     curRotKeys[i] < numRotKeys[i] - 1) {
-                    std::cout << "adnvance rotation from " << curRotKeys[i]
-                              << " to ";
                     curRotKeys[i]++;
-                    std::cout << curRotKeys[i] << std::endl;
                 }
             }
 
@@ -100,19 +93,10 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                 position =
                     (1 - ratio) * curPosKey.mValue + ratio * nextPosKey.mValue;
 
-                std::cout << "cur: " << curPosKeys[i] << std::endl;
-                std::cout << "next: "
-                          << std::min(curPosKeys[i] + 1, numPosKeys[i] - 1)
-                          << std::endl;
-                std::cout << "ratio: " << ratio << std::endl;
-
                 // if we reached this keyframe's timestamp, advance
                 if (nextPosKey.mTime <= keyframeTimesOrdered[t] &&
                     curPosKeys[i] < numPosKeys[i] - 1) {
-                    std::cout << "adnvance position from " << curPosKeys[i]
-                              << " to ";
                     curPosKeys[i]++;
-                    std::cout << curPosKeys[i] << std::endl;
                 }
             }
 
@@ -144,6 +128,7 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
             glm::mat4 animTransform = glmMat4FromAiMat4(composedTransform);
             glm::mat4 baseTransform = glmMat4FromAiMat4(baseTransformAi);
 
+            /*
             glm::mat4 r = glmMat4FromAiMat4(rotateMatrix);
             glm::mat4 s = glmMat4FromAiMat4(scaleMatrix);
             glm::mat4 p = glmMat4FromAiMat4(positionMatrix);
@@ -156,6 +141,7 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                       << std::endl;
             std::cout << "  base: " << glm::to_string(baseTransform)
                       << std::endl;
+                      */
 
             frameTransforms[t].push_back(animTransform * baseTransform);
         }

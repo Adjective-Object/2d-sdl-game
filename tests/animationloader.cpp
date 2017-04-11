@@ -80,7 +80,7 @@ TEST(AnimationLoader, load3FrameAnimation) {
     // check that the file has some constraints we expect
     ASSERT_NE(scene, (void*)NULL);
     ASSERT_EQ(scene->mNumMeshes, 1);
-    ASSERT_EQ(std::string(scene->mMeshes[0]->mName.C_Str()), "Cube.001");
+    ASSERT_EQ(std::string(scene->mMeshes[0]->mName.C_Str()), "Cube");
     ASSERT_EQ(scene->mMeshes[0]->mNumBones, 1);
     ASSERT_EQ(scene->mNumAnimations, 1);
 
