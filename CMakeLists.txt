@@ -7,7 +7,6 @@ set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 
 
 
