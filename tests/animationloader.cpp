@@ -20,10 +20,11 @@
                                       << glm::to_string(b);                 \
     }
 
-TEST(AnimationLoader, loadEmptyAnimation) {
+TEST(AnimationLoader, load2FrameAnimation) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile("test-assets/cube_move.dae", 0);
     // check that the file has some constraints we expect
+    ASSERT_NE(scene, (void*)NULL);
     ASSERT_EQ(scene->mNumMeshes, 1);
     ASSERT_EQ(std::string(scene->mMeshes[0]->mName.C_Str()), "Cube");
     ASSERT_EQ(scene->mMeshes[0]->mNumBones, 1);
@@ -70,4 +71,46 @@ TEST(AnimationLoader, loadEmptyAnimation) {
     loadedAnimation->getTransform(loadedAnimation->getDuration(), &animTrans);
     EXPECT_MATRIX_NEAR(animTrans, expectedFinalTrans,
                        "interpolated final transform");
+}
+
+TEST(AnimationLoader, load3FrameAnimation) {
+    Assimp::Importer importer;
+    const aiScene* scene =
+        importer.ReadFile("test-assets/cube_move_2part.dae", 0);
+    // check that the file has some constraints we expect
+    ASSERT_NE(scene, (void*)NULL);
+    ASSERT_EQ(scene->mNumMeshes, 1);
+    ASSERT_EQ(std::string(scene->mMeshes[0]->mName.C_Str()), "Cube.001");
+    ASSERT_EQ(scene->mMeshes[0]->mNumBones, 1);
+    ASSERT_EQ(scene->mNumAnimations, 1);
+
+    // grab the things we care about and import them
+
+    const aiMesh* mesh = scene->mMeshes[0];
+    const aiAnimation* animation = scene->mAnimations[0];
+
+    MeshAnim* loadedAnimation =
+        AnimationLoader::makeModelAnimation(mesh, animation);
+
+    ASSERT_EQ(loadedAnimation->getNumFrames(), 3);
+
+    glm::mat4 expectedInitialTrans =
+        glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+    glm::mat4 expectedMiddleTrans =
+        glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2.0, 0, 0, 0, 1);
+
+    glm::mat4 expectedFinalTrans =
+        glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -2.0, 0, 0, 0, 1);
+
+    // check that the transforms were saved correctly
+    glm::mat4 savedInitialTransform = loadedAnimation->frames[0]->transforms[0];
+    glm::mat4 savedMiddleTransform = loadedAnimation->frames[1]->transforms[0];
+    glm::mat4 savedFinalTransform = loadedAnimation->frames[2]->transforms[0];
+    EXPECT_MATRIX_NEAR(savedInitialTransform, expectedInitialTrans,
+                       "saved initial transform");
+    EXPECT_MATRIX_NEAR(savedMiddleTransform, expectedMiddleTrans,
+                       "saved middle transform");
+    EXPECT_MATRIX_NEAR(savedFinalTransform, expectedFinalTrans,
+                       "saved final transform");
 }
