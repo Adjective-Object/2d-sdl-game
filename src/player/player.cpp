@@ -42,9 +42,18 @@ void Player::init() {
     }
 
     if (loadedModel) {
-        std::cout << "loaded mesh. making player renderer" << std::endl;
+        std::cout << "loaded model." << std::endl;
+        std::cout << "animations {" << std::endl;
+        for (ModelMesh m : loadedModel->meshes) {
+            for (std::pair<std::string, MeshAnim*> namedAnim : m.animations) {
+                std::cout << '"' << namedAnim.first << '"' << " : "
+                          << namedAnim.second->getDuration() << std::endl;
+            }
+        }
+        std::cout << "}" << std::endl;
+        std::cout << "making player renderer" << std::endl;
         modelMeshRenderer = loadedModel->makeRenderer();
-        std::cout << "generatedi " << modelMeshRenderer << std::endl;
+        std::cout << "generated " << modelMeshRenderer << std::endl;
     } else {
         std::cout << "failed loading mesh. using fallback cube" << std::endl;
         WorldspaceMesh* cube = new WorldspaceMesh();

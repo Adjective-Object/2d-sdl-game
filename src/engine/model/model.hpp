@@ -11,11 +11,11 @@
 #include "modelmesh.h"
 
 class Model {
-    std::vector<ModelMesh> meshes;
-
    public:
     Model(std::vector<ModelMesh>);
     MultiMeshRenderer* makeRenderer();
+
+    std::vector<ModelMesh> meshes;
 };
 
 #endif

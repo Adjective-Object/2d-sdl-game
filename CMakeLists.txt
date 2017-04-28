@@ -132,7 +132,7 @@ set(LIB_SRCS
     src/engine/mesh/screenspacequad.hpp
     src/engine/meshanim/meshanim.cpp
         src/engine/model/loader/boneweightloader.hpp
-        src/engine/model/loader/boneweightloader.cpp src/engine/model/loader/loadedmesh.hpp src/engine/model/modelmesh.h src/engine/model/loader/AnimationLoader.cpp src/engine/model/loader/AnimationLoader.hpp)
+        src/engine/model/loader/boneweightloader.cpp src/engine/model/loader/loadedmesh.hpp src/engine/model/modelmesh.h src/engine/model/loader/AnimationLoader.cpp src/engine/model/loader/AnimationLoader.hpp src/engine/shader/skinnedmeshshader.cpp src/engine/shader/skinnedmeshshader.hpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}

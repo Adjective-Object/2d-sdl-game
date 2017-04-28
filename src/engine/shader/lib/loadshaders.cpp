@@ -31,6 +31,8 @@ GLuint LoadShaders(const char* vertex_file_path,
         return 0;
     }
 
+    // preprocess the template with jinja2
+
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode;
     std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
