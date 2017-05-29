@@ -1,8 +1,7 @@
 #version 110
 
-// requires MAX_BONES_PER_VERT
-// requires MAX_BONES
-// @insert
+// @require MAX_BONES_PER_VERT
+// @require MAX_BONES
 
 attribute vec3 position;
 attribute vec2 uvs;

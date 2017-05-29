@@ -8,7 +8,71 @@
 // cribbed from
 // http://www.opengl-tutorial.org/beginners-tutorials/tutorial-2-the-first-triangle/
 
-#define INSERT_STRING "@insert"
+std::string REQUIRE_STRING = "// @require";
+
+std::string templateCode(
+        std::string VertexShaderCode,
+        const std::map<std::string, std::string>* defines) {
+    // insert defines
+    if (defines != NULL) {
+        bool anyChanges = false;
+        for (std::pair<std::string, std::string> define : *defines) {
+            std::string requireString = REQUIRE_STRING + " " + define.first;
+
+            // try to find a place in the code where the @require
+            // definitions occurs w/o being a substring of another
+            // @require block
+            size_t insertionPoint = 0;
+            bool foundMatch = false;
+            while ( insertionPoint != (size_t) -1 &&
+                    insertionPoint < VertexShaderCode.length() &&
+                    !foundMatch) {
+                insertionPoint = VertexShaderCode.find(requireString, insertionPoint);
+                size_t nextChar = insertionPoint + requireString.length();
+                if (VertexShaderCode[nextChar] == ' ' ||
+                        VertexShaderCode[nextChar] == '\r' ||
+                        VertexShaderCode[nextChar] == '\n'
+                        ) {
+                    foundMatch = true;
+                } else if (insertionPoint != -1) {
+                    insertionPoint++;
+                }
+            }
+
+            if (!foundMatch) {
+                continue;
+            }
+
+            if (insertionPoint != ((size_t) -1)) {
+                anyChanges = true;
+                size_t insertionLength = VertexShaderCode.find("\n", insertionPoint) - insertionPoint;
+                std::string DefineString = "#define " + define.first + " " + define.second;
+                std::cout << DefineString << std::endl;
+                VertexShaderCode = VertexShaderCode.replace(insertionPoint, insertionLength, DefineString);
+            }
+        }
+
+        if(anyChanges) {
+            std::cout << "Templated vertex code:" << std::endl;
+            int i = 1;
+            bool newline = true;
+            for (char c : VertexShaderCode) {
+                if (newline) {
+                    printf("%3d : ", i);
+                    i++;
+                    newline = false;
+                }
+                if (c == '\n') {
+                    newline = true;
+                }
+                std::cout << c;
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    return VertexShaderCode;
+}
 
 GLuint LoadShaders(const char* vertex_file_path,
                    const char* fragment_file_path,
@@ -27,29 +91,14 @@ GLuint LoadShaders(const char* vertex_file_path,
         VertexShaderStream.close();
     } else {
         printf(
-            "Impossible to open %s. Are you in the right directory ? Don't "
-            "forget to read the FAQ !\n",
-            vertex_file_path);
+                "Impossible to open %s. Are you in the right directory ? Don't "
+                        "forget to read the FAQ !\n",
+                vertex_file_path);
         getchar();
         return 0;
     }
 
-    // insert defines
-    if (defines != NULL) {
-        size_t insertionPoint = VertexShaderCode.find(INSERT_STRING);
-        if (insertionPoint != -1) {
-            std::string DefineString = "\n";
-            for (std::pair<std::string, std::string> define : *defines) {
-                DefineString +=
-                    "#define " + define.first + " " + define.second + "\n";
-            }
-            VertexShaderCode = VertexShaderCode.replace(
-                insertionPoint, sizeof(INSERT_STRING), DefineString);
-
-            std::cout << "templated vertex code" << std::endl;
-            std::cout << VertexShaderCode << std::endl;
-        }
-    }
+    VertexShaderCode = templateCode(VertexShaderCode, defines);
 
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode;
@@ -60,6 +109,7 @@ GLuint LoadShaders(const char* vertex_file_path,
             FragmentShaderCode += "\n" + Line;
         FragmentShaderStream.close();
     }
+
 
     GLint Result = GL_FALSE;
     int InfoLogLength;
