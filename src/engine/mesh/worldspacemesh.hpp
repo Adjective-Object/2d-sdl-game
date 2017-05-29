@@ -1,9 +1,9 @@
 #ifndef __ENGINE_STATICMESH
 #define __ENGINE_STATICMESH
 
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include "engine/gl.h"
+#include <glm/mat4x4.hpp>
+
 
 class WorldspaceMesh {
    public:
@@ -38,6 +38,8 @@ class WorldspaceMesh {
     GLuint boneCountBuffer = -1;
     size_t num_bones;
     size_t num_weights_per_point;
+
+    glm::mat4 * boneTransforms = NULL;
 
     bool hasSkeleton() const;
     bool hasUvs() const;

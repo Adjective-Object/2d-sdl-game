@@ -1,6 +1,7 @@
 #include "worldspacemesh.hpp"
 #include "engine/gl.h"
 #include <iostream>
+#include <glm/detail/type_mat.hpp>
 
 void WorldspaceMesh::init(const GLfloat* verts,
                           const GLfloat* colors,
@@ -78,6 +79,11 @@ void WorldspaceMesh::updateSkeleton(const uint8_t* vertBoneCounts,
     glBufferData(GL_ARRAY_BUFFER,
                  num_weights_per_point * num_points * sizeof(GLfloat),
                  vertBoneWeights, GL_STATIC_DRAW);
+
+    if (boneTransforms != NULL) {
+        delete[] boneTransforms;
+    }
+    boneTransforms = new glm::mat4[num_bones];
 }
 
 bool WorldspaceMesh::hasUvs() const {

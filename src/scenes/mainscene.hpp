@@ -17,6 +17,7 @@ using namespace Terrain;
 class MainScene : public Scene {
     glm::vec3 cameraPosition;
     glm::vec3 cameraTarget;
+    glm::vec3 cameraStickOffset;
     Player* player;
     Text *stateText, *posText;
     ActionState lastActionState = __NUM_ACTION_STATES;

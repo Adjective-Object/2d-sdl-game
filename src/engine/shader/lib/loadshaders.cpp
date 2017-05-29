@@ -1,15 +1,18 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
 #include <vector>
+#include <map>
 #include "engine/gl.h"
 
 // cribbed from
 // http://www.opengl-tutorial.org/beginners-tutorials/tutorial-2-the-first-triangle/
 
+#define INSERT_STRING "@insert"
+
 GLuint LoadShaders(const char* vertex_file_path,
-                   const char* fragment_file_path) {
+                   const char* fragment_file_path,
+                   const std::map<std::string, std::string> * defines) {
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -31,7 +34,29 @@ GLuint LoadShaders(const char* vertex_file_path,
         return 0;
     }
 
-    // preprocess the template with jinja2
+    // insert defines
+    if (defines != NULL) {
+        size_t insertionPoint = VertexShaderCode.find(INSERT_STRING);
+        if (insertionPoint != -1) {
+            std::string DefineString = "\n";
+            for (std::pair<std::string, std::string> define : *defines) {
+                DefineString +=
+                        "#define " + define.first +
+                        " " + define.second +
+                        "\n";
+            }
+            VertexShaderCode = VertexShaderCode.replace(
+                insertionPoint,
+                sizeof(INSERT_STRING),
+                DefineString
+            );
+
+
+            std::cout << "templated vertex code" << std::endl;
+            std::cout << VertexShaderCode << std::endl;
+        }
+    }
+
 
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode;

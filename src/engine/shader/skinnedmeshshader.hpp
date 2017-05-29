@@ -34,4 +34,7 @@ class SkinnedMeshShader : public PrimitiveShader {
     void init();
 };
 
+extern SkinnedMeshShader skinnedShader;
+
 #endif  // SDL_GAME_SKINNEDMESHSHADER_H
+

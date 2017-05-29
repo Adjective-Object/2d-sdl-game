@@ -1,15 +1,11 @@
 #version 110
 
-// this program uses jinja2 as a templating engine to insert variables
-// and needs to be preprocessed before running.
-//
-// note that because MAX_BONES_PER_VERT and MAX_BONES are both
-// used as array size declarations, they are subject to the arraysize
-// constraints of whatever hardware you are targeting (typically <=16)
-#define MAX_BONES_PER_VERT {{maxBonesPerVert}}
-#define MAX_BONES {{maxBones}}
+// requires MAX_BONES_PER_VERT
+// requires MAX_BONES
+// @insert
 
 attribute vec3 position;
+attribute vec2 uvs;
 uniform mat4 baseTransform;
 
 attribute mediump float inBoneIndex[MAX_BONES_PER_VERT];
@@ -18,6 +14,8 @@ attribute mediump float inBoneWeights[MAX_BONES_PER_VERT];
 uniform mediump int boneCount;
 uniform highp mat4 boneMatrixArray[MAX_BONES];
 uniform highp mat3 boneMatrixArrayInverseTrans[MAX_BONES];
+
+varying vec2 texCoord;
 
 void main()
 {
@@ -33,6 +31,7 @@ void main()
     }
 
     gl_Position = baseTransform * skinnedPosition;
+    texCoord = uvs;
 }
 
 void init() {

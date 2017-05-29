@@ -9,7 +9,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 
 
-
 #########################
 # external dependencies #
 #########################
@@ -116,8 +115,8 @@ set(LIB_SRCS
     src/engine/mesh/cube.hpp
     src/engine/mesh/worldspacemesh.hpp
     src/engine/mesh/worldspacemesh.cpp
-        src/engine/model/loader/modelloader.cpp
-        src/engine/model/loader/modelloader.hpp
+    src/engine/model/loader/modelloader.cpp
+    src/engine/model/loader/modelloader.hpp
     src/engine/model/model.cpp
     src/engine/model/model.hpp
     src/engine/shader/lib/loadshaders.hpp
@@ -131,8 +130,14 @@ set(LIB_SRCS
     src/engine/mesh/screenspacequad.cpp
     src/engine/mesh/screenspacequad.hpp
     src/engine/meshanim/meshanim.cpp
-        src/engine/model/loader/boneweightloader.hpp
-        src/engine/model/loader/boneweightloader.cpp src/engine/model/loader/loadedmesh.hpp src/engine/model/modelmesh.h src/engine/model/loader/AnimationLoader.cpp src/engine/model/loader/AnimationLoader.hpp src/engine/shader/skinnedmeshshader.cpp src/engine/shader/skinnedmeshshader.hpp)
+    src/engine/model/loader/boneweightloader.hpp
+    src/engine/model/loader/boneweightloader.cpp
+    src/engine/model/loader/loadedmesh.hpp
+        src/engine/model/modelmesh.hpp
+    src/engine/model/loader/AnimationLoader.cpp
+    src/engine/model/loader/AnimationLoader.hpp
+    src/engine/shader/skinnedmeshshader.cpp
+    src/engine/shader/skinnedmeshshader.hpp)
 add_library(SDL_GAME_LIB OBJECT ${LIB_SRCS})
 target_include_directories(SDL_GAME_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}
@@ -146,7 +151,7 @@ set(TEST_SRCS
     tests/util.cpp
         tests/boneweightloader.cpp
     tests/lib/mock-player.cpp
-    tests/lib/mock-player.hpp tests/animationloader.cpp)
+    tests/lib/mock-player.hpp tests/animationloader.cpp tests/meshshader.cpp)
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}

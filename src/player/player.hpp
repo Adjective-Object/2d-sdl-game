@@ -6,6 +6,7 @@
 #include "engine/renderer/multimeshrenderer.hpp"
 #include "engine/renderer/multirenderer.hpp"
 #include "engine/renderer/meshrenderer.hpp"
+#include "engine/model/model.hpp"
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"
 #include "action.hpp"
@@ -27,6 +28,7 @@ class Player : public Sprite {
     WorldspaceMesh modelMesh;
 
     void updateMesh();
+    Model * model = NULL;
 
    public:
     const Platform* currentPlatform = NULL;

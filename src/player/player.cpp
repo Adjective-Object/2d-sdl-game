@@ -36,15 +36,14 @@ void Player::init() {
     ecbMeshRenderer = new MeshRenderer(&vertexColorShader, &mesh);
 
     ModelLoader loader(EnG->getRenderer());
-    Model* loadedModel = NULL;
     if (loader.load("assets/Chicken/chickenV2.dae")) {
-        loadedModel = loader.queryScene("Cylinder.001");
+        model = loader.queryScene("Cylinder.001");
     }
 
-    if (loadedModel) {
+    if (model) {
         std::cout << "loaded model." << std::endl;
         std::cout << "animations {" << std::endl;
-        for (ModelMesh m : loadedModel->meshes) {
+        for (ModelMesh m : model->meshes) {
             for (std::pair<std::string, MeshAnim*> namedAnim : m.animations) {
                 std::cout << '"' << namedAnim.first << '"' << " : "
                           << namedAnim.second->getDuration() << std::endl;
@@ -52,7 +51,7 @@ void Player::init() {
         }
         std::cout << "}" << std::endl;
         std::cout << "making player renderer" << std::endl;
-        modelMeshRenderer = loadedModel->makeRenderer();
+        modelMeshRenderer = model->makeRenderer();
         std::cout << "generated " << modelMeshRenderer << std::endl;
     } else {
         std::cout << "failed loading mesh. using fallback cube" << std::endl;
@@ -156,6 +155,14 @@ void Player::update() {
         currentCollision->postCollision.heightBottom =
             -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
     }
+
+    float animationTime = timer *1.0f/60;
+    model->applyAnimation(
+            "unnamed_0",
+            (float) fmod(animationTime, model->getAnimationDuration(
+                    "unnamed_0"
+            ))
+    );
 }
 
 // void Player::physics() {

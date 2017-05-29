@@ -4,6 +4,7 @@
 
 #include "skinnedmeshshader.hpp"
 #include "primitiveshader.hpp"
+#include "lib/loadshaders.hpp"
 
 SkinnedMeshShader::SkinnedMeshShader(const char* v,
                                      const char* f,
@@ -13,6 +14,8 @@ SkinnedMeshShader::SkinnedMeshShader(const char* v,
       maxBones(maxBones),
       maxBonesPerVert(maxBonesPerVert) {}
 void SkinnedMeshShader::init() {
+    defines["MAX_BONES"] = std::to_string(16);
+    defines["MAX_BONES_PER_VERT"] = std::to_string(4);
     PrimitiveShader::init();
 
     attributes.position = glGetAttribLocation(programId, "position");
@@ -20,5 +23,10 @@ void SkinnedMeshShader::init() {
     uniforms.baseTransform = glGetUniformLocation(programId, "baseTransform");
 }
 
-MeshShader vertexColorShader =
-    MeshShader("assets/shaders/id.vert", "assets/shaders/red.frag");
+SkinnedMeshShader skinnedShader(
+        "assets/shaders/skinned.vert",
+        "assets/shaders/texture.frag",
+        GL_MAX_VERTEX_UNIFORM_VECTORS,
+        4
+        );
+

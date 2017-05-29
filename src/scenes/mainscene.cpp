@@ -14,6 +14,7 @@
 #include "./mainscene.hpp"
 #include "engine/shader/meshshader.hpp"
 #include "engine/shader/screenspaceshader.hpp"
+#include "engine/shader/skinnedmeshshader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -130,12 +131,14 @@ void MainScene::init() {
     // set camera
     glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
     cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
+    cameraStickOffset = glm::vec3(0.0f ,0.0f ,0.0f);
 
     // load shaders we plan on using
     vertexColorShader.init();
     textureShader.init();
     screenShader.init();
     fallbackShader.init();
+    skinnedShader.init();
 
     Scene::init();
 }

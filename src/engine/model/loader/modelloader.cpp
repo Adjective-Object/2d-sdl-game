@@ -162,7 +162,7 @@ Model* ModelLoader::queryScene(const char* scenePath) {
                 mesh->sourceMesh, animation);
             std::string name = std::string(animation->mName.C_Str());
             if (name == "") {
-                name = "animation_" + std::to_string(i);
+                name = "unnamed_" + std::to_string(i);
             }
             mesh->loadedMesh.animations[name] = modelAnimation;
             meshes.push_back(mesh->loadedMesh);

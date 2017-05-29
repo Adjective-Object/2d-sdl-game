@@ -22,3 +22,27 @@ MultiMeshRenderer* Model::makeRenderer() {
 
     return new MultiMeshRenderer(renderers);
 }
+
+void Model::applyAnimation(std::string name, float time) {
+    // apply animation to relevant parts of the body
+    for (const ModelMesh & mesh : meshes) {
+        if (mesh.animations.count(name) != 0) {
+            const MeshAnim * animation = (*(mesh.animations.find(name))).second;
+            animation->getTransform(time, mesh.mesh->boneTransforms);
+        }
+    }
+}
+
+float Model::getAnimationDuration(std::string name) const {
+    float duration = 0;
+    for (const ModelMesh & mesh : meshes) {
+        if (mesh.animations.count(name) != 0) {
+            const MeshAnim * animation = (*(mesh.animations.find(name))).second;
+            float animDuration = animation->getDuration();
+            if (animDuration > duration) {
+                duration = animDuration;
+            }
+        }
+    }
+    return duration;
+}
