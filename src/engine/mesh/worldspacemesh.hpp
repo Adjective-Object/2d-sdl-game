@@ -4,7 +4,9 @@
 #include "engine/gl.h"
 #include <glm/mat4x4.hpp>
 
-
+/**
+ * Represnts a 3d mesh within worldspace
+ */
 class WorldspaceMesh {
    public:
     void init(const GLfloat* verts,
@@ -39,7 +41,7 @@ class WorldspaceMesh {
     size_t num_bones;
     size_t num_weights_per_point;
 
-    glm::mat4 * boneTransforms = NULL;
+    glm::mat4* boneTransforms = NULL;
 
     bool hasSkeleton() const;
     bool hasUvs() const;

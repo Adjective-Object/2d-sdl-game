@@ -10,15 +10,10 @@ class TEST_MeshShader : public MeshShader {
     // programmatic shaders are an issue. Rather than redo this
     // for testing (as programmatic shaders aren't really something
     // in scope at the moment), we expose the internals for testing.
-public:
-    TEST_MeshShader() : MeshShader ("", "") {
-    }
-    void setUniformStruct(MeshShaderUniforms u) {
-        uniforms = u;
-    }
-    void setAttributeStruct(MeshShaderAttributes a) {
-        attributes = a;
-    }
+   public:
+    TEST_MeshShader() : MeshShader("", "") {}
+    void setUniformStruct(MeshShaderUniforms u) { uniforms = u; }
+    void setAttributeStruct(MeshShaderAttributes a) { attributes = a; }
 };
 
 TEST(MeshShader, hasUniform) {
@@ -36,19 +31,17 @@ TEST(MeshShader, hasUniform) {
     EXPECT_FALSE(shader.hasUniform(boneMatrixArrayInverseTrans));
 
     shader.setUniformStruct((MeshShaderUniforms){
-            .baseTransform = 1,
-            .ambientTexture = -1,
-            .boneMatrixArray = 1,
-            .boneMatrixArrayInverseTrans = -1,
+        .baseTransform = 1,
+        .ambientTexture = -1,
+        .boneMatrixArray = 1,
+        .boneMatrixArrayInverseTrans = -1,
     });
 
     EXPECT_TRUE(shader.hasUniform(baseTransform));
     EXPECT_FALSE(shader.hasUniform(ambientTexture));
     EXPECT_TRUE(shader.hasUniform(boneMatrixArray));
     EXPECT_FALSE(shader.hasUniform(boneMatrixArrayInverseTrans));
-
 }
-
 
 TEST(MeshShader, hasAttribute) {
     TEST_MeshShader shader;
@@ -69,12 +62,12 @@ TEST(MeshShader, hasAttribute) {
     EXPECT_FALSE(shader.hasAttribute(inBoneWeights));
 
     shader.setAttributeStruct((MeshShaderAttributes){
-            .position = -1,
-            .uvs = 1,
-            .vertexColor = 1,
-            .boneCount = -1,
-            .inBoneIndex = -1,
-            .inBoneWeights = 1,
+        .position = -1,
+        .uvs = 1,
+        .vertexColor = 1,
+        .boneCount = -1,
+        .inBoneIndex = -1,
+        .inBoneWeights = 1,
     });
 
     EXPECT_FALSE(shader.hasAttribute(position));
@@ -83,6 +76,4 @@ TEST(MeshShader, hasAttribute) {
     EXPECT_FALSE(shader.hasAttribute(boneCount));
     EXPECT_FALSE(shader.hasAttribute(inBoneIndex));
     EXPECT_TRUE(shader.hasAttribute(inBoneWeights));
-
 }
-

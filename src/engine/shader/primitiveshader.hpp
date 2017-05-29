@@ -5,7 +5,7 @@
 #include "engine/gl.h"
 
 class PrimitiveShader {
-protected:
+   protected:
     const char* vec;
     const char* frag;
     std::map<std::string, std::string> defines;

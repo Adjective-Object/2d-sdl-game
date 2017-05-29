@@ -156,13 +156,10 @@ void Player::update() {
             -PLAYER_ECB_OFFSET.y + ecbBottomFixedSize;
     }
 
-    float animationTime = timer *1.0f/60;
+    float animationTime = timer * 1.0f / 60;
     model->applyAnimation(
-            "unnamed_0",
-            (float) fmod(animationTime, model->getAnimationDuration(
-                    "unnamed_0"
-            ))
-    );
+        "unnamed_0",
+        (float)fmod(animationTime, model->getAnimationDuration("unnamed_0")));
 }
 
 // void Player::physics() {

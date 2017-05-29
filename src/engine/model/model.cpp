@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <engine/shader/skinnedmeshshader.hpp>
 #include "engine/renderer/multimeshrenderer.hpp"
 #include "model.hpp"
 
@@ -10,7 +11,9 @@ MultiMeshRenderer* Model::makeRenderer() {
     std::vector<MeshRenderer*> renderers;
     for (ModelMesh m : meshes) {
         MeshShader* s;
-        if (m.material->hasTexture()) {
+        if (m.mesh->hasSkeleton()) {
+            s = &skinnedShader;
+        } else if (m.material->hasTexture()) {
             s = &textureShader;
         } else if (m.mesh->hasVertexColors()) {
             s = &vertexColorShader;
@@ -25,9 +28,9 @@ MultiMeshRenderer* Model::makeRenderer() {
 
 void Model::applyAnimation(std::string name, float time) {
     // apply animation to relevant parts of the body
-    for (const ModelMesh & mesh : meshes) {
+    for (const ModelMesh& mesh : meshes) {
         if (mesh.animations.count(name) != 0) {
-            const MeshAnim * animation = (*(mesh.animations.find(name))).second;
+            const MeshAnim* animation = (*(mesh.animations.find(name))).second;
             animation->getTransform(time, mesh.mesh->boneTransforms);
         }
     }
@@ -35,9 +38,9 @@ void Model::applyAnimation(std::string name, float time) {
 
 float Model::getAnimationDuration(std::string name) const {
     float duration = 0;
-    for (const ModelMesh & mesh : meshes) {
+    for (const ModelMesh& mesh : meshes) {
         if (mesh.animations.count(name) != 0) {
-            const MeshAnim * animation = (*(mesh.animations.find(name))).second;
+            const MeshAnim* animation = (*(mesh.animations.find(name))).second;
             float animDuration = animation->getDuration();
             if (animDuration > duration) {
                 duration = animDuration;

@@ -131,7 +131,7 @@ void MainScene::init() {
     // set camera
     glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f);
     cameraMatrix = glm::lookAt(cameraPosition, cameraTarget, up);
-    cameraStickOffset = glm::vec3(0.0f ,0.0f ,0.0f);
+    cameraStickOffset = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // load shaders we plan on using
     vertexColorShader.init();

@@ -13,6 +13,9 @@ typedef struct {
     float time;
 } Keyframe;
 
+/**
+ * Meshanim: Animation applied to a specific mesh
+ */
 class MeshAnim {
     float duration;
     public:

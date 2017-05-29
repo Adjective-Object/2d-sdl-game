@@ -28,7 +28,7 @@ class Player : public Sprite {
     WorldspaceMesh modelMesh;
 
     void updateMesh();
-    Model * model = NULL;
+    Model* model = NULL;
 
    public:
     const Platform* currentPlatform = NULL;

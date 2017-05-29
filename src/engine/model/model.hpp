@@ -10,6 +10,9 @@
 #include "engine/meshanim/meshanim.hpp"
 #include "modelmesh.hpp"
 
+/*
+ * Model : Handles a number of associated meshes with shared animations
+ */
 class Model {
    public:
     Model(std::vector<ModelMesh>);

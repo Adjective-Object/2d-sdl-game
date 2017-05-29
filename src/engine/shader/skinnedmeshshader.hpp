@@ -8,33 +8,19 @@
 #include <cstddef>
 #include "engine/gl.h"
 #include "primitiveshader.hpp"
+#include "meshshader.hpp"
 
-class SkinnedMeshShader : public PrimitiveShader {
+class SkinnedMeshShader : public MeshShader {
    public:
     size_t maxBones;
     size_t maxBonesPerVert;
-
-    struct {
-        GLint baseTransform;
-        GLint boneCount;
-        GLint boneMatrixArray;
-        GLint boneMatrixArrayInverseTrans;
-    } uniforms;
-    struct {
-        GLint position;
-        GLint uvs;
-        GLint inBoneIndex;
-        GLint inBoneWeights;
-    } attributes;
 
     SkinnedMeshShader(const char* vec,
                       const char* frag,
                       size_t max_bones,
                       size_t max_bones_per_vert);
-    void init();
 };
 
 extern SkinnedMeshShader skinnedShader;
 
 #endif  // SDL_GAME_SKINNEDMESHSHADER_H
-

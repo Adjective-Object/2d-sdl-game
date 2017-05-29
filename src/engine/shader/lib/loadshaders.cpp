@@ -12,7 +12,7 @@
 
 GLuint LoadShaders(const char* vertex_file_path,
                    const char* fragment_file_path,
-                   const std::map<std::string, std::string> * defines) {
+                   const std::map<std::string, std::string>* defines) {
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -41,22 +41,15 @@ GLuint LoadShaders(const char* vertex_file_path,
             std::string DefineString = "\n";
             for (std::pair<std::string, std::string> define : *defines) {
                 DefineString +=
-                        "#define " + define.first +
-                        " " + define.second +
-                        "\n";
+                    "#define " + define.first + " " + define.second + "\n";
             }
             VertexShaderCode = VertexShaderCode.replace(
-                insertionPoint,
-                sizeof(INSERT_STRING),
-                DefineString
-            );
-
+                insertionPoint, sizeof(INSERT_STRING), DefineString);
 
             std::cout << "templated vertex code" << std::endl;
             std::cout << VertexShaderCode << std::endl;
         }
     }
-
 
     // Read the Fragment Shader code from the file
     std::string FragmentShaderCode;
