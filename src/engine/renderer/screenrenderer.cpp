@@ -4,9 +4,7 @@
 #include "engine/shader/screenspaceshader.hpp"
 #include "engine/game.hpp"
 
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include "engine/gl.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

@@ -23,6 +23,7 @@ PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
 PKG_SEARCH_MODULE(GLU REQUIRED glu)
 PKG_SEARCH_MODULE(GLM REQUIRED glm)
 PKG_SEARCH_MODULE(ASSIMP REQUIRED assimp)
+PKG_SEARCH_MODULE(PCI REQUIRED pciaccess)
 include(cmake/gtest.cmake)
 
 ##########################
@@ -206,6 +207,7 @@ target_link_libraries(sdl_game
     ${GLU_LIBRARIES}
     ${ASSIMP_LIBRARIES}
     ${SDL_GAME_LIB}
+    ${PCI_LIBRARIES}
     )
 target_include_directories(sdl_game PUBLIC
     ${SDL2_INCLUDE_DIRS}

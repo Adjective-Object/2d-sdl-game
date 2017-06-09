@@ -12,9 +12,7 @@
 #include "engine/shader/meshshader.hpp"
 #include "player.hpp"
 
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include "engine/gl.h"
 
 using namespace InputMapping;
 

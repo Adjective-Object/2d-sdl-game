@@ -3,10 +3,7 @@
 //
 
 #include "screenspacequad.hpp"
-
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include "engine/gl.h"
 
 void ScreenSpaceQuad::updateMesh(const SDL_Rect& bounds,
                                  const int textureWidth,

@@ -15,7 +15,7 @@
         uniforms.name = glGetUniformLocation(programId, #name);               \
         std::cout << "uniforms." << #name ": " << uniforms.name << std::endl; \
     }
-
+//
 MeshShader::MeshShader(const char* v, const char* f) : PrimitiveShader(v, f) {}
 void MeshShader::init() {
     defines["MAX_BONES"] = std::to_string(16);
