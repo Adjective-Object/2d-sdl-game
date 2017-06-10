@@ -6,6 +6,14 @@
 #include "primitiveshader.hpp"
 #include "lib/loadshaders.hpp"
 #include "meshshader.hpp"
+#include "engine/gl.h"
+
+#ifdef GL_MAX_VERTEX_UNIFORM_VECTORS
+#define MAX_BONES_PER_VERT GL_MAX_VERTEX_UNIFORM_VECTORS
+#else
+#warning "GL_MAX_VERTEX_UNIFORM_VECTORS not set, assuming 16"
+#define MAX_BONES_PER_VERT 16
+#endif
 
 SkinnedMeshShader::SkinnedMeshShader(const char* v,
                                      const char* f,
@@ -15,5 +23,5 @@ SkinnedMeshShader::SkinnedMeshShader(const char* v,
 
 SkinnedMeshShader skinnedShader("assets/shaders/skinned.vert",
                                 "assets/shaders/fallback.frag",
-                                GL_MAX_VERTEX_UNIFORM_VECTORS,
+                                MAX_BONES_PER_VERT,
                                 4);
