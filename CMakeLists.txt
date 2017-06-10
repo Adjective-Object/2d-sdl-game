@@ -6,7 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11 -O0 -fstandalone-debug")
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
 
 #########################
 # external dependencies #
@@ -28,7 +28,7 @@ else()
     find_package(OpenGL REQUIRED)
     SET(OPENGL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
 endif()
-# include(cmake/gtest.cmake)
+include(cmake/gtest.cmake)
 
 ##########################
 # project source objects #

@@ -28,6 +28,7 @@ in with pkgs; let
     gmock
     zsh
     patchelf
+    glxinfo
   ];
 
 in stdenv.mkDerivation {
