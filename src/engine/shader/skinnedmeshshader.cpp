@@ -13,7 +13,7 @@ SkinnedMeshShader::SkinnedMeshShader(const char* v,
                                      size_t maxBonesPerVert)
     : MeshShader(v, f), maxBones(maxBones), maxBonesPerVert(maxBonesPerVert) {}
 
-SkinnedMeshShader skinnedShader("assets/shaders/id.vert",
-                                "assets/shaders/texture.frag",
+SkinnedMeshShader skinnedShader("assets/shaders/skinned.vert",
+                                "assets/shaders/fallback.frag",
                                 GL_MAX_VERTEX_UNIFORM_VECTORS,
                                 4);

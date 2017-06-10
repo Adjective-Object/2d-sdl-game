@@ -82,8 +82,12 @@ SDL_Window* Game::makeWindow(const std::string& name,
 }
 
 SDL_GLContext Game::makeGlContext(SDL_Window* win) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GLContext context = SDL_GL_CreateContext(win);
+    std::cout << glGetString(GL_VERSION) << std::endl;
+    std::cout << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     return context;
 }
 
