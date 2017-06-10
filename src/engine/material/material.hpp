@@ -2,11 +2,7 @@
 #define __ENGINE_MATERIAL
 
 #include <SDL.h>
-
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "engine/gl.h"
 
 class Material {
     SDL_Surface* ambientSurface = NULL;

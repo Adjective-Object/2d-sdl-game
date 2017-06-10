@@ -6,9 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
-
-
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11 -O0 -fstandalone-debug")
 
 #########################
 # external dependencies #
@@ -20,28 +18,51 @@ PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 PKG_SEARCH_MODULE(SDL2TTF REQUIRED SDL2_ttf>=2.0.0)
 PKG_SEARCH_MODULE(SDL2GFX REQUIRED SDL2_gfx)
 PKG_SEARCH_MODULE(YAML_CPP REQUIRED yaml-cpp)
-PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
-PKG_SEARCH_MODULE(GLU REQUIRED glu)
 PKG_SEARCH_MODULE(GLM REQUIRED glm)
 PKG_SEARCH_MODULE(ASSIMP REQUIRED assimp)
-include(cmake/gtest.cmake)
+
+# normalize vars between pkg-search and local lookup for osx
+if (NOT APPLE)
+PKG_SEARCH_MODULE(OPENGL REQUIRED gl)
+else()
+    find_package(OpenGL REQUIRED)
+    SET(OPENGL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
+endif()
+# include(cmake/gtest.cmake)
 
 ##########################
 # project source objects #
 ##########################
-SET(ALL_INCLUDE_DIRS 
+SET(ALL_INCLUDE_DIRS
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
     ${SDL2TTF_INCLUDE_DIRS}
     ${SDL2GFX_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
-    ${OPENGL_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIRS}
     ${ASSIMP_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIRS}
     "src")
 
-set(LIB_SRCS 
+foreach(dir ${ALL_INCLUDE_DIRS})
+MESSAGE(STATUS "INCLUDE: " ${dir})
+endforeach()
+
+SET(ALL_LIBRARIES
+    ${SDL2_LIBRARIES}
+    ${SDL2IMAGE_LIBRARIES}
+    ${SDL2TTF_LIBRARIES}
+    ${SDL2GFX_LIBRARIES}
+    ${YAML_CPP_LIBRARIES}
+    ${ASSIMP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    )
+
+foreach(dir ${ALL_LIBRARIES})
+MESSAGE(STATUS "LIB: " ${dir})
+endforeach()
+
+set(LIB_SRCS
     src/scenes/mainscene.hpp
     src/iterator_wrapper.hpp
     src/scenes/mainscene.cpp
@@ -150,6 +171,7 @@ set(TEST_SRCS
 add_library(TEST_LIB OBJECT ${TEST_SRCS})
 target_include_directories(TEST_LIB PUBLIC
     ${ALL_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIR}
     "tests"
 )
 
@@ -159,31 +181,21 @@ PREPEND(ABSOLUTE_ALL_SRCS ${PROJECT_SOURCE_DIR} ${ALL_SRCS})
 #####################
 # output executable #
 #####################
+MESSAGE(STATUS "GTEST: " ${GTEST_INCLUDE_DIR})
 add_executable(ctest
     tests/main.cpp
     $<TARGET_OBJECTS:TEST_LIB>
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
 target_link_libraries(ctest
-    ${SDL2_LIBRARIES}
-    ${SDL2IMAGE_LIBRARIES} 
-    ${SDL2TTF_LIBRARIES} 
-    ${SDL2GFX_LIBRARIES} 
-    ${YAML_CPP_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${GLU_LIBRARIES}
+    ${ALL_LIBRARIES}
     ${GTEST_LIBRARY}
     ${GTEST_LIBRARY_MAIN}
     ${TEST_LIB}
     ${SDL_GAME_LIB}
-    ${ASSIMP_LIBRARIES}
     )
 target_include_directories(ctest PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_LIBRARIES} 
-    ${YAML_CPP_INCLUDE_DIRS}
-    ${GTEST_INCLUDE_DIRS}
+    ${ALL_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIR}
     ${ASSIMP_INCLUDE_DIRS}
     "src"
     )
@@ -192,23 +204,11 @@ add_executable(sdl_game
     src/main.cpp
     $<TARGET_OBJECTS:SDL_GAME_LIB>)
 target_link_libraries(sdl_game
-    ${SDL2_LIBRARIES}
-    ${SDL2IMAGE_LIBRARIES} 
-    ${SDL2TTF_LIBRARIES} 
-    ${SDL2GFX_LIBRARIES} 
-    ${YAML_CPP_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${GLU_LIBRARIES}
-    ${ASSIMP_LIBRARIES}
+    ${ALL_LIBRARIES}
     ${SDL_GAME_LIB}
     )
 target_include_directories(sdl_game PUBLIC
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2IMAGE_INCLUDE_DIRS}
-    ${SDL2TTF_INCLUDE_DIRS}
-    ${SDL2GFX_INCLUDE_DIRS}
-    ${YAML_CPP_INCLUDE_DIRS}
-    ${ASSIMP_INCLUDE_DIRS}
+    ${ALL_INCLUDE_DIRS}
     "src"
     )
 
@@ -219,7 +219,7 @@ copy_files(ctest ${PROJECT_SOURCE_DIR}/test-assets/* ${CMAKE_BINARY_DIR}/test-as
 # Code formatting and linting commands #
 ########################################
 add_custom_target(lint
-    COMMAND cppcheck 
+    COMMAND cppcheck
         --std=c11
         --enable=warning
         --enable=missingInclude

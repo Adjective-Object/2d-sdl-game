@@ -20,12 +20,20 @@ glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
 MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                                               const aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
-    size_t numPosKeys[animation->mNumChannels] = {0};
-    size_t curPosKeys[animation->mNumChannels] = {0};
-    size_t numRotKeys[animation->mNumChannels] = {0};
-    size_t curRotKeys[animation->mNumChannels] = {0};
-    size_t numSclKeys[animation->mNumChannels] = {0};
-    size_t curSclKeys[animation->mNumChannels] = {0};
+    size_t numPosKeys[animation->mNumChannels];
+    size_t curPosKeys[animation->mNumChannels];
+    size_t numRotKeys[animation->mNumChannels];
+    size_t curRotKeys[animation->mNumChannels];
+    size_t numSclKeys[animation->mNumChannels];
+    size_t curSclKeys[animation->mNumChannels];
+    // can't use variable initializers because clang
+    memset(&numPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(&curPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(&numRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(&curRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(&numSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(&curSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
+
     std::set<float> keyframeTimes;
     for (size_t i = 0; i < animation->mNumChannels; i++) {
         aiNodeAnim* nodeAnim = animation->mChannels[i];

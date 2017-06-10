@@ -168,3 +168,4 @@ Model* ModelLoader::queryScene(const char* scenePath) {
 
     return new Model(meshes);
 }
+

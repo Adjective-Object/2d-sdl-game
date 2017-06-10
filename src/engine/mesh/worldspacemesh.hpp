@@ -1,9 +1,8 @@
 #ifndef __ENGINE_STATICMESH
 #define __ENGINE_STATICMESH
 
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include <stddef.h>
+#include "engine/gl.h"
 
 class WorldspaceMesh {
    public:

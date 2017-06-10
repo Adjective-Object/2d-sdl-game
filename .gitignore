@@ -1,4 +1,4 @@
-G# Cmake inputs / build byproducts
+# Cmake inputs / build byproducts
 compile_commands.json
 CMakeCache.txt
 CMakeFiles
@@ -8,3 +8,6 @@ cmake_install.cmake
 # build outputs
 build/*
 
+# misc
+*.swo
+*.swp

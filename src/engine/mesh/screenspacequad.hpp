@@ -2,9 +2,7 @@
 #define __ENGINE_SCREENSPACEMESH_H
 
 #include <SDL.h>
-#define GL_GLEXT_PROTOTYPES 1
-#define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include "engine/gl.h"
 
 /**
  * Mesh class for managing a quad in screen space

@@ -27,6 +27,8 @@ set_target_properties(libgtest PROPERTIES
 # I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
 # include_directories("${source_dir}/include")
 
+MESSAGE(STATUS "gtest src:" ${source_dir})
+MESSAGE(STATUS "gtest bin:" ${binary_dir})
 set(GTEST_INCLUDE_DIR ${source_dir}/googletest/include)
 set(GTEST_LIBRARY_PATH ${binary_dir}/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
 set(GTEST_LIBRARY libgtest)

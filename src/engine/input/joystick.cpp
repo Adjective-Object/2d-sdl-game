@@ -108,7 +108,7 @@ void Joystick::setAxis(unsigned int axisId, double value) {
 
 double Joystick::axis(unsigned int axisId, int framesBack) {
     size_t frame = ((currentHistory - framesBack) + historySize) % historySize;
-    if (axisId < 0 || axisId > num_axies) {
+    if (axisId > num_axies) {
         std::cout << "Warning: axis " << axisId << " out of range" << std::endl;
         return 0;
     }

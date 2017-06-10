@@ -241,7 +241,7 @@ class Fall : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isLandable(Player const& p, Platform const* plat) {
+    bool isLandable(Player const& p, Platform const* plat) override {
         return !(plat->isPassable() && p.input->axis(MOVEMENT_AXIS_Y) > 0.67);
     }
 
@@ -300,7 +300,7 @@ class KneeBend : public Action {
         }
     }
 
-    bool canWalkOff(Player const&) { return false; }
+    bool canWalkOff(Player const&) override { return false; }
 };
 
 void startGroundedJump(Player& p, bool isShort) {
@@ -670,8 +670,8 @@ class Pass : public Action {
         return interruptWithAirdodge(p) || interruptWithDJump(p);
     }
 
-    bool isGrounded(Player const& p) { return false; }
-    bool isLandable(Player const& p, Platform const* plat) {
+    bool isGrounded(Player const& p) override { return false; }
+    bool isLandable(Player const& p, Platform const* plat) override {
         return plat != p.getCurrentPlatform();
     }
 };
@@ -743,7 +743,7 @@ class CliffCatch : public Action {
         p.cVel = Pair(0, 0);
     }
 
-    bool isGrounded(Player const& p) { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 class CliffWait : public Action {
@@ -765,7 +765,7 @@ class CliffWait : public Action {
         return false;
     }
 
-    bool isGrounded(Player const& p) { return false; }
+    bool isGrounded(Player const& p) override { return false; }
 };
 
 const char* actionStateName(ActionState state) {
