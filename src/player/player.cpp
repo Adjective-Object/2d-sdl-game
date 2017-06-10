@@ -11,7 +11,6 @@
 #include "engine/model/loader/modelloader.hpp"
 #include "engine/shader/meshshader.hpp"
 #include "player.hpp"
-
 #include "engine/gl.h"
 
 using namespace InputMapping;
@@ -259,7 +258,7 @@ void Player::aerialDrift() {
     // std::cout << inputDrift << " ";
 
     // if the player is moving more than inputDrift, slow then with air friction
-    if (abs(inputDrift) > abs(cVel.x) && sign(cVel.x) == sign(inputDrift)) {
+    if (std::abs(inputDrift) > std::abs(cVel.x) && sign(cVel.x) == sign(inputDrift)) {
         // std::cout << "too fast, dragging";
         if (cVel.x > 0) {
             cVel.x = std::max(cVel.x - getAttribute("air_friction"), 0.0);

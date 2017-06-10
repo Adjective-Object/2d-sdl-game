@@ -23,7 +23,9 @@ int checkLineSweep(Pair const& a1,
                    Pair& out2,
                    double epsilon = 0.001);
 
+#ifndef M_PI
 #define M_PI 3.14159265358979323846 /* pi */
+#endif
 bool onLine(Pair const& l1, Pair const& l2, Pair const& point);
 
 double Dot(const Pair& a, const Pair& b);

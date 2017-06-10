@@ -98,7 +98,6 @@ private:
     size_t def_width, width;
     std::streambuf* sbuf;
     size_t count;
-    size_t tab_count;
     static const int tab_width = 8;
     string prefix;
 

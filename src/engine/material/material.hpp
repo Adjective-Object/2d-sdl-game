@@ -2,7 +2,6 @@
 #define __ENGINE_MATERIAL
 
 #include <SDL.h>
-
 #include "engine/gl.h"
 
 class Material {

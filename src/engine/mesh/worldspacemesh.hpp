@@ -1,8 +1,9 @@
 #ifndef __ENGINE_STATICMESH
 #define __ENGINE_STATICMESH
 
-#include "engine/gl.h"
+#include <stddef.h>
 #include <glm/mat4x4.hpp>
+#include "engine/gl.h"
 
 /**
  * Represnts a 3d mesh within worldspace
