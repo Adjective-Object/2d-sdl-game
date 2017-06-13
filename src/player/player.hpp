@@ -16,8 +16,8 @@
 #include "inputhandler.hpp"
 #include "ecbmesh.hpp"
 
-#define FACE_LEFT -1;
-#define FACE_RIGHT 1;
+#define FACE_LEFT -1
+#define FACE_RIGHT 1
 
 class Player : public Sprite {
     AnimationBank* bank;

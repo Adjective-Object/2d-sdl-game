@@ -220,7 +220,7 @@ void Player::land(const Platform* p) {
     times_jumped = 0;
 
     currentPlatform = p;
-    printf("landing on %p\n", p);
+    printf("landing on %p\n", (void*) p);
 
     currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 

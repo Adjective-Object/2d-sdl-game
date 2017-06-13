@@ -7,6 +7,9 @@ set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors -Wno-c99-extensions")
+endif()
 
 ########################
 # external dependencies #

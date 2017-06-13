@@ -19,7 +19,7 @@ Scene::Scene() {
 
 Scene::~Scene() {
     for (Entity* e : entities) {
-        delete e;
+        // delete e;
     }
 }
 

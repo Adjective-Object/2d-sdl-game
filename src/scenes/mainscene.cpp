@@ -110,13 +110,13 @@ void MainScene::init() {
     SDL_Renderer* r = EnG->getRenderer();
     stateText = new Text(r, Pair(130, 10), fontMonaco,
                          {
-                             .r = 255, .g = 255, .b = 255, .a = 255,
+                         255,255,255,255
                          },
                          "???");
 
     posText = new Text(r, Pair(130, 40), fontMonaco,
                        {
-                           .r = 255, .g = 255, .b = 255, .a = 255,
+                       255,255,255,255
                        },
                        ".");
 

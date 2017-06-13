@@ -1,4 +1,5 @@
 #include <set>
+#include <iostream>
 #include "AnimationLoader.hpp"
 #include <glm/gtx/string_cast.hpp>
 
@@ -20,19 +21,20 @@ glm::mat4 glmMat4FromAiMat4(aiMatrix4x4& mat) {
 MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                                               const aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
-    size_t numPosKeys[animation->mNumChannels];
-    size_t curPosKeys[animation->mNumChannels];
-    size_t numRotKeys[animation->mNumChannels];
-    size_t curRotKeys[animation->mNumChannels];
-    size_t numSclKeys[animation->mNumChannels];
-    size_t curSclKeys[animation->mNumChannels];
+    std::cout << "preallocating meta arrays" << std::endl;
+    size_t *numPosKeys = new size_t[animation->mNumChannels];
+    size_t *curPosKeys = new size_t[animation->mNumChannels];
+    size_t *numRotKeys = new size_t[animation->mNumChannels];
+    size_t *curRotKeys = new size_t[animation->mNumChannels];
+    size_t *numSclKeys = new size_t[animation->mNumChannels];
+    size_t *curSclKeys = new size_t[animation->mNumChannels];
     // can't use variable initializers because clang
-    memset(&numPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
-    memset(&curPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
-    memset(&numRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
-    memset(&curRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
-    memset(&numSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
-    memset(&curSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(numPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(curPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(numRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(curRotKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(numSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
+    memset(curSclKeys, 0, sizeof(size_t) * animation->mNumChannels);
 
     std::set<float> keyframeTimes;
     for (size_t i = 0; i < animation->mNumChannels; i++) {
@@ -60,7 +62,8 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
               std::back_inserter(keyframeTimesOrdered));
     std::sort(keyframeTimesOrdered.begin(), keyframeTimesOrdered.end());
 
-    std::vector<glm::mat4> frameTransforms[keyframeTimesOrdered.size()];
+    std::vector<glm::mat4> *frameTransforms =
+        new std::vector<glm::mat4>[keyframeTimesOrdered.size()];
     for (int t = 0; t < keyframeTimesOrdered.size(); t++) {
         float keyTime = keyframeTimesOrdered[t];
         for (size_t i = 0; i < animation->mNumChannels; i++) {
@@ -163,5 +166,12 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
         frames[t]->transforms = frameTransforms[t];
     }
 
+    std::cout << "clearing array info" << std::endl;
+    delete[] numPosKeys;
+    delete[] curPosKeys;
+    delete[] numRotKeys;
+    delete[] curRotKeys;
+    delete[] numSclKeys;
+    delete[] curSclKeys;
     return new MeshAnim(frames);
 }
