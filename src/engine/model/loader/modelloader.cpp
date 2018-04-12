@@ -8,10 +8,10 @@
 #include <SDL.h>
 #include <SDL_image.h>
 // assimp
-#include <Importer.hpp>
-#include <scene.h>
-#include <postprocess.h>
-#include <quaternion.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/quaternion.h>
 // locals
 #include "engine/mesh/worldspacemesh.hpp"
 #include "engine/material/material.hpp"

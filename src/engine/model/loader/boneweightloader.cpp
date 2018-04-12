@@ -1,7 +1,7 @@
 // lib
 #include <iostream>
 // assimp
-#include <mesh.h>
+#include <assimp/mesh.h>
 // locals
 #include "engine/gl.h"
 #include "boneweightloader.hpp"

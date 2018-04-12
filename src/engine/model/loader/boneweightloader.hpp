@@ -4,7 +4,7 @@
 #include <vector>
 #include "engine/gl.h"
 // assimp
-#include <mesh.h>
+#include <assimp/mesh.h>
 
 class BoneWeightLoader {
     bool initialized = false;

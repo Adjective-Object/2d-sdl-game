@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "engine/gl.h"
 // assimp includes
-#include <mesh.h>
+#include <assimp/mesh.h>
 #include <engine/model/loader/boneweightloader.hpp>
 
 aiBone* makeBone(const char* name,
@@ -36,17 +36,20 @@ void makeMesh(aiMesh& mesh,
 TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
-        {// vertex 1
-         .mVertexId = 1,
-         .mWeight = 0.5},
+        aiVertexWeight(// vertex 1
+          1, // mVertexId,
+          0.5 //mWeight
+          ),
 
-        {// vertex 2
-         .mVertexId = 3,
-         .mWeight = 0.3},
+        aiVertexWeight(// vertex 2
+          3, // mVertexId,
+          0.3 //mWeight
+          ),
 
-        {// vertex 3
-         .mVertexId = 0,
-         .mWeight = 0.2},
+        aiVertexWeight(// vertex 3
+          0, // mVertexId,
+          0.2 //mWeight
+          ),
     };
     aiBone* b1 = makeBone("bone1", bone1Weights, 3);
     aiBone* bonesStack[] = {b1};
@@ -84,28 +87,33 @@ TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
 TEST(BoneWeightLoader, loadMeshBoneWeights_MultiBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
-        {// vertex 1
-         .mVertexId = 1,
-         .mWeight = 0.5},
+        aiVertexWeight(// vertex 1
+          1, // mVertexId,
+          0.5 //mWeight
+          ),
 
-        {// vertex 2
-         .mVertexId = 3,
-         .mWeight = 0.3},
+        aiVertexWeight(// vertex 2
+          3, // mVertexId,
+          0.3 //mWeight
+          ),
 
-        {// vertex 3
-         .mVertexId = 0,
-         .mWeight = 0.2},
+        aiVertexWeight(// vertex 3
+          0, // mVertexId,
+          0.2 //mWeight
+          ),
     };
     aiBone* b1 = makeBone("bone1", bone1Weights, 3);
 
     aiVertexWeight bone2Weights[] = {
-        {// vertex 2
-         .mVertexId = 3,
-         .mWeight = 0.9},
+        aiVertexWeight(// vertex 2
+          3, // mVertexId,
+          0.9 //mWeight
+          ),
 
-        {// vertex 3
-         .mVertexId = 0,
-         .mWeight = 1.0},
+        aiVertexWeight(// vertex 3
+          0, // mVertexId,
+          1.0 //mWeight
+          ),
     };
     aiBone* b2 = makeBone("bone2", bone2Weights, 2);
     aiBone* bonesStack[] = {b1, b2};

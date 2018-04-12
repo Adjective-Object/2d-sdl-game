@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <glm/gtx/string_cast.hpp>
 // assimp
-#include <scene.h>
-#include <Importer.hpp>
-#include <engine/model/loader/AnimationLoader.hpp>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include "engine/model/loader/AnimationLoader.hpp"
 
 #define EXPECT_MATRIX_NEAR(a, b, msg)                                       \
     {                                                                       \
