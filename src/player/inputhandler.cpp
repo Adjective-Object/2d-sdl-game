@@ -74,6 +74,10 @@ KEYBOARD_AXIS_MAPPING InputMapping::gamecubeKeyAxies[] = {
     {SDLK_RIGHT, MOVEMENT_AXIS_X, +1.0},
     {SDLK_UP, MOVEMENT_AXIS_Y, -1.0},
     {SDLK_DOWN, MOVEMENT_AXIS_Y, +1.0},
+    {SDLK_a, ATTACK_AXIS_X, -1.0},
+    {SDLK_d, ATTACK_AXIS_X, +1.0},
+    {SDLK_s, ATTACK_AXIS_Y, -1.0},
+    {SDLK_w, ATTACK_AXIS_Y, +1.0},
     {-1, __NUM_AXIES},
 };
 

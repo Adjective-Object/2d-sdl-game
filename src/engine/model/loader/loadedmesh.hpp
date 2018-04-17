@@ -1,7 +1,7 @@
 #ifndef __ENGINE_LOADEDMESH_H
 #define __ENGINE_LOADEDMESH_H
 
-#include <engine/model/modelmesh.h>
+#include "engine/model/modelmesh.hpp"
 // assimp
 #include <assimp/mesh.h>
 

@@ -5,7 +5,7 @@
 #include "engine/game.hpp"
 #include "engine/gl.h"
 
-ScreenRenderer::ScreenRenderer(SDL_Texture* texture, ScreenSpaceQuad* mesh)
+ScreenRenderer::ScreenRenderer(Texture* texture, ScreenSpaceQuad* mesh)
     : mesh(mesh) {
     material.setAmbientTexture(texture);
 }
@@ -21,7 +21,7 @@ void ScreenRenderer::render(glm::mat4& baseTransform) {
 
     // pass texture to the shader
     glActiveTexture(GL_TEXTURE0);
-    SDL_GL_BindTexture(material.ambientTexture, NULL, NULL);
+    glBindTexture(GL_TEXTURE_2D, material.ambientTexture->getTextureID());
     glUniform1i(shader->uniforms.ambientTexture, 0);
 
     // pass vertex data to the shader

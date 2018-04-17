@@ -6,7 +6,7 @@ set (sdl_game_VERSION_MAJOR 0)
 set (sdl_game_VERSION_MINOR 0)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "-fPIC -g -Wall -std=c++11 -fstack-protector-all")
 if (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors -Wno-c99-extensions")
 endif()
@@ -80,8 +80,6 @@ set(LIB_SRCS
     src/player/action.cpp
     src/player/playerconfig.hpp
     src/player/playerconfig.cpp
-    src/player/animationbank.hpp
-    src/player/animationbank.cpp
     src/player/ecb.hpp
     src/player/ecb.cpp
     src/player/ecbmesh.hpp
@@ -138,6 +136,8 @@ set(LIB_SRCS
     src/engine/renderer/screenrenderer.hpp
     src/engine/material/material.hpp
     src/engine/material/material.cpp
+    src/engine/texture/texture.hpp
+    src/engine/texture/texture.cpp
     src/engine/gl.h
     src/engine/mesh/cube.cpp
     src/engine/mesh/cube.hpp

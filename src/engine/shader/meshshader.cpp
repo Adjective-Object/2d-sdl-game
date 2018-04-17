@@ -48,5 +48,5 @@ MeshShader vertexColorShader =
 
 MeshShader textureShader =
     MeshShader("assets/shaders/id_texture.vert", "assets/shaders/texture.frag");
-MeshShader fallbackShader = MeshShader("assets/shaders/id_texture.vert",
+MeshShader fallbackShader = MeshShader("assets/shaders/id_simple.vert",
                                        "assets/shaders/fallback.frag");

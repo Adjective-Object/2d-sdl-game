@@ -53,11 +53,6 @@ void Sprite::updateMotion() {
     velocity.y += vdelta;
 }
 
-void Sprite::render(SDL_Renderer* ren) {
-    SDL_Rect destination{(int)position.x, (int)position.y, 32, 32};
-    SDL_RenderCopy(ren, FALLBACK_TEXTURE, NULL, &destination);
-}
-
 void Sprite::preUpdate(){
 
 };

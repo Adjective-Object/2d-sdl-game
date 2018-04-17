@@ -3,14 +3,13 @@
 
 #include <SDL.h>
 #include "engine/gl.h"
+#include "engine/texture/texture.hpp"
 
 class Material {
-    SDL_Surface* ambientSurface = NULL;
-
    public:
-    SDL_Texture* ambientTexture = NULL;
+    Texture* ambientTexture = NULL;
 
-    void setAmbientTexture(SDL_Texture* texture);
+    void setAmbientTexture(Texture* texture);
     bool hasTexture();
 };
 

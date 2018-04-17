@@ -23,7 +23,7 @@
 using namespace std;
 using namespace Assimp;
 
-ModelLoader::ModelLoader(SDL_Renderer* renderCtx) : renderCtx(renderCtx) {}
+ModelLoader::ModelLoader() {}
 
 bool ModelLoader::load(const char* fpath) {
     std::cout << "load(" << fpath << ")" << std::endl;
@@ -39,8 +39,7 @@ LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
     : loadedMesh(m), sourceMesh(a) {}
 
 #define MAX_BONES_PER_VERT 16
-LoadedMesh* makeModel(SDL_Renderer* renderCtx,
-                      const aiScene* scene,
+LoadedMesh* makeModel(const aiScene* scene,
                       const aiMesh* mesh) {
     GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
     GLfloat* colors = NULL;
@@ -109,8 +108,8 @@ LoadedMesh* makeModel(SDL_Renderer* renderCtx,
         } else {
             std::cout << "ambient texture @ " << path.C_Str() << std::endl;
             SDL_Surface* loadedSurface = IMG_Load(path.C_Str());
-            SDL_Texture* loadedTexture =
-                SDL_CreateTextureFromSurface(renderCtx, loadedSurface);
+            Texture* loadedTexture = Texture::fromSurface(loadedSurface);
+            delete loadedSurface; 
             material->setAmbientTexture(loadedTexture);
         }
     }
@@ -133,10 +132,9 @@ Model* ModelLoader::queryScene(const char* scenePath) {
 
     std::vector<LoadedMesh*> loadedMeshes;
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
-        std::cout << "querying mesh" << i << " of " << scene->mNumMeshes
-                  << std::endl;
         const aiMesh* mesh = scene->mMeshes[i];
-        std::cout << "query " << mesh->mName.C_Str() << "? " << scenePath
+        std::cout << "considering mesh " << i << " of " << scene->mNumMeshes
+                  << ". name: \"" << mesh->mName.C_Str() << "\""
                   << std::endl;
         if (0 == strcmp(mesh->mName.C_Str(), scenePath)) {
             std::cout << "loading a mesh with " << mesh->mNumVertices
@@ -144,7 +142,7 @@ Model* ModelLoader::queryScene(const char* scenePath) {
                       << ", " << mesh->mNumFaces << " faces" << std::endl;
 
             if (mesh->mNumFaces != 0) {
-                loadedMeshes.push_back(makeModel(renderCtx, scene, mesh));
+                loadedMeshes.push_back(makeModel(scene, mesh));
             }
         }
     }

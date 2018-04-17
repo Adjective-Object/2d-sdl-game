@@ -10,7 +10,7 @@
 #include "engine/gl.h"
 
 Game* EnG = nullptr;
-SDL_Texture* FALLBACK_TEXTURE = nullptr;
+SDL_Surface* FALLBACK_SURFACE = nullptr;
 
 // TODO use zoomLevel at all
 Game::Game(unsigned int width,
@@ -47,15 +47,27 @@ Game::Game(unsigned int width,
     input.init();
 
     // create the game stuff
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     win = makeWindow("poop", width, height);
     ctx = makeGlContext(win);
-    ren = makeRenderer(win);
+    if (SDL_GL_MakeCurrent(win, ctx)) {
+        std::cout << "SDL_GL_MakeCurrent Error: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        exit(1);
+    }
+    PRINT_GL_CONTEXT
 
+    // TODO depth test is causing failures on OSX
     glEnable(GL_DEPTH_TEST);
+    PRINT_GL_CONTEXT
     glDepthFunc(GL_LESS);
+    PRINT_GL_CONTEXT
 
     // TODO replace this with a string constant
-    FALLBACK_TEXTURE = loadPNG("assets/fallback.png");
+    FALLBACK_SURFACE = loadPNG("assets/fallback.png");
+    PRINT_GL_CONTEXT
 }
 
 Game::~Game() {
@@ -82,30 +94,9 @@ SDL_Window* Game::makeWindow(const std::string& name,
 }
 
 SDL_GLContext Game::makeGlContext(SDL_Window* win) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GLContext context = SDL_GL_CreateContext(win);
-    std::cout << "GL Version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "glsl version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    PRINT_GL_CONTEXT
     return context;
-}
-
-/**
- * Makes a renderer for the SDL window
- **/
-SDL_Renderer* Game::makeRenderer(SDL_Window* win) {
-    SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
-
-    if (ren == nullptr) {
-        SDL_DestroyWindow(win);
-        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError()
-                  << std::endl;
-        SDL_Quit();
-        exit(1);
-    }
-
-    return ren;
 }
 
 /**
@@ -114,26 +105,19 @@ SDL_Renderer* Game::makeRenderer(SDL_Window* win) {
 * @param ren The renderer to load the texture onto
 * @return the loaded texture, or nullptr if something went wrong.
 */
-SDL_Texture* Game::loadPNG(const std::string& file) {
-    // Initialize to nullptr to avoid dangling pointer issues
-    SDL_Texture* texture = FALLBACK_TEXTURE;
+SDL_Surface* Game::loadPNG(const std::string& file) {
     // Load the image
-    SDL_Surface* loadedImage = IMG_Load(file.c_str());
+    SDL_Surface* loadedSurface = IMG_Load(file.c_str());
     // If the loading went ok, convert to texture and return the texture
-    if (loadedImage != nullptr) {
-        texture = SDL_CreateTextureFromSurface(ren, loadedImage);
-        SDL_FreeSurface(loadedImage);
-        // Make sure converting went ok too
-        if (texture == nullptr) {
-            logSDLError(std::cout, "CreateTextureFromSurface");
-        }
-    } else {
+    if (loadedSurface == nullptr) {
         logSDLError(std::cout, "LoadIMG");
+        return FALLBACK_SURFACE;
     }
-    return texture;
+    return loadedSurface;
 }
 
 void Game::start() {
+    PRINT_GL_CONTEXT
     uint32_t lastTick, thisTick = SDL_GetTicks();
     this->currentScene->init();
     while (!readyToExit) {
@@ -183,10 +167,6 @@ void Game::start() {
         long long int millis_to_delay = 16 - ticks;
         SDL_Delay(std::max(0LL, std::min(16LL, millis_to_delay)));
     }
-}
-
-SDL_Renderer* Game::getRenderer() {
-    return ren;
 }
 
 SDL_Window* Game::getWindow() {

@@ -11,10 +11,9 @@
 class ModelLoader {
     const aiScene* scene = NULL;
     Assimp::Importer importer;
-    SDL_Renderer* renderCtx;
 
    public:
-    ModelLoader(SDL_Renderer* renderCtx);
+    ModelLoader();
     bool load(const char* fpath);
     Model* queryScene(const char* scenepath);
 };

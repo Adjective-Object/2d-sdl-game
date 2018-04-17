@@ -30,7 +30,7 @@ void MeshRenderer::render(mat4& baseTransform) {
     if (material && material->hasTexture() && mesh->hasUvs() &&
         shader->hasAttribute(uvs)) {
         glActiveTexture(GL_TEXTURE0);
-        SDL_GL_BindTexture(material->ambientTexture, NULL, NULL);
+        glBindTexture(GL_TEXTURE_2D, material->ambientTexture->getTextureID());
         glUniform1i(shader->uniforms.ambientTexture, 0);
 
         glEnableVertexAttribArray(shader->attributes.uvs);
@@ -59,7 +59,7 @@ void MeshRenderer::render(mat4& baseTransform) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->colorbuffer);
         glVertexAttribPointer(shader->attributes.vertexColor,
                               3,         // size
-                              GL_FLOAT,  // typ& e
+                              GL_FLOAT,  // type
                               GL_FALSE,  // normalized?
                               0,         // stride
                               (void*)0   // array buffer offset
@@ -86,7 +86,7 @@ void MeshRenderer::render(mat4& baseTransform) {
         glEnableVertexAttribArray(shader->attributes.inBoneWeights);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->boneWeightBuffer);
         glVertexAttribPointer(shader->attributes.inBoneWeights,
-                              shader->bonesPerVertex, GL_INT, GL_FALSE, 0,
+                              shader->bonesPerVertex, GL_FLOAT, GL_FALSE, 0,
                               (void*)0);
 
         // load bone transform uniforms

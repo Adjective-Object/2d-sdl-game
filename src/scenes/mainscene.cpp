@@ -18,6 +18,7 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Terrain;
@@ -80,6 +81,7 @@ MainScene::MainScene() : Scene() {
 MainScene::~MainScene() {}
 
 void MainScene::init() {
+
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
         joystick->calibrateAxis(0, -30000, 32800, 450);
@@ -99,22 +101,20 @@ void MainScene::init() {
             EnG->input.getKeyboard());
     }
 
+
     PlayerConfig* marthConfig = new PlayerConfig("assets/attributes.yaml");
-    AnimationBank* animationBank = new AnimationBank();
-    animationBank->loadImages();
     player =
-        new Player(marthConfig, playerInput, animationBank, Pair(0.5, 0.5));
+        new Player(marthConfig, playerInput, Pair(0.5, 0.5));
 
     TTF_Font* fontMonaco = TTF_OpenFont("assets/monaco.ttf", 20);
 
-    SDL_Renderer* r = EnG->getRenderer();
-    stateText = new Text(r, Pair(130, 10), fontMonaco,
+    stateText = new Text(Pair(130, 10), fontMonaco,
                          {
                          255,255,255,255
                          },
                          "???");
 
-    posText = new Text(r, Pair(130, 40), fontMonaco,
+    posText = new Text(Pair(130, 40), fontMonaco,
                        {
                        255,255,255,255
                        },
@@ -182,17 +182,24 @@ void MainScene::update() {
 }
 
 void MainScene::render() {
+    glm::vec3 cameraTilt = glm::vec3(
+        playerInput->axis(InputMapping::ATTACK_AXIS_X, 0),
+        playerInput->axis(InputMapping::ATTACK_AXIS_Y, 0),
+        0
+    ) * 0.2f;
+
     glm::vec3 projectedPos =
-        glm::vec3(player->position.x, player->position.y - 0.25, -2.0f);
+        glm::vec3(player->position.x, player->position.y - 0.25, -2.0f) +
+        cameraTilt;
 
     glm::vec3 projectedTarget =
         glm::vec3(player->position.x, player->position.y, 0);
 
     float easingSpeed = 5;
 
-    cameraPosition = cameraPosition +
-                     (projectedPos - cameraPosition) *
-                         std::min(1.0f, (float)EnG->elapsed * easingSpeed);
+    cameraPosition = cameraPosition + cameraTilt +
+                 (projectedPos - cameraPosition) *
+                     std::min(1.0f, (float)EnG->elapsed * easingSpeed);
 
     cameraTarget = cameraTarget +
                    (projectedTarget - cameraTarget) *

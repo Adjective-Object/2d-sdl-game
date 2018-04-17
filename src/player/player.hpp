@@ -10,7 +10,6 @@
 #include "terrain/platform.hpp"
 #include "terrain/ledge.hpp"
 #include "action.hpp"
-#include "animationbank.hpp"
 #include "playerconfig.hpp"
 #include "playercollision.hpp"
 #include "inputhandler.hpp"
@@ -20,7 +19,6 @@
 #define FACE_RIGHT 1
 
 class Player : public Sprite {
-    AnimationBank* bank;
     MeshRenderer* ecbMeshRenderer;
     MultiMeshRenderer* modelMeshRenderer;
     AbstractMultiRenderer* multiRenderer;
@@ -61,7 +59,6 @@ class Player : public Sprite {
     int hitlagFrames = 0;
 
     void init() override;
-    void render(SDL_Renderer* ren) override;
     void update() override;
 
     void fall(bool fast = false);
@@ -73,7 +70,6 @@ class Player : public Sprite {
 
     Player(PlayerConfig* config,
            InputMapping::InputHandler* input,
-           AnimationBank* animationBank,
            Pair initialPosition);
     ~Player();
 

@@ -116,9 +116,12 @@ GLuint LoadShaders(const char* vertex_file_path,
 
     // Compile Vertex Shader
     printf("Compiling shader : %s\n", vertex_file_path);
+    PRINT_GL_CONTEXT
     char const* VertexSourcePointer = VertexShaderCode.c_str();
     glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+    CHECK_GL_ERROR(glShaderSource);
     glCompileShader(VertexShaderID);
+    CHECK_GL_ERROR(glCompileShader);
 
     // Check Vertex Shader
     glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);

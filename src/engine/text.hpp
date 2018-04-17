@@ -3,6 +3,7 @@
 
 #include "engine/renderer/abstractrenderer.hpp"
 #include "engine/renderer/screenrenderer.hpp"
+#include "engine/texture/texture.hpp"
 
 #include "entity.hpp"
 #include "pair.hpp"
@@ -11,18 +12,16 @@
 
 class Text : public Entity {
    public:
+    Texture* texture;
     Pair position;
     TTF_Font* font;
     SDL_Color color;
-    SDL_Texture* texture;
     SDL_Rect rect;
-    SDL_Renderer* ren;
     ScreenRenderer* renderer;
     ScreenSpaceQuad* model;
     const char* text;
 
-    Text(SDL_Renderer* r,
-         Pair position,
+    Text(Pair position,
          TTF_Font* font,
          SDL_Color color,
          const char* initialText);
@@ -32,7 +31,6 @@ class Text : public Entity {
     virtual void update() override;
     virtual void preUpdate() override;
     virtual void postUpdate() override;
-    virtual void render(SDL_Renderer* ren);
     AbstractRenderer* getRenderer() override;
 };
 

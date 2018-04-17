@@ -9,20 +9,20 @@ Model::Model(std::vector<ModelMesh> meshes) : meshes(meshes) {}
 MultiMeshRenderer* Model::makeRenderer() {
     std::cout << "making renderer for model" << std::endl;
     std::vector<MeshRenderer*> renderers;
+    int num_meshes = 0;
     for (ModelMesh m : meshes) {
-        MeshShader* s;
+        num_meshes++;
+        MeshShader* s = &fallbackShader;
         if (m.mesh->hasSkeleton()) {
             s = &skinnedShader;
         } else if (m.material->hasTexture()) {
             s = &textureShader;
         } else if (m.mesh->hasVertexColors()) {
             s = &vertexColorShader;
-        } else {
-            s = &fallbackShader;
         }
         renderers.push_back(new MeshRenderer(s, m.mesh, m.material));
     }
-
+    std::cout << "model renderer has " << num_meshes << " internal renderers" << std::endl;
     return new MultiMeshRenderer(renderers);
 }
 

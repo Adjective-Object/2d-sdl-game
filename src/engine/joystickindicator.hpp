@@ -20,8 +20,6 @@ class JoystickIndicator : public Entity {
     virtual void preUpdate();
     virtual void update();
     virtual void postUpdate();
-
-    virtual void render(SDL_Renderer* ren);
 };
 
 #endif

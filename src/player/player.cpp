@@ -17,9 +17,8 @@ using namespace InputMapping;
 
 Player::Player(PlayerConfig* config,
                InputHandler* input,
-               AnimationBank* animationBank,
                Pair initialPosition)
-    : bank(animationBank), input(input), config(config) {
+    : input(input), config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
     currentCollision->reset(position + PLAYER_ECB_OFFSET);
@@ -32,9 +31,9 @@ void Player::init() {
     mesh.init(currentCollision->postCollision);
     ecbMeshRenderer = new MeshRenderer(&vertexColorShader, &mesh);
 
-    ModelLoader loader(EnG->getRenderer());
-    if (loader.load("assets/Chicken/chickenV2.dae")) {
-        model = loader.queryScene("Cylinder.001");
+    ModelLoader loader;
+    if (loader.load("test-assets/cube_move.dae")) {
+        model = loader.queryScene("Cube");
     }
 
     if (model) {
@@ -156,7 +155,7 @@ void Player::update() {
     float animationTime = timer * 1.0f / 60;
     model->applyAnimation(
         "unnamed_0",
-        (float)fmod(animationTime, model->getAnimationDuration("unnamed_0")));
+        (float)fmod(animationTime, model->getAnimationDuration("anima_0")));
 }
 
 // void Player::physics() {
@@ -288,49 +287,11 @@ void Player::aerialDrift() {
     // std::cout << std::endl;
 }
 
-void Player::render(SDL_Renderer* ren) {
-    SDL_SetRenderDrawColor(ren, 255, 215, 0, 255);
-    previousCollision->postCollision.render(ren, PLAYER_SCALE);
-
-    SDL_SetRenderDrawColor(ren, 80, 127, 80, 255);
-    currentCollision->root.render(ren, PLAYER_SCALE);
-
-    SDL_SetRenderDrawColor(ren, 255, 127, 80, 255);
-    currentCollision->postCollision.render(ren, PLAYER_SCALE);
-
-    SDL_Rect destination{(int)(position.x * PLAYER_SCALE) - 64,
-                         (int)(position.y * PLAYER_SCALE) - 110, 128, 128};
-    SDL_RenderCopyEx(ren, bank->getCurrentTexture(*this), NULL, &destination, 0,
-                     NULL, face < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-    // SDL_RenderDrawRect(ren, &destination);
-
-    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
-    SDL_RenderDrawLine(ren, ((int)(position.x * PLAYER_SCALE)) - 3,
-                       ((int)(position.y * PLAYER_SCALE)),
-                       ((int)(position.x * PLAYER_SCALE)) + 3,
-                       ((int)(position.y * PLAYER_SCALE)));
-    SDL_RenderDrawLine(ren, ((int)(position.x * PLAYER_SCALE)),
-                       ((int)(position.y * PLAYER_SCALE)) - 3,
-                       ((int)(position.x * PLAYER_SCALE)),
-                       ((int)(position.y * PLAYER_SCALE)) + 3);
-
-    SDL_SetRenderDrawColor(ren, 100, 255, 100, 255);
-    SDL_Rect ledgeGrabBox = {
-        ((int)(position.x * PLAYER_SCALE)),
-        ((int)((position.y - LEDGEBOX_BASE) * PLAYER_SCALE)),
-        ((int)((face * LEDGEBOX_WIDTH) * PLAYER_SCALE)),
-        ((int)((-LEDGEBOX_HEIGHT) * PLAYER_SCALE))};
-    SDL_RenderDrawRect(ren, &ledgeGrabBox);
-}
-
 void Player::changeAction(ActionState state) {
     std::cout << "change to state [" << state << "] "
               << "(" << actionStateName(state) << ")" << std::endl;
     timer = 0;
     action = ACTIONS[state];
-    bank->playAnimation(state);
     action->step(*this);
     actionState = state;
 }

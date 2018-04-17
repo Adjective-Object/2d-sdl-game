@@ -10,13 +10,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <engine/mesh/screenspacequad.hpp>
+#include <engine/texture/texture.hpp>
 
 class ScreenRenderer : public AbstractRenderer {
     Material material;
     ScreenSpaceQuad* mesh;
 
    public:
-    ScreenRenderer(SDL_Texture* texture, ScreenSpaceQuad* bounds);
+    ScreenRenderer(Texture* texture, ScreenSpaceQuad* bounds);
     void render(glm::mat4& baseTransform) override;
 };
 

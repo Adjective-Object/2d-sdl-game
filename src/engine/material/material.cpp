@@ -93,7 +93,7 @@ std::endl;
     SDL_FreeSurface(rgbSurface);
 }
 
-void Material::setAmbientTexture(SDL_Texture* texture) {
+void Material::setAmbientTexture(Texture* texture) {
     ambientTexture = texture;
 }
 
