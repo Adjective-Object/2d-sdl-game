@@ -87,6 +87,6 @@ class KeyboardInputHandler : public InputHandler {
                          Keyboard* k);
     void step() override;
 };
-}
+}  // namespace InputMapping
 
 #endif

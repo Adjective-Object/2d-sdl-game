@@ -29,6 +29,6 @@ bool performFloorCollision(Map const& m,
                            Ecb& projectedEcb,
                            const Platform*& currentPlatform,
                            double& distance);
-}
+}  // namespace Terrain
 
 #endif

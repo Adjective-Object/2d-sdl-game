@@ -1,6 +1,6 @@
-#include <vector>
-#include <cmath>
 #include "meshanim.hpp"
+#include <cmath>
+#include <vector>
 
 MeshAnim::MeshAnim(std::vector<Keyframe*> frames) : frames(frames) {}
 

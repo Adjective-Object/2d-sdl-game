@@ -1,9 +1,9 @@
-#include <iostream>
 #include "action.hpp"
-#include "util.hpp"
-#include "terrain/ledge.hpp"
+#include <iostream>
 #include "./player.hpp"
 #include "inputhandler.hpp"
+#include "terrain/ledge.hpp"
+#include "util.hpp"
 
 using namespace InputMapping;
 
@@ -777,29 +777,18 @@ const char* actionStateName(ActionState state) {
 }
 
 Action* ACTIONS[__NUM_ACTION_STATES] = {
-        [WALK] = new Walk(),
-        [ WAIT ] = new Wait(),
-        [ FALL ] = new Fall(),
-        [ SPECIALFALL ] = new SpecialFall(),
-        [ LANDING ] = new Landing(),
-        [ KNEEBEND ] = new KneeBend(),
-        [ JUMPF ] = new JumpF(),
-        [ JUMPB ] = new JumpB(),
-        [ JUMPAIRF ] = new JumpAir(),
-        [ JUMPAIRB ] = new JumpAir(),
-        [ ESCAPEAIR ] = new EscapeAir(),
-        [ TURN ] = new Turn(),
-        [ DASH ] = new Dash(),
-        [ RUN ] = new Run(),
-        [ SMASHTURN ] = new SmashTurn(),
-        [ RUNBRAKE ] = new RunBrake(),
-        [ RUNTURN ] = new RunTurn(),
-        [ PASS ] = new Pass(),
-        [ SQUAT ] = new Squat(),
-        [ SQUATWAIT ] = new SquatWait(),
-        [ SQUATRV ] = new SquatRv(),
-        [ CLIFFCATCH ] = new CliffCatch(),
-        [ CLIFFWAIT ] = new CliffWait(),
+    [WALK] = new Walk(),           [WAIT] = new Wait(),
+    [FALL] = new Fall(),           [SPECIALFALL] = new SpecialFall(),
+    [LANDING] = new Landing(),     [KNEEBEND] = new KneeBend(),
+    [JUMPF] = new JumpF(),         [JUMPB] = new JumpB(),
+    [JUMPAIRF] = new JumpAir(),    [JUMPAIRB] = new JumpAir(),
+    [ESCAPEAIR] = new EscapeAir(), [TURN] = new Turn(),
+    [DASH] = new Dash(),           [RUN] = new Run(),
+    [SMASHTURN] = new SmashTurn(), [RUNBRAKE] = new RunBrake(),
+    [RUNTURN] = new RunTurn(),     [PASS] = new Pass(),
+    [SQUAT] = new Squat(),         [SQUATWAIT] = new SquatWait(),
+    [SQUATRV] = new SquatRv(),     [CLIFFCATCH] = new CliffCatch(),
+    [CLIFFWAIT] = new CliffWait(),
 };
 
 #define ACTION_STATE(x) #x,

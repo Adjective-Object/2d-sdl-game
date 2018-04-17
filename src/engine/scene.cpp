@@ -2,16 +2,16 @@
 #include <algorithm>
 #include <iostream>
 
-#include "entity.hpp"
 #include "constants.hpp"
+#include "entity.hpp"
 #include "game.hpp"
-#include "scene.hpp"
 #include "renderer/abstractrenderer.hpp"
+#include "scene.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 Scene::Scene() {
     entities = std::vector<Entity*>();

@@ -1,23 +1,21 @@
+#include "player.hpp"
 #include <algorithm>
 #include <iostream>
 #include <vector>
 #include "../engine/game.hpp"
 #include "../util.hpp"
-#include "constants.hpp"
 #include "action.hpp"
-#include "playerconfig.hpp"
-#include "inputhandler.hpp"
+#include "constants.hpp"
+#include "engine/gl.h"
 #include "engine/mesh/cube.hpp"
 #include "engine/model/loader/modelloader.hpp"
 #include "engine/shader/meshshader.hpp"
-#include "player.hpp"
-#include "engine/gl.h"
+#include "inputhandler.hpp"
+#include "playerconfig.hpp"
 
 using namespace InputMapping;
 
-Player::Player(PlayerConfig* config,
-               InputHandler* input,
-               Pair initialPosition)
+Player::Player(PlayerConfig* config, InputHandler* input, Pair initialPosition)
     : input(input), config(config) {
     position = initialPosition;
     previousCollision->reset(position + PLAYER_ECB_OFFSET);
@@ -219,7 +217,7 @@ void Player::land(const Platform* p) {
     times_jumped = 0;
 
     currentPlatform = p;
-    printf("landing on %p\n", (void*) p);
+    printf("landing on %p\n", (void*)p);
 
     currentCollision->postCollision.heightBottom = -PLAYER_ECB_OFFSET.y;
 
@@ -257,7 +255,8 @@ void Player::aerialDrift() {
     // std::cout << inputDrift << " ";
 
     // if the player is moving more than inputDrift, slow then with air friction
-    if (std::abs(inputDrift) > std::abs(cVel.x) && sign(cVel.x) == sign(inputDrift)) {
+    if (std::abs(inputDrift) > std::abs(cVel.x) &&
+        sign(cVel.x) == sign(inputDrift)) {
         // std::cout << "too fast, dragging";
         if (cVel.x > 0) {
             cVel.x = std::max(cVel.x - getAttribute("air_friction"), 0.0);

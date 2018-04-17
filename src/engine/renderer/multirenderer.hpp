@@ -1,9 +1,9 @@
 #ifndef __ENGINE_MULTI_RENDERER
 #define __ENGINE_MULTI_RENDERER
 
-#include "abstractrenderer.hpp"
-#include <vector>
 #include <iostream>
+#include <vector>
+#include "abstractrenderer.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

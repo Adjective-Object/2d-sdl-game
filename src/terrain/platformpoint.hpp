@@ -1,7 +1,7 @@
 #ifndef __GAME_PLATFORM_POINT_WRAP
 #define __GAME_PLATFORM_POINT_WRAP
-#include "platform.hpp"
 #include "engine/pair.hpp"
+#include "platform.hpp"
 
 class PlatformPoint {
     friend class Platform;

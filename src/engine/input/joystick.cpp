@@ -1,6 +1,6 @@
-#include <iostream>
-#include <stdint.h>
 #include "./joystick.hpp"
+#include <stdint.h>
+#include <iostream>
 
 Joystick::Joystick(int numButtons, int numAxies, size_t historySize) {
     this->historySize = historySize;

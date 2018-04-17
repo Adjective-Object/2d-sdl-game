@@ -1,12 +1,12 @@
 #include "keyboard.hpp"
 #include <stdint.h>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 Keyboard::Keyboard(size_t historySize) : historySize(historySize) {
-    heldKeys = new std::set<int>[ historySize ];
-    downKeys = new std::set<int>[ historySize ];
-    upKeys = new std::set<int>[ historySize ];
+    heldKeys = new std::set<int>[historySize];
+    downKeys = new std::set<int>[historySize];
+    upKeys = new std::set<int>[historySize];
     for (size_t i = 0; i < historySize; i++) {
         heldKeys[i] = std::set<int>();
         downKeys[i] = std::set<int>();

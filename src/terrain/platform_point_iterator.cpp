@@ -1,7 +1,7 @@
+#include "platform_point_iterator.hpp"
 #include <iterator>
 #include "../engine/pair.hpp"
 #include "platform.hpp"
-#include "platform_point_iterator.hpp"
 #include "platformpoint.hpp"
 
 typedef PlatformPointArray::iterator itr;

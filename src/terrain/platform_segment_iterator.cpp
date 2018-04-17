@@ -1,7 +1,7 @@
-#include "platform.hpp"
-#include "platformsegment.hpp"
 #include "platform_segment_iterator.hpp"
 #include <iostream>
+#include "platform.hpp"
+#include "platformsegment.hpp"
 
 typedef PlatformSegmentArray::iterator itr;
 

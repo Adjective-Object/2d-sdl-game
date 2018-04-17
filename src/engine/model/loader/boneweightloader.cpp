@@ -3,8 +3,8 @@
 // assimp
 #include <assimp/mesh.h>
 // locals
-#include "engine/gl.h"
 #include "boneweightloader.hpp"
+#include "engine/gl.h"
 
 BoneWeightLoader::BoneWeightLoader() {}
 BoneWeightLoader::~BoneWeightLoader() {}

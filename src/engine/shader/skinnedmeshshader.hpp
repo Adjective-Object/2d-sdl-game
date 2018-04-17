@@ -7,8 +7,8 @@
 
 #include <cstddef>
 #include "engine/gl.h"
-#include "primitiveshader.hpp"
 #include "meshshader.hpp"
+#include "primitiveshader.hpp"
 
 class SkinnedMeshShader : public MeshShader {
    public:

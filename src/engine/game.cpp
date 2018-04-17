@@ -1,11 +1,11 @@
 #include <iostream>
 
-#include "game.hpp"
-#include "input/input.hpp"
-#include "util.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include "game.hpp"
+#include "input/input.hpp"
+#include "util.hpp"
 
 #include "engine/gl.h"
 
@@ -49,25 +49,23 @@ Game::Game(unsigned int width,
     // create the game stuff
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
     win = makeWindow("poop", width, height);
     ctx = makeGlContext(win);
     if (SDL_GL_MakeCurrent(win, ctx)) {
-        std::cout << "SDL_GL_MakeCurrent Error: " << SDL_GetError() << std::endl;
+        std::cout << "SDL_GL_MakeCurrent Error: " << SDL_GetError()
+                  << std::endl;
         SDL_Quit();
         exit(1);
     }
-    PRINT_GL_CONTEXT
 
     // TODO depth test is causing failures on OSX
     glEnable(GL_DEPTH_TEST);
-    PRINT_GL_CONTEXT
     glDepthFunc(GL_LESS);
-    PRINT_GL_CONTEXT
 
     // TODO replace this with a string constant
     FALLBACK_SURFACE = loadPNG("assets/fallback.png");
-    PRINT_GL_CONTEXT
 }
 
 Game::~Game() {
@@ -95,16 +93,15 @@ SDL_Window* Game::makeWindow(const std::string& name,
 
 SDL_GLContext Game::makeGlContext(SDL_Window* win) {
     SDL_GLContext context = SDL_GL_CreateContext(win);
-    PRINT_GL_CONTEXT
     return context;
 }
 
 /**
-* Loads a BMP image into a texture on the rendering device
-* @param file The BMP image file to load
-* @param ren The renderer to load the texture onto
-* @return the loaded texture, or nullptr if something went wrong.
-*/
+ * Loads a BMP image into a texture on the rendering device
+ * @param file The BMP image file to load
+ * @param ren The renderer to load the texture onto
+ * @return the loaded texture, or nullptr if something went wrong.
+ */
 SDL_Surface* Game::loadPNG(const std::string& file) {
     // Load the image
     SDL_Surface* loadedSurface = IMG_Load(file.c_str());
@@ -117,7 +114,6 @@ SDL_Surface* Game::loadPNG(const std::string& file) {
 }
 
 void Game::start() {
-    PRINT_GL_CONTEXT
     uint32_t lastTick, thisTick = SDL_GetTicks();
     this->currentScene->init();
     while (!readyToExit) {

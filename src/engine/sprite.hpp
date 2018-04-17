@@ -1,11 +1,11 @@
 #ifndef __ENGINE_SPRITE
 #define __ENGINE_SPRITE
 
+#include <SDL.h>
+#include <limits>
 #include "entity.hpp"
 #include "pair.hpp"
 #include "util.hpp"
-#include <SDL.h>
-#include <limits>
 
 typedef enum Direction { UP, DOWN, LEFT, RIGHT } Direction;
 

@@ -1,5 +1,5 @@
-#include "./platform.hpp"
 #include "platformsegment.hpp"
+#include "./platform.hpp"
 #include "engine/pair.hpp"
 
 PlatformSegment::PlatformSegment() : platform(NULL), index(0) {}

@@ -1,7 +1,7 @@
-#include <math.h>
-#include "gtest/gtest.h"
-#include "engine/pair.hpp"
 #include "terrain/platform.hpp"
+#include <math.h>
+#include "engine/pair.hpp"
+#include "gtest/gtest.h"
 #include "terrain/platformsegment.hpp"
 
 TEST(Platform, GroundedMovement_NoMovement) {
@@ -45,7 +45,8 @@ TEST(Platform, GroundedMovement_MultiSegmentMovement) {
 TEST(Platform, GroundedMovement_DiagonalMovement) {
     // diagonal surface with rightward movement
     Platform p = Platform({
-        Pair(0, 0), Pair(8, 6),
+        Pair(0, 0),
+        Pair(8, 6),
     });
     Pair pos = Pair(0, 0), vel = Pair(5, 0);
     p.groundedMovement(pos, vel);
@@ -57,7 +58,9 @@ TEST(Platform, GroundedMovement_DiagonalMovement) {
 TEST(Platform, GroundedMovement_DiagonalMultiSegmentMovement) {
     // segmented diagonal surface with rightward movement
     Platform p = Platform({
-        Pair(0, 0), Pair(8, 6), Pair(10, 6),
+        Pair(0, 0),
+        Pair(8, 6),
+        Pair(10, 6),
     });
     Pair pos = Pair(0, 0), vel = Pair(11, 0);
     p.groundedMovement(pos, vel);
@@ -69,7 +72,8 @@ TEST(Platform, GroundedMovement_DiagonalMultiSegmentMovement) {
 TEST(Platform, GroundedMovement_Walkoff) {
     // flat surface with walkoff
     Platform p = Platform({
-        Pair(0, 0), Pair(1, 0),
+        Pair(0, 0),
+        Pair(1, 0),
     });
     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
     p.groundedMovement(pos, vel);
@@ -88,7 +92,10 @@ TEST(Platform, GroundedMovement_Walkoff) {
 TEST(Platform, GroundedMovement_Walkoff_Wall) {
     // flat surface with walkoff
     Platform p = Platform({
-        Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3),
+        Pair(0, 3),
+        Pair(0, 0),
+        Pair(1, 0),
+        Pair(1, 3),
     });
     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
     p.groundedMovement(pos, vel);
@@ -111,7 +118,12 @@ TEST(Platform, GroundedMovement_Walkoff_Wall_Platform) {
     //  __|    |__
     //
     Platform p = Platform({
-        Pair(-1, 3), Pair(0, 3), Pair(0, 0), Pair(1, 0), Pair(1, 3), Pair(2, 3),
+        Pair(-1, 3),
+        Pair(0, 3),
+        Pair(0, 0),
+        Pair(1, 0),
+        Pair(1, 3),
+        Pair(2, 3),
     });
     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
     p.groundedMovement(pos, vel);
@@ -134,7 +146,11 @@ TEST(Platform, GroundedMovmeent_Flat_ConvolutedSurface) {
     //   __\     /__
     //
     Platform p = Platform({
-        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+        Pair(-1, 1),
+        Pair(0.25, 1),
+        Pair(0, 0),
+        Pair(1, 0),
+        Pair(0.75, 1),
         Pair(2, 1),
     });
     Pair pos = Pair(0.5, 0), vel = Pair(1, 0);
@@ -157,7 +173,11 @@ TEST(Platform, GroundedMovement_WalkIntoConvolutedSurface) {
     //   __\     /__
     //
     Platform p = Platform({
-        Pair(-1, 1), Pair(0.25, 1), Pair(0, 0), Pair(1, 0), Pair(0.75, 1),
+        Pair(-1, 1),
+        Pair(0.25, 1),
+        Pair(0, 0),
+        Pair(1, 0),
+        Pair(0.75, 1),
         Pair(2, 1),
     });
     Pair pos = Pair(-0.5, 1), vel = Pair(1, 0);
@@ -179,7 +199,8 @@ TEST(Platform, GroundedMovement_WalkFromExactEndOfSurface) {
     //   _______
     //
     Platform p = Platform({
-        Pair(1, 1), Pair(3, 1),
+        Pair(1, 1),
+        Pair(3, 1),
     });
     Pair pos = Pair(1, 1), vel = Pair(0, 0);
     p.groundedMovement(pos, vel);
@@ -405,9 +426,17 @@ TEST(Platform, checkCollision_Playtest_1) {
 
 TEST(Platform, pointsIterator) {
     std::vector<Pair> pts = std::vector<Pair>({
-        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
-        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
-        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+        Pair(0.1, 2.0),
+        Pair(0.1, 1.35),
+        Pair(0.7, 1.35),
+        Pair(0.7, 1.2),
+        Pair(0.9, 1.2),
+        Pair(0.9, 1.6),
+        Pair(2.2, 1.6),
+        Pair(2.0, 2.0),
+        Pair(2.4, 2.0),
+        Pair(3, 1.0),
+        Pair(3.4, 1.0),
     });
     std::set<Pair> pts_set = std::set<Pair>(pts.begin(), pts.end());
 
@@ -428,9 +457,17 @@ TEST(Platform, pointsIterator) {
 
 TEST(Platform, segmentsIterator) {
     std::vector<Pair> pts = std::vector<Pair>({
-        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
-        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
-        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+        Pair(0.1, 2.0),
+        Pair(0.1, 1.35),
+        Pair(0.7, 1.35),
+        Pair(0.7, 1.2),
+        Pair(0.9, 1.2),
+        Pair(0.9, 1.6),
+        Pair(2.2, 1.6),
+        Pair(2.0, 2.0),
+        Pair(2.4, 2.0),
+        Pair(3, 1.0),
+        Pair(3.4, 1.0),
     });
 
     Platform platform = Platform(pts);

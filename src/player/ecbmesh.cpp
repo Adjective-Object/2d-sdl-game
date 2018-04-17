@@ -1,5 +1,5 @@
-#include "engine/gl.h"
 #include "player/ecbmesh.hpp"
+#include "engine/gl.h"
 #include "player/ecb.hpp"
 
 #define GLM_FORCE_RADIANS

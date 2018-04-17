@@ -1,8 +1,8 @@
 #ifndef __ENGINE_MULTI_MESHRENDERER
 #define __ENGINE_MULTI_MESHRENDERER
 
-#include "multirenderer.hpp"
 #include "meshrenderer.hpp"
+#include "multirenderer.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

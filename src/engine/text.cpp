@@ -1,13 +1,10 @@
-#include "engine/renderer/screenrenderer.hpp"
 #include "text.hpp"
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include "engine/renderer/screenrenderer.hpp"
 #include "string.h"
 
-Text::Text(Pair position,
-           TTF_Font* font,
-           SDL_Color color,
-           const char* text)
+Text::Text(Pair position, TTF_Font* font, SDL_Color color, const char* text)
     : position(position), font(font), color(color), text(text) {}
 
 Text::~Text() {
@@ -36,9 +33,13 @@ void Text::updateText(const char* newText) {
 }
 
 void Text::init() {
-    texture = Texture::createEmpty(INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);
+    texture =
+        Texture::createEmpty(INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);
     rect = {
-        .x = 0, .y = 0, .w = INITIAL_TEXTURE_WIDTH, .h = INITIAL_TEXTURE_HEIGHT,
+        .x = 0,
+        .y = 0,
+        .w = INITIAL_TEXTURE_WIDTH,
+        .h = INITIAL_TEXTURE_HEIGHT,
     };
     model = new ScreenSpaceQuad();
     model->init(rect, INITIAL_TEXTURE_WIDTH, INITIAL_TEXTURE_HEIGHT);

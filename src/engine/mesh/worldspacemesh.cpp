@@ -1,7 +1,7 @@
 #include "worldspacemesh.hpp"
-#include "engine/gl.h"
-#include <iostream>
 #include <glm/detail/type_mat.hpp>
+#include <iostream>
+#include "engine/gl.h"
 
 void WorldspaceMesh::init(const GLfloat* verts,
                           const GLfloat* colors,

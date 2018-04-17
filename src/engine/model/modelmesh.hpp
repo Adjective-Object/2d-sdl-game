@@ -1,8 +1,8 @@
 #ifndef __ENGINE_MODELMESH_H
 #define __ENGINE_MODELMESH_H
 
-#include <string>
 #include <map>
+#include <string>
 #include "engine/material/material.hpp"
 #include "engine/mesh/worldspacemesh.hpp"
 #include "engine/meshanim/meshanim.hpp"

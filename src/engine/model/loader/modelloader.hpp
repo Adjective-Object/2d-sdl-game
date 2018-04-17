@@ -2,8 +2,8 @@
 #define __ENGINE_MODEL_LOADER
 
 // assimp
-#include <assimp/scene.h>
 #include <assimp/mesh.h>
+#include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include "engine/model/model.hpp"
 #include "loadedmesh.hpp"

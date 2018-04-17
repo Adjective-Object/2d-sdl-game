@@ -1,6 +1,6 @@
-#include "platform.hpp"
-#include "engine/pair.hpp"
 #include "platformpoint.hpp"
+#include "engine/pair.hpp"
+#include "platform.hpp"
 
 PlatformPoint::PlatformPoint(const Platform* p, size_t index)
     : platform(p), index(index) {}

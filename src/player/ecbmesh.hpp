@@ -1,9 +1,9 @@
 #ifndef __GAME_MESH_ECB
 #define __GAME_MESH_ECB
 
+#include "engine/gl.h"
 #include "engine/mesh/worldspacemesh.hpp"
 #include "player/ecb.hpp"
-#include "engine/gl.h"
 
 class EcbMesh : public WorldspaceMesh {
     GLfloat vectorBuffer[36];

@@ -1,6 +1,6 @@
-#include "gtest/gtest.h"
-#include "engine/pair.hpp"
 #include "util.hpp"
+#include "engine/pair.hpp"
+#include "gtest/gtest.h"
 
 TEST(Util, checkLineIntersection_Basic) {
     Pair a1 = Pair(-1, 1), a2 = Pair(2, 1);

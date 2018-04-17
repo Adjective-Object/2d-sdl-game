@@ -18,9 +18,13 @@
 #define attribute(name) GLint name;
 #define uniform(name) GLint name;
 
-typedef struct { MESH_SHADER_UNIFORMS } MeshShaderUniforms;
+typedef struct {
+    MESH_SHADER_UNIFORMS
+} MeshShaderUniforms;
 
-typedef struct { MESH_SHADER_ATTRIBUTES } MeshShaderAttributes;
+typedef struct {
+    MESH_SHADER_ATTRIBUTES
+} MeshShaderAttributes;
 
 #undef attribute
 #undef uniform

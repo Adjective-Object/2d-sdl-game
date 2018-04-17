@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "player/player.hpp"
+#include "gtest/gtest.h"
 
 // TEST(Player, moveTo) {
 //     Player p = Player("./assets/attributes.yaml", 0, 0);

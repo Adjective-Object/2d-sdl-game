@@ -3,10 +3,10 @@
 //
 
 #include "skinnedmeshshader.hpp"
-#include "primitiveshader.hpp"
+#include "engine/gl.h"
 #include "lib/loadshaders.hpp"
 #include "meshshader.hpp"
-#include "engine/gl.h"
+#include "primitiveshader.hpp"
 
 SkinnedMeshShader::SkinnedMeshShader(const char* v,
                                      const char* f,

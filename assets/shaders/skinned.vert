@@ -7,12 +7,12 @@ uniform mat4 baseTransform;
 uniform mat4 boneMatrixArray[MAX_BONES];
 uniform mat3 boneMatrixArrayInverseTrans[MAX_BONES];
 
-attribute vec3 position;
-attribute vec2 uvs;
+in vec3 position;
+in vec2 uvs;
 
-// attribute int boneCount;
-// attribute int inBoneIndex[MAX_BONES_PER_VERT];
-// attribute float inBoneWeights[MAX_BONES_PER_VERT];
+in int boneCount;
+in int inBoneIndex[MAX_BONES_PER_VERT];
+in float inBoneWeights[MAX_BONES_PER_VERT];
 
 void main()
 {

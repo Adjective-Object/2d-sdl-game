@@ -1,6 +1,6 @@
 #include "inputhandler.hpp"
-#include "engine/input/input.hpp"
 #include <iostream>
+#include "engine/input/input.hpp"
 
 using namespace InputMapping;
 

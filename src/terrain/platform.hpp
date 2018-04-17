@@ -3,15 +3,15 @@
 
 #include <SDL.h>
 #include <vector>
-#include "engine/pair.hpp"
-#include "engine/entity.hpp"
-#include "./platformsegment.hpp"
-#include "./platformpoint.hpp"
+#include "./collisiondatum.hpp"
+#include "./collisiontype.hpp"
+#include "./platform_movement.hpp"
 #include "./platform_point_iterator.hpp"
 #include "./platform_segment_iterator.hpp"
-#include "./platform_movement.hpp"
-#include "./collisiontype.hpp"
-#include "./collisiondatum.hpp"
+#include "./platformpoint.hpp"
+#include "./platformsegment.hpp"
+#include "engine/entity.hpp"
+#include "engine/pair.hpp"
 
 class Platform : public Entity {
     friend class PlatformSegment;

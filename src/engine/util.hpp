@@ -1,9 +1,9 @@
 #ifndef __ENGINE_UTIL
 #define __ENGINE_UTIL
 
-#include "util.hpp"
 #include <iostream>
 #include <limits>
+#include "util.hpp"
 
 #define DOUBLE_INFINITY std::numeric_limits<double>::infinity()
 

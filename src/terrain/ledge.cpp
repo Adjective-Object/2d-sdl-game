@@ -1,9 +1,9 @@
+#include "./ledge.hpp"
 #include <SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
-#include "engine/pair.hpp"
 #include "constants.hpp"
+#include "engine/pair.hpp"
 #include "facing.hpp"
-#include "./ledge.hpp"
 
 Ledge::Ledge(Pair position, Facing facing)
     : position(position), facing(facing) {}

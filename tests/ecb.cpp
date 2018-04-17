@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "player/ecb.hpp"
+#include "gtest/gtest.h"
 
 TEST(Ecb, construct) {
     Ecb e = Ecb(Pair(0, 0), 1, 1, 1, 1);

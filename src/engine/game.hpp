@@ -1,12 +1,12 @@
 #ifndef __ENGINE_GAME
 #define __ENGINE_GAME
 
+#include <SDL.h>
+#include <SDL_image.h>
+#include <string>
 #include "entity.hpp"
 #include "input/input.hpp"
 #include "scene.hpp"
-#include <SDL_image.h>
-#include <SDL.h>
-#include <string>
 
 class Game;
 extern Game* EnG;

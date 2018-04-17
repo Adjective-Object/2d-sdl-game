@@ -1,15 +1,15 @@
 #ifndef __GAME_SCENES
 #define __GAME_SCENES
 
-#include <vector>
 #include <SDL.h>
+#include <vector>
 
 #include "engine/input/input.hpp"
 #include "engine/input/joystick.hpp"
 #include "engine/scene.hpp"
 #include "engine/text.hpp"
-#include "player/player.hpp"
 #include "player/inputhandler.hpp"
+#include "player/player.hpp"
 #include "terrain/map.hpp"
 
 using namespace Terrain;

@@ -1,7 +1,7 @@
-#include "engine/gl.h"
 #include "engine/shader/meshshader.hpp"
-#include "meshshader.hpp"
 #include <iostream>
+#include "engine/gl.h"
+#include "meshshader.hpp"
 
 #define attribute(name)                                             \
     {                                                               \
@@ -44,9 +44,9 @@ bool MeshShader::hasUniform(MESH_SHADER_UNIFORM uniform) {
 }
 
 MeshShader vertexColorShader =
-    MeshShader("assets/shaders/id.vert", "assets/shaders/red.frag");
+    MeshShader("assets/shaders/id.vert", "assets/shaders/id.frag");
 
 MeshShader textureShader =
     MeshShader("assets/shaders/id_texture.vert", "assets/shaders/texture.frag");
-MeshShader fallbackShader = MeshShader("assets/shaders/id_simple.vert",
-                                       "assets/shaders/fallback.frag");
+MeshShader fallbackShader =
+    MeshShader("assets/shaders/id_simple.vert", "assets/shaders/fallback.frag");

@@ -1,8 +1,8 @@
-#include <string>
-#include <iostream>
 #include <fstream>
-#include <vector>
+#include <iostream>
 #include <map>
+#include <string>
+#include <vector>
 #include "engine/gl.h"
 
 // cribbed from
@@ -10,9 +10,8 @@
 
 std::string REQUIRE_STRING = "// @require";
 
-std::string templateCode(
-        std::string VertexShaderCode,
-        const std::map<std::string, std::string>* defines) {
+std::string templateCode(std::string VertexShaderCode,
+                         const std::map<std::string, std::string>* defines) {
     // insert defines
     if (defines != NULL) {
         bool anyChanges = false;
@@ -24,15 +23,14 @@ std::string templateCode(
             // @require block
             size_t insertionPoint = 0;
             bool foundMatch = false;
-            while ( insertionPoint != (size_t) -1 &&
-                    insertionPoint < VertexShaderCode.length() &&
-                    !foundMatch) {
-                insertionPoint = VertexShaderCode.find(requireString, insertionPoint);
+            while (insertionPoint != (size_t)-1 &&
+                   insertionPoint < VertexShaderCode.length() && !foundMatch) {
+                insertionPoint =
+                    VertexShaderCode.find(requireString, insertionPoint);
                 size_t nextChar = insertionPoint + requireString.length();
                 if (VertexShaderCode[nextChar] == ' ' ||
-                        VertexShaderCode[nextChar] == '\r' ||
-                        VertexShaderCode[nextChar] == '\n'
-                        ) {
+                    VertexShaderCode[nextChar] == '\r' ||
+                    VertexShaderCode[nextChar] == '\n') {
                     foundMatch = true;
                 } else if (insertionPoint != -1) {
                     insertionPoint++;
@@ -43,16 +41,20 @@ std::string templateCode(
                 continue;
             }
 
-            if (insertionPoint != ((size_t) -1)) {
+            if (insertionPoint != ((size_t)-1)) {
                 anyChanges = true;
-                size_t insertionLength = VertexShaderCode.find("\n", insertionPoint) - insertionPoint;
-                std::string DefineString = "#define " + define.first + " " + define.second;
+                size_t insertionLength =
+                    VertexShaderCode.find("\n", insertionPoint) -
+                    insertionPoint;
+                std::string DefineString =
+                    "#define " + define.first + " " + define.second;
                 std::cout << DefineString << std::endl;
-                VertexShaderCode = VertexShaderCode.replace(insertionPoint, insertionLength, DefineString);
+                VertexShaderCode = VertexShaderCode.replace(
+                    insertionPoint, insertionLength, DefineString);
             }
         }
 
-        if(anyChanges) {
+        if (anyChanges) {
             std::cout << "Templated vertex code:" << std::endl;
             int i = 1;
             bool newline = true;
@@ -79,7 +81,9 @@ GLuint LoadShaders(const char* vertex_file_path,
                    const std::map<std::string, std::string>* defines) {
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    CHECK_GL_ERROR(glCreateShader);
     GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    CHECK_GL_ERROR(glCreateShader);
 
     // Read the Vertex Shader code from the file
     std::string VertexShaderCode;
@@ -91,9 +95,9 @@ GLuint LoadShaders(const char* vertex_file_path,
         VertexShaderStream.close();
     } else {
         printf(
-                "Impossible to open %s. Are you in the right directory ? Don't "
-                        "forget to read the FAQ !\n",
-                vertex_file_path);
+            "Impossible to open %s. Are you in the right directory ? Don't "
+            "forget to read the FAQ !\n",
+            vertex_file_path);
         getchar();
         return 0;
     }
@@ -110,13 +114,11 @@ GLuint LoadShaders(const char* vertex_file_path,
         FragmentShaderStream.close();
     }
 
-
     GLint Result = GL_FALSE;
     int InfoLogLength;
 
     // Compile Vertex Shader
     printf("Compiling shader : %s\n", vertex_file_path);
-    PRINT_GL_CONTEXT
     char const* VertexSourcePointer = VertexShaderCode.c_str();
     glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
     CHECK_GL_ERROR(glShaderSource);
@@ -125,7 +127,9 @@ GLuint LoadShaders(const char* vertex_file_path,
 
     // Check Vertex Shader
     glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+    CHECK_GL_ERROR(glGetShaderiv);
     glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    CHECK_GL_ERROR(glGetShaderiv);
     if (Result == GL_FALSE || InfoLogLength > 0) {
         std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
         glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL,
@@ -137,11 +141,15 @@ GLuint LoadShaders(const char* vertex_file_path,
     printf("Compiling shader : %s\n", fragment_file_path);
     char const* FragmentSourcePointer = FragmentShaderCode.c_str();
     glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+    CHECK_GL_ERROR(glShaderSource);
     glCompileShader(FragmentShaderID);
+    CHECK_GL_ERROR(glCompileShader);
 
     // Check Fragment Shader
     glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+    CHECK_GL_ERROR(glGetShaderiv);
     glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    CHECK_GL_ERROR(glGetShaderiv);
     if (Result == GL_FALSE || InfoLogLength > 0) {
         std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
         glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL,
@@ -153,12 +161,17 @@ GLuint LoadShaders(const char* vertex_file_path,
     printf("Linking program\n");
     GLuint ProgramID = glCreateProgram();
     glAttachShader(ProgramID, VertexShaderID);
+    CHECK_GL_ERROR(glAttachShader);
     glAttachShader(ProgramID, FragmentShaderID);
+    CHECK_GL_ERROR(glAttachShader);
     glLinkProgram(ProgramID);
+    CHECK_GL_ERROR(glLinkProgram);
 
     // Check the program
     glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    CHECK_GL_ERROR(glGetProgramiv);
     glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    CHECK_GL_ERROR(glGetProgramiv);
     if (InfoLogLength > 0) {
         std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
         glGetProgramInfoLog(ProgramID, InfoLogLength, NULL,
@@ -167,10 +180,14 @@ GLuint LoadShaders(const char* vertex_file_path,
     }
 
     glDetachShader(ProgramID, VertexShaderID);
+    CHECK_GL_ERROR(glDetachShader);
     glDetachShader(ProgramID, FragmentShaderID);
+    CHECK_GL_ERROR(glDetachShader);
 
     glDeleteShader(VertexShaderID);
+    CHECK_GL_ERROR(glDeleteShader);
     glDeleteShader(FragmentShaderID);
+    CHECK_GL_ERROR(glDeleteShader);
 
     return ProgramID;
 }

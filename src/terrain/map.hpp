@@ -2,14 +2,14 @@
 #define __GAME_MAP
 
 #include <vector>
-#include "engine/entity.hpp"
-#include "player/player.hpp"
-#include "./platform.hpp"
-#include "./ledge.hpp"
 #include "./collisiondatum.hpp"
-#include "widthbuf.hpp"
-#include "iterator_wrapper.hpp"
+#include "./ledge.hpp"
+#include "./platform.hpp"
+#include "engine/entity.hpp"
 #include "engine/renderer/meshrenderer.hpp"
+#include "iterator_wrapper.hpp"
+#include "player/player.hpp"
+#include "widthbuf.hpp"
 
 namespace Terrain {
 
@@ -63,6 +63,6 @@ class Map : public Entity {
 };
 
 extern widthstream out;
-}
+}  // namespace Terrain
 
 #endif

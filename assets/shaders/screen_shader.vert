@@ -1,9 +1,9 @@
-#version 110
+#version 150 core
 
 uniform vec2 screenDimensions;
-attribute vec2 pixelPosition;
-attribute vec2 uvs;
-varying vec2 texCoord;
+in vec2 pixelPosition;
+in vec2 uvs;
+out vec2 texCoord;
 void main()
 {
     vec2 fracPosition = vec2(2, 2) * pixelPosition / screenDimensions;

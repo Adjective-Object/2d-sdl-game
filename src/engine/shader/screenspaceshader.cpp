@@ -1,5 +1,5 @@
-#include <iostream>
 #include "screenspaceshader.hpp"
+#include <iostream>
 
 ScreenShader::ScreenShader(const char* v, const char* f)
     : PrimitiveShader(v, f) {}

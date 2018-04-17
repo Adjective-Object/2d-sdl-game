@@ -2,18 +2,18 @@
 #define __GAME_MAINPLAYER
 
 #include <SDL.h>
-#include "engine/sprite.hpp"
+#include "action.hpp"
+#include "ecbmesh.hpp"
+#include "engine/model/model.hpp"
+#include "engine/renderer/meshrenderer.hpp"
 #include "engine/renderer/multimeshrenderer.hpp"
 #include "engine/renderer/multirenderer.hpp"
-#include "engine/renderer/meshrenderer.hpp"
-#include "engine/model/model.hpp"
-#include "terrain/platform.hpp"
-#include "terrain/ledge.hpp"
-#include "action.hpp"
-#include "playerconfig.hpp"
-#include "playercollision.hpp"
+#include "engine/sprite.hpp"
 #include "inputhandler.hpp"
-#include "ecbmesh.hpp"
+#include "playercollision.hpp"
+#include "playerconfig.hpp"
+#include "terrain/ledge.hpp"
+#include "terrain/platform.hpp"
 
 #define FACE_LEFT -1
 #define FACE_RIGHT 1

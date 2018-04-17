@@ -5,10 +5,10 @@
 #include "engine/renderer/screenrenderer.hpp"
 #include "engine/texture/texture.hpp"
 
-#include "entity.hpp"
-#include "pair.hpp"
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include "entity.hpp"
+#include "pair.hpp"
 
 class Text : public Entity {
    public:

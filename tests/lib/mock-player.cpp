@@ -1,6 +1,6 @@
+#include "player/inputhandler.hpp"
 #include "player/player.hpp"
 #include "player/playerconfig.hpp"
-#include "player/inputhandler.hpp"
 
 bool initialized = false;
 Player* player;

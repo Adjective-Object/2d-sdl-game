@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "engine/gl.h"
+#include "gtest/gtest.h"
 // assimp includes
 #include <assimp/mesh.h>
 #include <engine/model/loader/boneweightloader.hpp>
@@ -36,20 +36,20 @@ void makeMesh(aiMesh& mesh,
 TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
-        aiVertexWeight(// vertex 1
-          1, // mVertexId,
-          0.5 //mWeight
-          ),
+        aiVertexWeight(  // vertex 1
+            1,           // mVertexId,
+            0.5          // mWeight
+            ),
 
-        aiVertexWeight(// vertex 2
-          3, // mVertexId,
-          0.3 //mWeight
-          ),
+        aiVertexWeight(  // vertex 2
+            3,           // mVertexId,
+            0.3          // mWeight
+            ),
 
-        aiVertexWeight(// vertex 3
-          0, // mVertexId,
-          0.2 //mWeight
-          ),
+        aiVertexWeight(  // vertex 3
+            0,           // mVertexId,
+            0.2          // mWeight
+            ),
     };
     aiBone* b1 = makeBone("bone1", bone1Weights, 3);
     aiBone* bonesStack[] = {b1};
@@ -64,7 +64,10 @@ TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
     // check output is valid
 
     std::vector<uint8_t> expectedBoneCounts = {
-        1, 1, 0, 1,
+        1,
+        1,
+        0,
+        1,
     };
 
     std::vector<uint16_t> expectedBoneIndecies = {
@@ -87,33 +90,33 @@ TEST(BoneWeightLoader, loadMeshBoneWeights_SingleBone) {
 TEST(BoneWeightLoader, loadMeshBoneWeights_MultiBone) {
     aiMesh mesh;
     aiVertexWeight bone1Weights[] = {
-        aiVertexWeight(// vertex 1
-          1, // mVertexId,
-          0.5 //mWeight
-          ),
+        aiVertexWeight(  // vertex 1
+            1,           // mVertexId,
+            0.5          // mWeight
+            ),
 
-        aiVertexWeight(// vertex 2
-          3, // mVertexId,
-          0.3 //mWeight
-          ),
+        aiVertexWeight(  // vertex 2
+            3,           // mVertexId,
+            0.3          // mWeight
+            ),
 
-        aiVertexWeight(// vertex 3
-          0, // mVertexId,
-          0.2 //mWeight
-          ),
+        aiVertexWeight(  // vertex 3
+            0,           // mVertexId,
+            0.2          // mWeight
+            ),
     };
     aiBone* b1 = makeBone("bone1", bone1Weights, 3);
 
     aiVertexWeight bone2Weights[] = {
-        aiVertexWeight(// vertex 2
-          3, // mVertexId,
-          0.9 //mWeight
-          ),
+        aiVertexWeight(  // vertex 2
+            3,           // mVertexId,
+            0.9          // mWeight
+            ),
 
-        aiVertexWeight(// vertex 3
-          0, // mVertexId,
-          1.0 //mWeight
-          ),
+        aiVertexWeight(  // vertex 3
+            0,           // mVertexId,
+            1.0          // mWeight
+            ),
     };
     aiBone* b2 = makeBone("bone2", bone2Weights, 2);
     aiBone* bonesStack[] = {b1, b2};
@@ -129,7 +132,10 @@ TEST(BoneWeightLoader, loadMeshBoneWeights_MultiBone) {
     // check output is valid
 
     std::vector<uint8_t> expectedBoneCounts = {
-        2, 1, 0, 2,
+        2,
+        1,
+        0,
+        2,
     };
 
     std::vector<uint16_t> expectedBoneIndecies = {

@@ -1,15 +1,15 @@
 #include "./map.hpp"
-#include "util.hpp"
-#include "engine/util.hpp"
-#include "constants.hpp"
 #include <iostream>
+#include "constants.hpp"
 #include "engine/game.hpp"
-#include "widthbuf.hpp"
+#include "engine/mesh/cube.hpp"
+#include "engine/shader/meshshader.hpp"
+#include "engine/util.hpp"
 #include "map_movement.hpp"
 #include "terrain/platform_point_iterator.hpp"
 #include "terrain/platform_segment_iterator.hpp"
-#include "engine/mesh/cube.hpp"
-#include "engine/shader/meshshader.hpp"
+#include "util.hpp"
+#include "widthbuf.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

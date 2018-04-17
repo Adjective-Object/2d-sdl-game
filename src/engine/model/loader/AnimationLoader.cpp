@@ -1,7 +1,7 @@
-#include <set>
-#include <iostream>
 #include "AnimationLoader.hpp"
 #include <glm/gtx/string_cast.hpp>
+#include <iostream>
+#include <set>
 
 const aiBone* getBoneFromNodeName(const aiMesh* mesh, const aiString name) {
     for (size_t i = 0; i < mesh->mNumBones; i++) {
@@ -22,12 +22,12 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
                                               const aiAnimation* animation) {
     // get times of all keyframes in a way we can actually iterate over
     std::cout << "preallocating meta arrays" << std::endl;
-    size_t *numPosKeys = new size_t[animation->mNumChannels];
-    size_t *curPosKeys = new size_t[animation->mNumChannels];
-    size_t *numRotKeys = new size_t[animation->mNumChannels];
-    size_t *curRotKeys = new size_t[animation->mNumChannels];
-    size_t *numSclKeys = new size_t[animation->mNumChannels];
-    size_t *curSclKeys = new size_t[animation->mNumChannels];
+    size_t* numPosKeys = new size_t[animation->mNumChannels];
+    size_t* curPosKeys = new size_t[animation->mNumChannels];
+    size_t* numRotKeys = new size_t[animation->mNumChannels];
+    size_t* curRotKeys = new size_t[animation->mNumChannels];
+    size_t* numSclKeys = new size_t[animation->mNumChannels];
+    size_t* curSclKeys = new size_t[animation->mNumChannels];
     // can't use variable initializers because clang
     memset(numPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
     memset(curPosKeys, 0, sizeof(size_t) * animation->mNumChannels);
@@ -62,7 +62,7 @@ MeshAnim* AnimationLoader::makeModelAnimation(const aiMesh* mesh,
               std::back_inserter(keyframeTimesOrdered));
     std::sort(keyframeTimesOrdered.begin(), keyframeTimesOrdered.end());
 
-    std::vector<glm::mat4> *frameTransforms =
+    std::vector<glm::mat4>* frameTransforms =
         new std::vector<glm::mat4>[keyframeTimesOrdered.size()];
     for (int t = 0; t < keyframeTimesOrdered.size(); t++) {
         float keyTime = keyframeTimesOrdered[t];

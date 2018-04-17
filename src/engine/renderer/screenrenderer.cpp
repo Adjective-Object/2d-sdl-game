@@ -1,9 +1,9 @@
+#include "screenrenderer.hpp"
 #include <SDL.h>
 #include "abstractrenderer.hpp"
-#include "screenrenderer.hpp"
-#include "engine/shader/screenspaceshader.hpp"
 #include "engine/game.hpp"
 #include "engine/gl.h"
+#include "engine/shader/screenspaceshader.hpp"
 
 ScreenRenderer::ScreenRenderer(Texture* texture, ScreenSpaceQuad* mesh)
     : mesh(mesh) {
@@ -33,7 +33,7 @@ void ScreenRenderer::render(glm::mat4& baseTransform) {
                           GL_FALSE,  // normalized?
                           0,         // stride
                           (void*)0   // array buffer offset
-                          );
+    );
 
     // pass uv data to she shader
     glEnableVertexAttribArray(shader->attributes.uvs);
@@ -44,7 +44,7 @@ void ScreenRenderer::render(glm::mat4& baseTransform) {
                           GL_FALSE,  // normalized?
                           0,         // stride
                           (void*)0   // array buffer offset
-                          );
+    );
 
     glDrawArrays(GL_TRIANGLES, 0, ScreenSpaceQuad::num_points);
     glDisableVertexAttribArray(shader->attributes.uvs);

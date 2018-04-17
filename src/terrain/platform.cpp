@@ -1,18 +1,18 @@
-#include <vector>
+#include "platform.hpp"
+#include <SDL.h>
+#include <stdio.h>
 #include <cmath>
 #include <iostream>
-#include <stdio.h>
-#include <SDL.h>
-#include "engine/pair.hpp"
-#include "platform.hpp"
-#include "platformsegment.hpp"
-#include "platform_movement.hpp"
-#include "constants.hpp"
-#include "util.hpp"
-#include "engine/util.hpp"
+#include <vector>
 #include "./collisiontype.hpp"
-#include "platform_segment_iterator.hpp"
+#include "constants.hpp"
+#include "engine/pair.hpp"
+#include "engine/util.hpp"
+#include "platform_movement.hpp"
 #include "platform_point_iterator.hpp"
+#include "platform_segment_iterator.hpp"
+#include "platformsegment.hpp"
+#include "util.hpp"
 
 #define _debug(...)
 // #define _debug(...) \

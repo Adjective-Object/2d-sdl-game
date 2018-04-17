@@ -1,6 +1,6 @@
-#include <iostream>
-#include <cmath>
 #include "pair.hpp"
+#include <cmath>
+#include <iostream>
 
 Pair::Pair() {}
 Pair::Pair(double x, double y) : x(x), y(y) {}

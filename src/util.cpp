@@ -1,6 +1,6 @@
+#include "./util.hpp"
 #include <cmath>
 #include "engine/pair.hpp"
-#include "./util.hpp"
 
 #include <iostream>
 

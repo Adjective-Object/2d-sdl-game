@@ -1,8 +1,8 @@
+#include "model.hpp"
+#include <engine/shader/skinnedmeshshader.hpp>
 #include <iostream>
 #include <vector>
-#include <engine/shader/skinnedmeshshader.hpp>
 #include "engine/renderer/multimeshrenderer.hpp"
-#include "model.hpp"
 
 Model::Model(std::vector<ModelMesh> meshes) : meshes(meshes) {}
 
@@ -22,7 +22,8 @@ MultiMeshRenderer* Model::makeRenderer() {
         }
         renderers.push_back(new MeshRenderer(s, m.mesh, m.material));
     }
-    std::cout << "model renderer has " << num_meshes << " internal renderers" << std::endl;
+    std::cout << "model renderer has " << num_meshes << " internal renderers"
+              << std::endl;
     return new MultiMeshRenderer(renderers);
 }
 

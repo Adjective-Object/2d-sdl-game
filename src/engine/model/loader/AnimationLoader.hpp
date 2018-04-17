@@ -3,8 +3,8 @@
 
 #include <engine/meshanim/meshanim.hpp>
 // assimp
-#include <assimp/mesh.h>
 #include <assimp/anim.h>
+#include <assimp/mesh.h>
 
 class AnimationLoader {
    public:

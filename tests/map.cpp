@@ -1,9 +1,9 @@
-#include <math.h>
-#include "gtest/gtest.h"
-#include "engine/pair.hpp"
-#include "terrain/platform.hpp"
 #include "terrain/map.hpp"
+#include <math.h>
+#include "engine/pair.hpp"
+#include "gtest/gtest.h"
 #include "lib/mock-player.hpp"
+#include "terrain/platform.hpp"
 #include "util.hpp"
 
 // void Map::getClosestCollision(
@@ -527,7 +527,9 @@ TEST(Map, DISABLED_movePlayer_Upward_Partial_Ledge_Collision) {
     Map m = Map(
         {
             Platform({
-                Pair(3.4, 1.5), Pair(3.4, 1.1), Pair(3.5, 1.1),
+                Pair(3.4, 1.5),
+                Pair(3.4, 1.1),
+                Pair(3.5, 1.1),
             }),
         },
         {});
@@ -577,7 +579,9 @@ TEST(Map, movePlayer_Interrupt_Collision_Motion) {
     Map m = Map(
         {
             Platform({
-                Pair(0, 5), Pair(5, 5), Pair(5, 0),
+                Pair(0, 5),
+                Pair(5, 5),
+                Pair(5, 0),
             }),
         },
         {});
@@ -612,7 +616,10 @@ TEST(Map, movePlayer_Playtest_3) {
     Map m = Map(
         {
             Platform({
-                Pair(2.1, 0.5), Pair(2.5, 0.5), Pair(2.5, 1), Pair(2.1, 1),
+                Pair(2.1, 0.5),
+                Pair(2.5, 0.5),
+                Pair(2.5, 1),
+                Pair(2.1, 1),
                 Pair(2.1, 0.5),
             }),
         },
@@ -646,10 +653,20 @@ TEST(Map, movePlayer_Teleport_Playtest_4) {
         {
             // convoluted floor surface
             Platform({
-                Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35),
-                Pair(0.7, 1.2), Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6),
-                Pair(2.0, 2.0), Pair(2.2, 2.0), Pair(2.4, 2.0), Pair(3, 1.5),
-                Pair(3.4, 1.5), Pair(3.4, 1.1), Pair(3.5, 1.1),
+                Pair(0.1, 2.0),
+                Pair(0.1, 1.35),
+                Pair(0.7, 1.35),
+                Pair(0.7, 1.2),
+                Pair(0.9, 1.2),
+                Pair(0.9, 1.6),
+                Pair(2.2, 1.6),
+                Pair(2.0, 2.0),
+                Pair(2.2, 2.0),
+                Pair(2.4, 2.0),
+                Pair(3, 1.5),
+                Pair(3.4, 1.5),
+                Pair(3.4, 1.1),
+                Pair(3.5, 1.1),
             }),
         },
         {});
@@ -672,12 +689,21 @@ TEST(Map, movePlayer_Teleport_Playtest_4) {
 
 TEST(Map, pointsIterator) {
     std::vector<Pair> pts1 = std::vector<Pair>({
-        Pair(0.1, 2.0), Pair(0.1, 1.35), Pair(0.7, 1.35), Pair(0.7, 1.2),
-        Pair(0.9, 1.2), Pair(0.9, 1.6), Pair(2.2, 1.6), Pair(2.0, 2.0),
-        Pair(2.4, 2.0), Pair(3, 1.0), Pair(3.4, 1.0),
+        Pair(0.1, 2.0),
+        Pair(0.1, 1.35),
+        Pair(0.7, 1.35),
+        Pair(0.7, 1.2),
+        Pair(0.9, 1.2),
+        Pair(0.9, 1.6),
+        Pair(2.2, 1.6),
+        Pair(2.0, 2.0),
+        Pair(2.4, 2.0),
+        Pair(3, 1.0),
+        Pair(3.4, 1.0),
     });
     std::vector<Pair> pts2 = std::vector<Pair>({
-        Pair(2.505, 2.0), Pair(2.45, 2.0),
+        Pair(2.505, 2.0),
+        Pair(2.45, 2.0),
     });
 
     std::set<Pair> pts_set = std::set<Pair>();
@@ -687,7 +713,8 @@ TEST(Map, pointsIterator) {
     // make a map from the point lists
     Map m = Map(
         {
-            Platform(pts1), Platform(pts2),
+            Platform(pts1),
+            Platform(pts2),
         },
         {});
 

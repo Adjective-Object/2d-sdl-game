@@ -1,12 +1,12 @@
-#include "util.hpp"
-#include "engine/util.hpp"
-#include "constants.hpp"
-#include <iostream>
-#include <cmath>
-#include "engine/game.hpp"
-#include "widthbuf.hpp"
-#include "map.hpp"
 #include "map_movement.hpp"
+#include <cmath>
+#include <iostream>
+#include "constants.hpp"
+#include "engine/game.hpp"
+#include "engine/util.hpp"
+#include "map.hpp"
+#include "util.hpp"
+#include "widthbuf.hpp"
 
 using namespace Terrain;
 
@@ -483,4 +483,4 @@ int (*topLeftEdgeCollision)(EDGE_COLL_ARGS) =
                              setEcbSideLeft,
                              getTopLeftEdge,
                              setTopLeftEdge>;
-}
+}  // namespace Terrain

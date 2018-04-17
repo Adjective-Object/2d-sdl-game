@@ -8,17 +8,17 @@
 #include <SDL.h>
 #include <SDL_image.h>
 // assimp
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/quaternion.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 // locals
-#include "engine/mesh/worldspacemesh.hpp"
-#include "engine/material/material.hpp"
-#include "modelloader.hpp"
-#include "engine/meshanim/meshanim.hpp"
-#include "boneweightloader.hpp"
 #include "AnimationLoader.hpp"
+#include "boneweightloader.hpp"
+#include "engine/material/material.hpp"
+#include "engine/mesh/worldspacemesh.hpp"
+#include "engine/meshanim/meshanim.hpp"
+#include "modelloader.hpp"
 
 using namespace std;
 using namespace Assimp;
@@ -39,8 +39,7 @@ LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
     : loadedMesh(m), sourceMesh(a) {}
 
 #define MAX_BONES_PER_VERT 16
-LoadedMesh* makeModel(const aiScene* scene,
-                      const aiMesh* mesh) {
+LoadedMesh* makeModel(const aiScene* scene, const aiMesh* mesh) {
     GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
     GLfloat* colors = NULL;
     GLfloat* uvs = NULL;
@@ -109,7 +108,7 @@ LoadedMesh* makeModel(const aiScene* scene,
             std::cout << "ambient texture @ " << path.C_Str() << std::endl;
             SDL_Surface* loadedSurface = IMG_Load(path.C_Str());
             Texture* loadedTexture = Texture::fromSurface(loadedSurface);
-            delete loadedSurface; 
+            delete loadedSurface;
             material->setAmbientTexture(loadedTexture);
         }
     }
@@ -134,8 +133,7 @@ Model* ModelLoader::queryScene(const char* scenePath) {
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
         const aiMesh* mesh = scene->mMeshes[i];
         std::cout << "considering mesh " << i << " of " << scene->mNumMeshes
-                  << ". name: \"" << mesh->mName.C_Str() << "\""
-                  << std::endl;
+                  << ". name: \"" << mesh->mName.C_Str() << "\"" << std::endl;
         if (0 == strcmp(mesh->mName.C_Str(), scenePath)) {
             std::cout << "loading a mesh with " << mesh->mNumVertices
                       << " verts"
@@ -169,4 +167,3 @@ Model* ModelLoader::queryScene(const char* scenePath) {
 
     return new Model(meshes);
 }
-
