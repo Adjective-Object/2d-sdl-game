@@ -53,7 +53,7 @@ void surfaceToGlTexture(GLuint& glTexture, SDL_Surface* surface) {
                   << std::endl;
     }
 
-    glBindTexture(GL_TEXTURE_2D, glTexture);
+    _glBindTexture(GL_TEXTURE_2D, glTexture);
 
     /*
     std::cout << rgbSurface->w << "x" << rgbSurface->h << std::endl;
@@ -78,17 +78,17 @@ std::endl;
 
     SDL_SaveBMP(rgbSurface, "surface.bmp");
 
-    glTexImage2D(GL_TEXTURE_2D, 0,
+    _glTexImage2D(GL_TEXTURE_2D, 0,
                  GL_RGBA,  // rgb surface
                  rgbSurface->w, rgbSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  rgbSurface->pixels);
-    int glerror = glGetError();
+    int glerror = _glGetError();
     if (glerror != 0)
         std::cout << "error in glTexImage2D" << glerror << " @ " __FILE__ << ":"
                   << __LINE__ << std::endl;
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    _glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    _glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     SDL_FreeSurface(rgbSurface);
 }

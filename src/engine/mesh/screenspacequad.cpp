@@ -39,19 +39,19 @@ void ScreenSpaceQuad::updateMesh(const SDL_Rect& bounds,
     uvs[j++] = (GLfloat)(bounds.w) / textureWidth;
     uvs[j++] = (GLfloat)(bounds.h) / textureHeight;
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_VERTEX_BUFFER_SIZE * sizeof(GLfloat),
+    _glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    _glBufferData(GL_ARRAY_BUFFER, QUAD_VERTEX_BUFFER_SIZE * sizeof(GLfloat),
                  verts, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_UV_BUFFER_SIZE * sizeof(GLfloat), uvs,
+    _glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+    _glBufferData(GL_ARRAY_BUFFER, QUAD_UV_BUFFER_SIZE * sizeof(GLfloat), uvs,
                  GL_STATIC_DRAW);
 }
 
 void ScreenSpaceQuad::init(const SDL_Rect& bounds,
                            const int textureWidth,
                            const int textureHeight) {
-    glGenBuffers(1, &vertexBuffer);
-    glGenBuffers(1, &uvBuffer);
+    _glGenBuffers(1, &vertexBuffer);
+    _glGenBuffers(1, &uvBuffer);
     updateMesh(bounds, textureWidth, textureHeight);
 }

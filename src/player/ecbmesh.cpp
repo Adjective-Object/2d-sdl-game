@@ -50,7 +50,7 @@ void EcbMesh::init(Ecb& e) {
 void EcbMesh::update(Ecb& e) {
     updateMeshToEcb(e, vectorBuffer);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat),
+    _glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    _glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat),
                  vectorBuffer, GL_STATIC_DRAW);
 }

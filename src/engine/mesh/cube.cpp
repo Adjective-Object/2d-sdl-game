@@ -41,16 +41,16 @@ static const GLfloat g_color_buffer_data[] = {
 WorldspaceMesh makeCube() {
     WorldspaceMesh mesh;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &mesh.vertexbuffer);
+    _glGenBuffers(1, &mesh.vertexbuffer);
     // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
+    _glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
     // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
+    _glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
                  g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &mesh.colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data),
+    _glGenBuffers(1, &mesh.colorbuffer);
+    _glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
+    _glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data),
                  g_color_buffer_data, GL_STATIC_DRAW);
 
     mesh.num_points = sizeof(g_vertex_buffer_data) / 3;

@@ -42,6 +42,13 @@ class WorldspaceMesh {
     size_t num_bones;
     size_t num_weights_per_point;
 
+    GLuint vertexArray = -1;
+    GLuint colorArray = -1;
+    GLuint uvArray = -1;
+    GLuint boneWeightArray = -1;
+    GLuint boneIndexArray = -1;
+    GLuint boneCountArray = -1;
+
     glm::mat4* boneTransforms = NULL;
 
     bool hasSkeleton() const;

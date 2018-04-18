@@ -139,6 +139,7 @@ set(LIB_SRCS
     src/engine/texture/texture.hpp
     src/engine/texture/texture.cpp
     src/engine/gl.h
+    src/engine/gl.cpp
     src/engine/mesh/cube.cpp
     src/engine/mesh/cube.hpp
     src/engine/mesh/worldspacemesh.hpp
@@ -161,7 +162,7 @@ set(LIB_SRCS
     src/engine/model/loader/boneweightloader.hpp
     src/engine/model/loader/boneweightloader.cpp
     src/engine/model/loader/loadedmesh.hpp
-        src/engine/model/modelmesh.hpp
+    src/engine/model/modelmesh.hpp
     src/engine/model/loader/AnimationLoader.cpp
     src/engine/model/loader/AnimationLoader.hpp
     src/engine/shader/skinnedmeshshader.cpp

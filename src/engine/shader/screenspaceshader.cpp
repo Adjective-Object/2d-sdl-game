@@ -7,11 +7,11 @@ void ScreenShader::init() {
     PrimitiveShader::init();
 
     uniforms.screenDimensions =
-        glGetUniformLocation(programId, "screenDimensions");
-    uniforms.ambientTexture = glGetUniformLocation(programId, "ambientTexture");
+        _glGetUniformLocation(programId, "screenDimensions");
+    uniforms.ambientTexture = _glGetUniformLocation(programId, "ambientTexture");
 
-    attributes.uvs = glGetAttribLocation(programId, "uvs");
-    attributes.pixelPosition = glGetAttribLocation(programId, "pixelPosition");
+    attributes.uvs = _glGetAttribLocation(programId, "uvs");
+    attributes.pixelPosition = _glGetAttribLocation(programId, "pixelPosition");
 
     std::cout << "uniforms.screenDimensions: " << uniforms.screenDimensions
               << std::endl;

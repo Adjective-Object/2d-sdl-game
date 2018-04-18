@@ -5,14 +5,14 @@
 
 #define attribute(name)                                             \
     {                                                               \
-        attributes.name = glGetAttribLocation(programId, #name);    \
+        attributes.name = _glGetAttribLocation(programId, #name);    \
         std::cout << "attributes." << #name ": " << attributes.name \
                   << std::endl;                                     \
     }
 
 #define uniform(name)                                                         \
     {                                                                         \
-        uniforms.name = glGetUniformLocation(programId, #name);               \
+        uniforms.name = _glGetUniformLocation(programId, #name);               \
         std::cout << "uniforms." << #name ": " << uniforms.name << std::endl; \
     }
 //

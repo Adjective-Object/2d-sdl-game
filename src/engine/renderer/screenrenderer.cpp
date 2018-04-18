@@ -12,22 +12,22 @@ ScreenRenderer::ScreenRenderer(Texture* texture, ScreenSpaceQuad* mesh)
 
 void ScreenRenderer::render(glm::mat4& baseTransform) {
     ScreenShader* shader = &screenShader;
-    glUseProgram(shader->programId);
+    _glUseProgram(shader->programId);
 
     // pass screen dimensions to the shader
     SDL_Rect screenBounds = EnG->getScreenBounds();
-    glUniform2f(shader->uniforms.screenDimensions, screenBounds.w,
+    _glUniform2f(shader->uniforms.screenDimensions, screenBounds.w,
                 screenBounds.h);
 
     // pass texture to the shader
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material.ambientTexture->getTextureID());
-    glUniform1i(shader->uniforms.ambientTexture, 0);
+    _glActiveTexture(GL_TEXTURE0);
+    _glBindTexture(GL_TEXTURE_2D, material.ambientTexture->getTextureID());
+    _glUniform1i(shader->uniforms.ambientTexture, 0);
 
     // pass vertex data to the shader
-    glEnableVertexAttribArray(shader->attributes.pixelPosition);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
-    glVertexAttribPointer(shader->attributes.pixelPosition,
+    _glEnableVertexAttribArray(shader->attributes.pixelPosition);
+    _glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+    _glVertexAttribPointer(shader->attributes.pixelPosition,
                           2,         // size
                           GL_FLOAT,  // type
                           GL_FALSE,  // normalized?
@@ -36,9 +36,9 @@ void ScreenRenderer::render(glm::mat4& baseTransform) {
     );
 
     // pass uv data to she shader
-    glEnableVertexAttribArray(shader->attributes.uvs);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer);
-    glVertexAttribPointer(shader->attributes.uvs,
+    _glEnableVertexAttribArray(shader->attributes.uvs);
+    _glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer);
+    _glVertexAttribPointer(shader->attributes.uvs,
                           2,         // size
                           GL_FLOAT,  // type
                           GL_FALSE,  // normalized?
@@ -46,9 +46,9 @@ void ScreenRenderer::render(glm::mat4& baseTransform) {
                           (void*)0   // array buffer offset
     );
 
-    glDrawArrays(GL_TRIANGLES, 0, ScreenSpaceQuad::num_points);
-    glDisableVertexAttribArray(shader->attributes.uvs);
-    glDisableVertexAttribArray(shader->attributes.pixelPosition);
-    glDisableVertexAttribArray(shader->uniforms.ambientTexture);
-    glDisableVertexAttribArray(shader->uniforms.screenDimensions);
+    _glDrawArrays(GL_TRIANGLES, 0, ScreenSpaceQuad::num_points);
+    _glDisableVertexAttribArray(shader->attributes.uvs);
+    _glDisableVertexAttribArray(shader->attributes.pixelPosition);
+    _glDisableVertexAttribArray(shader->uniforms.ambientTexture);
+    _glDisableVertexAttribArray(shader->uniforms.screenDimensions);
 }

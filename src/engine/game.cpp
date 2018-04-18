@@ -61,8 +61,8 @@ Game::Game(unsigned int width,
     }
 
     // TODO depth test is causing failures on OSX
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    _glEnable(GL_DEPTH_TEST);
+    _glDepthFunc(GL_LESS);
 
     // TODO replace this with a string constant
     FALLBACK_SURFACE = loadPNG("assets/fallback.png");
@@ -151,8 +151,8 @@ void Game::start() {
         currentScene->update();
 
         // update the frame buffer
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        _glClearColor(0, 0, 0, 1);
+        _glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         currentScene->render();
 

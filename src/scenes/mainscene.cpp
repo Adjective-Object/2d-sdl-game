@@ -98,7 +98,6 @@ MainScene::MainScene() : Scene() {
 MainScene::~MainScene() {}
 
 void MainScene::init() {
-    CHECK_GL_ERROR(foo);
 
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
@@ -118,7 +117,6 @@ void MainScene::init() {
             InputMapping::gamecubeKeys, InputMapping::gamecubeKeyAxies,
             EnG->input.getKeyboard());
     }
-    CHECK_GL_ERROR(foo);
 
     PlayerConfig* marthConfig = new PlayerConfig("assets/attributes.yaml");
     player = new Player(marthConfig, playerInput, Pair(0.5, 0.5));
@@ -145,18 +143,12 @@ void MainScene::init() {
 
     // load shaders we plan on using
     vertexColorShader.init();
-    CHECK_GL_ERROR(foo);
     textureShader.init();
-    CHECK_GL_ERROR(foo);
     screenShader.init();
-    CHECK_GL_ERROR(foo);
     fallbackShader.init();
-    CHECK_GL_ERROR(foo);
     skinnedShader.init();
-    CHECK_GL_ERROR(foo);
 
     Scene::init();
-    CHECK_GL_ERROR(foo);
 }
 
 void MainScene::update() {
