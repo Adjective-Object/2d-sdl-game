@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "engine/renderer/screenrenderer.hpp"
+#include "engine/util.hpp"
 #include "string.h"
 
 Text::Text(Pair position, TTF_Font* font, SDL_Color color, const char* text)
@@ -16,7 +17,11 @@ Text::~Text() {
 #define INITIAL_TEXTURE_HEIGHT 50
 
 void Text::updateText(const char* newText) {
-    SDL_Surface* surface = TTF_RenderText_Solid(font, newText, color);
+    SDL_Surface* surface = TTF_RenderText_Blended(font, newText, color);
+    if (surface == NULL) {
+        logSDLError(std::cout, "TTF_RenderText_Blended");
+        exit(1);
+    }
     rect = {.x = (int)position.x,
             .y = (int)position.y,
             .w = surface->w,

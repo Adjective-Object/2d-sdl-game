@@ -1,8 +1,9 @@
 #ifndef __GAME_PLATFORM_SEGMENT_ITERATOR
 #define __GAME_PLATFORM_SEGMENT_ITERATOR
 
-#include "platform.hpp"
 #include "platformsegment.hpp"
+
+class Platform;
 
 class PlatformSegmentArray {
     const Platform* platform;

@@ -1,16 +1,24 @@
 #include <SDL.h>
+#include <iostream>
 #include <stdexcept>
 
 #include "engine/texture/texture.hpp"
 
 GLenum getFormatFromSurface(SDL_Surface* surface) {
-    return (surface->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
+    return (surface->format->BytesPerPixel == 4) ? (false  // TODO
+                                                        ? GL_BGRA
+                                                        : GL_RGBA)
+                                                 : (false  // TODO
+                                                        ? GL_BGR
+                                                        : GL_RGB);
 }
 
-Texture::Texture(int width, int height, int textureMode, const GLvoid* data)
-    : width(width), height(height) {
-    GLuint textureID = 0;
-    glGenTextures(1, &textureID);
+Texture::Texture(int width, int height, GLenum textureMode, const GLvoid* data)
+    : width(width), height(height), textureMode(textureMode) {
+    std::cout << "make texture with width " << width << std::endl;
+    std::cout << "TexureMode " << textureMode << std::endl;
+    glGenTextures(1, &(this->textureID));
+    std::cout << "Texture ID " << textureID << std::endl;
     CHECK_GL_ERROR(glGenTextures);
     glBindTexture(GL_TEXTURE_2D, textureID);
     CHECK_GL_ERROR(glBindTexture);
@@ -55,15 +63,30 @@ void Texture::update(SDL_Surface* surface, SDL_Rect* rect) {
     if (rect->x + rect->w > this->width || rect->y + rect->h > this->height) {
         throw std::invalid_argument("Updated rect outside bounds of texture");
     }
-    glTexSubImage2D(this->textureID,
-                    0,        // level
-                    rect->x,  // x offset
-                    rect->y,  // y offset
-                    rect->w,  // width,
-                    rect->h,  // height,
-                    getFormatFromSurface(surface),
-                    GL_UNSIGNED_BYTE,  // type
-                    surface->pixels    // data
+    std::cout << "Update subtexture width " << rect->w << std::endl;
+    GLenum surfaceTextureMode = getFormatFromSurface(surface);
+    if (surfaceTextureMode != this->textureMode) {
+        std::cerr << "Surface mode is " << surfaceTextureMode
+                  << ", but original surface was " << textureMode << std::endl;
+        throw std::invalid_argument(
+            "Texture mode of surface provided to Texture::update does not match"
+            " initial texture mode");
+    }
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    CHECK_GL_ERROR(glBindTexture);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    CHECK_GL_ERROR(glBindBuffer);
+    glTexSubImage2D(GL_TEXTURE_2D,
+                    0,                   // level
+                    rect->x,             // x offset
+                    rect->y,             // y offset
+                    rect->w,             // width,
+                    rect->h,             // height,
+                    surfaceTextureMode,  // format
+                    GL_UNSIGNED_BYTE,    // type
+                    surface->pixels      // data
     );
     CHECK_GL_ERROR(glTexSubImage2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    CHECK_GL_ERROR(glBindTexture);
 }

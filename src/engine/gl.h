@@ -13,12 +13,14 @@
 #define CHECK_GL_ERROR(name)                                                 \
     {                                                                        \
         int glerror = glGetError();                                          \
-        if (glerror != 0)                                                    \
+        if (glerror != 0) {                                                  \
             std::cout << "\033[1;31m"                                        \
                       << "error " << glerror << " ("                         \
                       << gluErrorString(glerror) << ") "                     \
                       << "in " << #name << " @ " __FILE__ << ":" << __LINE__ \
                       << "\033[0m" << std::endl;                             \
+            exit(1);                                                         \
+        }                                                                    \
     }
 
 #define PRINT_GL_CONTEXT                                                       \

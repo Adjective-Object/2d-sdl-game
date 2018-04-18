@@ -2,8 +2,9 @@
 #define __GAME_PLATFORM_POINT_ITERATOR
 #include <iterator>
 #include "engine/pair.hpp"
-#include "platform.hpp"
 #include "platformpoint.hpp"
+
+class Platform;
 
 class PlatformPointArray {
    private:

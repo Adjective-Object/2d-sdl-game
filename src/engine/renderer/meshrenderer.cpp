@@ -38,10 +38,10 @@ void MeshRenderer::render(mat4& baseTransform) {
         glUniform1i(shader->uniforms.ambientTexture, 0);
         CHECK_GL_ERROR(glUniform1i);
 
-        glEnableVertexAttribArray(shader->attributes.uvs);
-        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer);
         CHECK_GL_ERROR(glBindBuffer);
+        glEnableVertexAttribArray(shader->attributes.uvs);
+        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glVertexAttribPointer(shader->attributes.uvs,
                               2,         // size
                               GL_FLOAT,  // type
@@ -52,10 +52,11 @@ void MeshRenderer::render(mat4& baseTransform) {
         CHECK_GL_ERROR(glVertexAttribPointer);
     }
 
-    glEnableVertexAttribArray(shader->attributes.position);
-    CHECK_GL_ERROR(glEnableVertexAttribArray);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexbuffer);
     CHECK_GL_ERROR(glBindBuffer);
+    std::cout << "bound vertex buffer " << mesh->vertexbuffer << " to GL_ARRAY_BUFFER" << std::endl;
+    glEnableVertexAttribArray(shader->attributes.position);
+    CHECK_GL_ERROR(glEnableVertexAttribArray);
     glVertexAttribPointer(shader->attributes.position,
                           3,         // size
                           GL_FLOAT,  // type
@@ -66,10 +67,10 @@ void MeshRenderer::render(mat4& baseTransform) {
     CHECK_GL_ERROR(glVertexAttribPointer);
 
     if (mesh->hasVertexColors() && shader->hasAttribute(vertexColor)) {
-        glEnableVertexAttribArray(shader->attributes.vertexColor);
-        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->colorbuffer);
         CHECK_GL_ERROR(glBindBuffer);
+        glEnableVertexAttribArray(shader->attributes.vertexColor);
+        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glVertexAttribPointer(shader->attributes.vertexColor,
                               3,         // size
                               GL_FLOAT,  // type
@@ -86,27 +87,27 @@ void MeshRenderer::render(mat4& baseTransform) {
         shader->hasUniform(boneMatrixArray) &&
         shader->hasUniform(boneMatrixArrayInverseTrans)) {
         // load bone attributes
-        glEnableVertexAttribArray(shader->attributes.boneCount);
-        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->boneCountBuffer);
         CHECK_GL_ERROR(glBindBuffer);
+        glEnableVertexAttribArray(shader->attributes.boneCount);
+        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glVertexAttribPointer(shader->attributes.boneCount, 1, GL_INT, GL_FALSE,
                               0, (void*)0);
         CHECK_GL_ERROR(glVertexAttribPointer);
 
-        glEnableVertexAttribArray(shader->attributes.inBoneIndex);
-        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->boneIndexBuffer);
         CHECK_GL_ERROR(glBindBuffer);
+        glEnableVertexAttribArray(shader->attributes.inBoneIndex);
+        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glVertexAttribPointer(shader->attributes.inBoneIndex,
                               shader->bonesPerVertex, GL_INT, GL_FALSE, 0,
                               (void*)0);
         CHECK_GL_ERROR(glVertexAttribPointer);
 
-        glEnableVertexAttribArray(shader->attributes.inBoneWeights);
-        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->boneWeightBuffer);
         CHECK_GL_ERROR(glBindBuffer);
+        glEnableVertexAttribArray(shader->attributes.inBoneWeights);
+        CHECK_GL_ERROR(glEnableVertexAttribArray);
         glVertexAttribPointer(shader->attributes.inBoneWeights,
                               shader->bonesPerVertex, GL_FLOAT, GL_FALSE, 0,
                               (void*)0);

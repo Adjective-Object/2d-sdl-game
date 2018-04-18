@@ -2,6 +2,7 @@
 #define __GAME_COLLISIONDATUM
 
 #include "./platformsegment.hpp"
+#include "./collisiontype.hpp"
 
 class CollisionDatum {
 public:

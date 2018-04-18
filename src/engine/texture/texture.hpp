@@ -5,9 +5,10 @@
 class Texture {
    private:
     GLuint textureID;
+    GLenum textureMode;
     int width;
     int height;
-    Texture(int width, int height, int textureMode, const GLvoid* data);
+    Texture(int width, int height, GLenum textureMode, const GLvoid* data);
 
    public:
     static Texture* fromSurface(SDL_Surface* surface);
