@@ -24,7 +24,7 @@ void MeshRenderer::render(mat4& baseTransform) {
     // get base transform and pass to the shader
     mat4 compoundTransform = baseTransform * modelTransform;
     _glUniformMatrix4fv(shader->uniforms.baseTransform, 1, GL_FALSE,
-                       &compoundTransform[0][0]);
+                        &compoundTransform[0][0]);
 
     // if the shader has a texture and the model has UVs, load them
     if (material && material->hasTexture() && mesh->hasUvs() &&
@@ -36,11 +36,11 @@ void MeshRenderer::render(mat4& baseTransform) {
         _glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer);
         _glEnableVertexAttribArray(shader->attributes.uvs);
         _glVertexAttribPointer(shader->attributes.uvs,
-                              2,         // size
-                              GL_FLOAT,  // type
-                              GL_FALSE,  // normalized?
-                              0,         // stride
-                              (void*)0   // array buffer offset
+                               2,         // size
+                               GL_FLOAT,  // type
+                               GL_FALSE,  // normalized?
+                               0,         // stride
+                               (void*)0   // array buffer offset
         );
     }
 
@@ -48,52 +48,80 @@ void MeshRenderer::render(mat4& baseTransform) {
     _glBindVertexArray(mesh->vertexArray);
     _glEnableVertexAttribArray(shader->attributes.position);
     _glVertexAttribPointer(shader->attributes.position,
-                          3,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          (void*)0   // array buffer offset
+                           3,         // size
+                           GL_FLOAT,  // type
+                           GL_FALSE,  // normalized?
+                           0,         // stride
+                           (void*)0   // array buffer offset
     );
 
     if (mesh->hasVertexColors() && shader->hasAttribute(vertexColor)) {
         _glBindBuffer(GL_ARRAY_BUFFER, mesh->colorbuffer);
         _glEnableVertexAttribArray(shader->attributes.vertexColor);
         _glVertexAttribPointer(shader->attributes.vertexColor,
-                              3,         // size
-                              GL_FLOAT,  // type
-                              GL_FALSE,  // normalized?
-                              0,         // stride
-                              (void*)0   // array buffer offset
+                               3,         // size
+                               GL_FLOAT,  // type
+                               GL_FALSE,  // normalized?
+                               0,         // stride
+                               (void*)0   // array buffer offset
         );
     }
 
-    if (mesh->hasSkeleton() && shader->hasAttribute(boneCount) &&
-        shader->hasAttribute(inBoneIndex) &&
-        shader->hasAttribute(inBoneWeights) &&
-        shader->hasUniform(boneMatrixArray) &&
-        shader->hasUniform(boneMatrixArrayInverseTrans)) {
+    // std::cout << "checking Shader @ " << shader << std::endl;
+    // std::cout << mesh->hasSkeleton() << ", " <<
+    // shader->hasAttribute(boneCount)
+    //           << ", " << shader->hasAttribute(inBoneIndex) << ", "
+    //           << shader->hasAttribute(inBoneWeights) << ", "
+    //           << shader->hasUniform(boneMatrixArray) << ", "
+    //           << shader->hasUniform(boneMatrixArrayInverseTrans) <<
+    //           std::endl;
+    if (mesh->hasSkeleton()) {
         // load bone attributes
-        _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneCountBuffer);
-        _glEnableVertexAttribArray(shader->attributes.boneCount);
-        _glVertexAttribPointer(shader->attributes.boneCount, 1, GL_INT, GL_FALSE,
-                              0, (void*)0);
 
-        _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneIndexBuffer);
-        _glEnableVertexAttribArray(shader->attributes.inBoneIndex);
-        _glVertexAttribPointer(shader->attributes.inBoneIndex,
-                              shader->bonesPerVertex, GL_INT, GL_FALSE, 0,
-                              (void*)0);
+        if (shader->hasAttribute(boneCount)) {
+            std::cout << "buffering bone counts from " << mesh->boneCountBuffer << std::endl;
+            _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneCountBuffer);
+            _glEnableVertexAttribArray(shader->attributes.boneCount);
+            _glVertexAttribPointer(shader->attributes.boneCount,
+                                   1,                 // size
+                                   GL_UNSIGNED_BYTE,  // type
+                                   GL_FALSE,          // normalized?
+                                   0,                 // stride
+                                   (void*)0);         // array buffer offset
+        }
 
-        _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneWeightBuffer);
-        _glEnableVertexAttribArray(shader->attributes.inBoneWeights);
-        _glVertexAttribPointer(shader->attributes.inBoneWeights,
-                              shader->bonesPerVertex, GL_FLOAT, GL_FALSE, 0,
-                              (void*)0);
+        if (shader->hasAttribute(inBoneIndex)) {
+            std::cout << "buffering bone indecies from " << mesh->boneIndexBuffer << std::endl;
+            _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneIndexBuffer);
+            _glEnableVertexAttribArray(shader->attributes.inBoneIndex);
+            _glVertexAttribPointer(shader->attributes.inBoneIndex,
+                                   shader->bonesPerVertex,  // size per call
+                                   GL_UNSIGNED_SHORT,       // type
+                                   GL_FALSE,                // normalized?
+                                   0,                       // stride
+                                   (void*)0  // array buffer offset
+            );
+        }
+        if (shader->hasAttribute(inBoneWeights)) {
+            std::cout << "buffering bone weights from " << mesh->boneWeightBuffer << std::endl;
+            _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneWeightBuffer);
+            _glEnableVertexAttribArray(shader->attributes.inBoneWeights);
+            _glVertexAttribPointer(shader->attributes.inBoneWeights,
+                                   shader->bonesPerVertex,  // size per call
+                                   GL_FLOAT,                // type
+                                   GL_FALSE,                // normalized
+                                   0,                       // stride
+                                   (void*)0  // array buffer offset
+            );
+        }
 
         // load bone transform uniforms
         // TODO avoid doing this repeatedly for models with same skeletons
-        _glUniformMatrix4fv(shader->uniforms.boneMatrixArray, mesh->num_bones, 0,
-                           (GLfloat*)mesh->boneTransforms);
+        if (shader->hasUniform(boneMatrixArray)) {
+            _glUniformMatrix4fv(shader->uniforms.boneMatrixArray,
+                                mesh->num_bones, 0,
+                                (GLfloat*)mesh->boneTransforms);
+        }
     }
 
     _glDrawArrays(GL_TRIANGLES, 0, mesh->num_points);

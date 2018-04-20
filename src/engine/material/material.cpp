@@ -79,9 +79,9 @@ std::endl;
     SDL_SaveBMP(rgbSurface, "surface.bmp");
 
     _glTexImage2D(GL_TEXTURE_2D, 0,
-                 GL_RGBA,  // rgb surface
-                 rgbSurface->w, rgbSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 rgbSurface->pixels);
+                  GL_RGBA,  // rgb surface
+                  rgbSurface->w, rgbSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                  rgbSurface->pixels);
     int glerror = _glGetError();
     if (glerror != 0)
         std::cout << "error in glTexImage2D" << glerror << " @ " __FILE__ << ":"

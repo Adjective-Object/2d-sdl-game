@@ -5,22 +5,19 @@
 
 #define attribute(name)                                             \
     {                                                               \
-        attributes.name = _glGetAttribLocation(programId, #name);    \
+        attributes.name = _glGetAttribLocation(programId, #name);   \
         std::cout << "attributes." << #name ": " << attributes.name \
                   << std::endl;                                     \
     }
 
 #define uniform(name)                                                         \
     {                                                                         \
-        uniforms.name = _glGetUniformLocation(programId, #name);               \
+        uniforms.name = _glGetUniformLocation(programId, #name);              \
         std::cout << "uniforms." << #name ": " << uniforms.name << std::endl; \
     }
 //
 MeshShader::MeshShader(const char* v, const char* f) : PrimitiveShader(v, f) {}
 void MeshShader::init() {
-    defines["MAX_BONES"] = std::to_string(16);
-    defines["MAX_BONES_PER_VERT"] = std::to_string(4);
-
     PrimitiveShader::init();
 
     // use macros to define the initialization of attributes & macros

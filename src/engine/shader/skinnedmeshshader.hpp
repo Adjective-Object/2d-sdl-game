@@ -19,6 +19,8 @@ class SkinnedMeshShader : public MeshShader {
                       const char* frag,
                       size_t max_bones,
                       size_t max_bones_per_vert);
+
+    void init() override;
 };
 
 extern SkinnedMeshShader skinnedShader;

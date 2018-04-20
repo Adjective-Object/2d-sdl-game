@@ -34,13 +34,13 @@ void WorldspaceMesh::initSkeleton(const uint8_t* vertBoneCounts,
                                   size_t num_bones) {
     _glGenBuffers(1, &boneWeightBuffer);
     _glGenVertexArrays(1, &boneWeightArray);
-    
+
     _glGenBuffers(1, &boneIndexBuffer);
     _glGenVertexArrays(1, &boneIndexArray);
-    
+
     _glGenBuffers(1, &boneCountBuffer);
     _glGenVertexArrays(1, &boneCountArray);
-    
+
     updateSkeleton(vertBoneCounts, vertBoneIndecies, boneWeights,
                    num_weights_per_point, num_bones);
 }
@@ -51,19 +51,19 @@ void WorldspaceMesh::updateMesh(const GLfloat* verts,
     if (verts) {
         _glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         _glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
-                     GL_STATIC_DRAW);
+                      GL_STATIC_DRAW);
     }
 
     if (colors) {
         _glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
         _glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), colors,
-                     GL_STATIC_DRAW);
+                      GL_STATIC_DRAW);
     }
 
     if (uvs) {
         _glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
         _glBufferData(GL_ARRAY_BUFFER, num_points * 2 * sizeof(GLfloat), uvs,
-                     GL_STATIC_DRAW);
+                      GL_STATIC_DRAW);
     }
 }
 
@@ -75,19 +75,39 @@ void WorldspaceMesh::updateSkeleton(const uint8_t* vertBoneCounts,
     this->num_bones = num_bones;
     this->num_weights_per_point = num_weights_per_point;
 
+        std::cout << "vertBoneIndecies:";
+        for (int i = 0; i < num_weights_per_point * num_points; i++) {
+            std::cout << vertBoneIndecies[i] << ", ";
+        }
+        std::cout << std::endl;
+        std::cout << "vertBoneWeights:";
+        for (int i = 0; i < num_weights_per_point * num_points; i++) {
+            std::cout << vertBoneWeights[i] << ", ";
+        }
+        std::cout << std::endl;
+        std::cout << "vertBoneCounts:";
+        for (int i = 0; i < num_points; i++) {
+            std::cout << (int)(vertBoneCounts[i]) << ", ";
+        }
+        std::cout << std::endl;
+
+
+    std::cout << "buffering bone counts to " << boneCountBuffer << std::endl;
     _glBindBuffer(GL_ARRAY_BUFFER, boneCountBuffer);
     _glBufferData(GL_ARRAY_BUFFER, num_points * sizeof(uint8_t), vertBoneCounts,
-                 GL_STATIC_DRAW);
+                  GL_STATIC_DRAW);
 
+    std::cout << "buffering bone indecies to " << boneIndexBuffer << std::endl;
     _glBindBuffer(GL_ARRAY_BUFFER, boneIndexBuffer);
     _glBufferData(GL_ARRAY_BUFFER,
-                 num_weights_per_point * num_points * sizeof(uint16_t),
-                 vertBoneIndecies, GL_STATIC_DRAW);
+                  num_weights_per_point * num_points * sizeof(uint16_t),
+                  vertBoneIndecies, GL_STATIC_DRAW);
 
+    std::cout << "buffering bone weights to " << boneWeightBuffer << std::endl;
     _glBindBuffer(GL_ARRAY_BUFFER, boneWeightBuffer);
     _glBufferData(GL_ARRAY_BUFFER,
-                 num_weights_per_point * num_points * sizeof(GLfloat),
-                 vertBoneWeights, GL_STATIC_DRAW);
+                  num_weights_per_point * num_points * sizeof(GLfloat),
+                  vertBoneWeights, GL_STATIC_DRAW);
 
     if (boneTransforms != NULL) {
         delete[] boneTransforms;

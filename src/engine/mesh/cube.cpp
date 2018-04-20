@@ -46,12 +46,12 @@ WorldspaceMesh makeCube() {
     _glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
     // Give our vertices to OpenGL.
     _glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
-                 g_vertex_buffer_data, GL_STATIC_DRAW);
+                  g_vertex_buffer_data, GL_STATIC_DRAW);
 
     _glGenBuffers(1, &mesh.colorbuffer);
     _glBindBuffer(GL_ARRAY_BUFFER, mesh.colorbuffer);
     _glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data),
-                 g_color_buffer_data, GL_STATIC_DRAW);
+                  g_color_buffer_data, GL_STATIC_DRAW);
 
     mesh.num_points = sizeof(g_vertex_buffer_data) / 3;
 

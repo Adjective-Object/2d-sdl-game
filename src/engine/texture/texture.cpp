@@ -22,13 +22,13 @@ Texture::Texture(int width, int height, GLenum textureMode, const GLvoid* data)
     std::cout << "Texture ID " << textureID << std::endl;
     _glBindTexture(GL_TEXTURE_2D, textureID);
     _glTexImage2D(GL_TEXTURE_2D,
-                 0,            // level
-                 textureMode,  // internalFormat
-                 width, height,
-                 0,                 // border
-                 textureMode,       // format
-                 GL_UNSIGNED_BYTE,  // type
-                 data);
+                  0,            // level
+                  textureMode,  // internalFormat
+                  width, height,
+                  0,                 // border
+                  textureMode,       // format
+                  GL_UNSIGNED_BYTE,  // type
+                  data);
 
     _glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -70,14 +70,14 @@ void Texture::update(SDL_Surface* surface, SDL_Rect* rect) {
     _glBindTexture(GL_TEXTURE_2D, textureID);
     _glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     _glTexSubImage2D(GL_TEXTURE_2D,
-                    0,                   // level
-                    rect->x,             // x offset
-                    rect->y,             // y offset
-                    rect->w,             // width,
-                    rect->h,             // height,
-                    surfaceTextureMode,  // format
-                    GL_UNSIGNED_BYTE,    // type
-                    surface->pixels      // data
+                     0,                   // level
+                     rect->x,             // x offset
+                     rect->y,             // y offset
+                     rect->w,             // width,
+                     rect->h,             // height,
+                     surfaceTextureMode,  // format
+                     GL_UNSIGNED_BYTE,    // type
+                     surface->pixels      // data
     );
     _glBindTexture(GL_TEXTURE_2D, 0);
 }

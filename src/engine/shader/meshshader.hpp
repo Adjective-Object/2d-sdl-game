@@ -49,7 +49,7 @@ class MeshShader : public PrimitiveShader {
     MeshShaderAttributes attributes;
 
     MeshShader(const char* vec, const char* frag);
-    void init();
+    void init() override;
 
     bool hasAttribute(MESH_SHADER_ATTRIBUTE);
     bool hasUniform(MESH_SHADER_UNIFORM);

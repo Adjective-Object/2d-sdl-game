@@ -13,7 +13,7 @@ class PrimitiveShader {
    public:
     GLuint programId;
     PrimitiveShader(const char* vec, const char* frag);
-    void init();
+    virtual void init();
 };
 
 #endif

@@ -26,8 +26,8 @@ Player::Player(PlayerConfig* config, InputHandler* input, Pair initialPosition)
 Player::~Player() {}
 
 void Player::init() {
-    mesh.init(currentCollision->postCollision);
-    ecbMeshRenderer = new MeshRenderer(&vertexColorShader, &mesh);
+    mEcbMesh.init(currentCollision->postCollision);
+    ecbMeshRenderer = new MeshRenderer(&vertexColorShader, &mEcbMesh);
 
     ModelLoader loader;
     if (loader.load("test-assets/cube_move.dae")) {
@@ -61,14 +61,15 @@ void Player::init() {
 
 void Player::updateMesh() {
     // update ecb
-    mesh.update(currentCollision->postCollision);
+    mEcbMesh.update(currentCollision->postCollision);
 
     // update location
     glm::mat4 modelTransform;
     modelTransform = glm::translate(
         modelTransform, glm::vec3(position.x + PLAYER_ECB_OFFSET.x,
                                   position.y + PLAYER_ECB_OFFSET.y, 0));
-    ecbMeshRenderer->setModelTransform(modelTransform);
+    ecbMeshRenderer->setModelTransform(
+        glm::translate(modelTransform, glm::vec3(0, 0, -0.5)));
 
     // update model base transform
     modelTransform = glm::mat4();

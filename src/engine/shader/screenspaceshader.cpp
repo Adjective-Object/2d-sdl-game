@@ -8,7 +8,8 @@ void ScreenShader::init() {
 
     uniforms.screenDimensions =
         _glGetUniformLocation(programId, "screenDimensions");
-    uniforms.ambientTexture = _glGetUniformLocation(programId, "ambientTexture");
+    uniforms.ambientTexture =
+        _glGetUniformLocation(programId, "ambientTexture");
 
     attributes.uvs = _glGetAttribLocation(programId, "uvs");
     attributes.pixelPosition = _glGetAttribLocation(programId, "pixelPosition");

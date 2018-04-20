@@ -98,7 +98,6 @@ MainScene::MainScene() : Scene() {
 MainScene::~MainScene() {}
 
 void MainScene::init() {
-
     joystick = EnG->input.getJoystick(0);
     if (joystick) {
         joystick->calibrateAxis(0, -30000, 32800, 450);

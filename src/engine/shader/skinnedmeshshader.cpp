@@ -12,9 +12,18 @@ SkinnedMeshShader::SkinnedMeshShader(const char* v,
                                      const char* f,
                                      size_t maxBones,
                                      size_t maxBonesPerVert)
-    : MeshShader(v, f), maxBones(maxBones), maxBonesPerVert(maxBonesPerVert) {}
+    : MeshShader(v, f), maxBones(maxBones), maxBonesPerVert(maxBonesPerVert) {
+    std::cout << "initialized skinned mesh shader @ " << this << std::endl;
+}
 
 SkinnedMeshShader skinnedShader("assets/shaders/skinned.vert",
-                                "assets/shaders/fallback.frag",
+                                "assets/shaders/id.frag",
                                 24,
                                 4);
+
+void SkinnedMeshShader::init() {
+    defines["MAX_BONES"] = std::to_string(maxBones);
+    defines["MAX_BONES_PER_VERT"] = std::to_string(maxBonesPerVert);
+
+    MeshShader::init();
+}

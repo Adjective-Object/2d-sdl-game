@@ -39,41 +39,43 @@ LoadedMesh::LoadedMesh(ModelMesh m, const aiMesh* a)
     : loadedMesh(m), sourceMesh(a) {}
 
 #define MAX_BONES_PER_VERT 16
-LoadedMesh* makeModel(const aiScene* scene, const aiMesh* mesh) {
-    GLfloat* verts = new GLfloat[mesh->mNumFaces * 9];
+LoadedMesh* makeModel(const aiScene* scene, const aiMesh* assimpMesh) {
+    GLfloat* verts = new GLfloat[assimpMesh->mNumFaces * 9];
     GLfloat* colors = NULL;
     GLfloat* uvs = NULL;
 
-    if (mesh->HasVertexColors(0)) {
-        std::cout << "mesh has vertex colors" << std::endl;
-        colors = new GLfloat[mesh->mNumFaces * 9];
+    if (assimpMesh->HasVertexColors(0)) {
+        std::cout << "assimpMesh has vertex colors" << std::endl;
+        colors = new GLfloat[assimpMesh->mNumFaces * 9];
     }
 
-    if (mesh->HasTextureCoords(0)) {
-        std::cout << "mesh has uvs" << std::endl;
-        uvs = new GLfloat[mesh->mNumFaces * 6];
+    if (assimpMesh->HasTextureCoords(0)) {
+        std::cout << "assimpMesh has uvs" << std::endl;
+        uvs = new GLfloat[assimpMesh->mNumFaces * 6];
     }
 
+    // Duplicate points shared between faces of triangles so that
+    // everything can be rendered with _glDrawArrays( GL_TRIANGLES ..
     size_t tri = 0;
-    for (size_t f = 0; f < mesh->mNumFaces; f++) {
-        aiFace face = mesh->mFaces[f];
+    for (size_t f = 0; f < assimpMesh->mNumFaces; f++) {
+        aiFace face = assimpMesh->mFaces[f];
         for (size_t ind = 0; ind < face.mNumIndices; ind++) {
             size_t vertexIndex = face.mIndices[ind];
 
-            aiVector3D vert = mesh->mVertices[vertexIndex];
-            verts[tri * 3] = vert.x;
-            verts[tri * 3 + 1] = vert.y;
-            verts[tri * 3 + 2] = vert.z;
+            aiVector3D originalVertex = assimpMesh->mVertices[vertexIndex];
+            verts[tri * 3] = originalVertex.x;
+            verts[tri * 3 + 1] = originalVertex.y;
+            verts[tri * 3 + 2] = originalVertex.z;
 
             if (colors) {
-                aiColor4D color = mesh->mColors[0][vertexIndex];
+                aiColor4D color = assimpMesh->mColors[0][vertexIndex];
                 colors[tri * 3] = color.r;
                 colors[tri * 3 + 1] = color.g;
                 colors[tri * 3 + 2] = color.b;
             }
 
             if (uvs) {
-                aiVector3D uv = mesh->mTextureCoords[0][vertexIndex];
+                aiVector3D uv = assimpMesh->mTextureCoords[0][vertexIndex];
                 uvs[tri * 2] = uv.x;
                 uvs[tri * 2 + 1] = uv.y;
             }
@@ -84,7 +86,7 @@ LoadedMesh* makeModel(const aiScene* scene, const aiMesh* mesh) {
 
     // build an array of bone weights if the model has bones
     BoneWeightLoader boneWeights;
-    boneWeights.loadMeshBoneWeights(mesh, MAX_BONES_PER_VERT);
+    boneWeights.loadMeshBoneWeights(assimpMesh, MAX_BONES_PER_VERT);
 
     // assemble the final mesh
     WorldspaceMesh* outMesh = new WorldspaceMesh();
@@ -97,7 +99,7 @@ LoadedMesh* makeModel(const aiScene* scene, const aiMesh* mesh) {
     }
 
     // construct a material from the corresponding aiMaterial
-    aiMaterial* loadedMaterial = scene->mMaterials[mesh->mMaterialIndex];
+    aiMaterial* loadedMaterial = scene->mMaterials[assimpMesh->mMaterialIndex];
     Material* material = new Material();
     if (loadedMaterial->GetTextureCount(aiTextureType_AMBIENT)) {
         std::cout << "material has an ambient texture" << std::endl;
@@ -119,7 +121,7 @@ LoadedMesh* makeModel(const aiScene* scene, const aiMesh* mesh) {
             .mesh = outMesh,
             .animations = std::map<std::string, MeshAnim*>(),
         },
-        mesh);
+        assimpMesh);
     return m;
 }
 

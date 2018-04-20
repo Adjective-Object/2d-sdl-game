@@ -10,7 +10,7 @@
     {                      \
         out[i++] = x;      \
         out[i++] = y;      \
-        out[i++] = -0.5;   \
+        out[i++] = 0;      \
     }
 
 void updateMeshToEcb(Ecb& e, GLfloat* out) {
@@ -52,5 +52,5 @@ void EcbMesh::update(Ecb& e) {
 
     _glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     _glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat),
-                 vectorBuffer, GL_STATIC_DRAW);
+                  vectorBuffer, GL_STATIC_DRAW);
 }
