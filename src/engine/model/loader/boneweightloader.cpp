@@ -83,21 +83,6 @@ bool BoneWeightLoader::loadMeshBoneWeights(const aiMesh* mesh,
                 vertBoneCounts[weight.mVertexId]++;
             }
         }
-        std::cout << "bone indecies:";
-        for (int i = 0; i < numWeights; i++) {
-            std::cout << this->vertBoneIndecies[i] << ", ";
-        }
-        std::cout << std::endl;
-        std::cout << "bone weights:";
-        for (int i = 0; i < numWeights; i++) {
-            std::cout << this->vertBoneWeights[i] << ", ";
-        }
-        std::cout << std::endl;
-        std::cout << "bone counts:";
-        for (int i = 0; i < mesh->mNumVertices; i++) {
-            std::cout << (int)(this->vertBoneCounts[i]) << ", ";
-        }
-        std::cout << std::endl;
         initialized = true;
         return true;
     }
