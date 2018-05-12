@@ -79,7 +79,8 @@ void MeshRenderer::render(mat4& baseTransform) {
         // load bone attributes
 
         if (shader->hasAttribute(boneCount)) {
-            std::cout << "buffering bone counts from " << mesh->boneCountBuffer << std::endl;
+            // std::cout << "buffering bone counts from " << mesh->boneCountBuffer
+            //           << std::endl;
             _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneCountBuffer);
             _glEnableVertexAttribArray(shader->attributes.boneCount);
             _glVertexAttribPointer(shader->attributes.boneCount,
@@ -91,7 +92,8 @@ void MeshRenderer::render(mat4& baseTransform) {
         }
 
         if (shader->hasAttribute(inBoneIndex)) {
-            std::cout << "buffering bone indecies from " << mesh->boneIndexBuffer << std::endl;
+            // std::cout << "buffering bone indecies from "
+            //           << mesh->boneIndexBuffer << std::endl;
             _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneIndexBuffer);
             _glEnableVertexAttribArray(shader->attributes.inBoneIndex);
             _glVertexAttribPointer(shader->attributes.inBoneIndex,
@@ -103,7 +105,8 @@ void MeshRenderer::render(mat4& baseTransform) {
             );
         }
         if (shader->hasAttribute(inBoneWeights)) {
-            std::cout << "buffering bone weights from " << mesh->boneWeightBuffer << std::endl;
+            // std::cout << "buffering bone weights from "
+            //           << mesh->boneWeightBuffer << std::endl;
             _glBindBuffer(GL_ARRAY_BUFFER, mesh->boneWeightBuffer);
             _glEnableVertexAttribArray(shader->attributes.inBoneWeights);
             _glVertexAttribPointer(shader->attributes.inBoneWeights,
@@ -124,7 +127,12 @@ void MeshRenderer::render(mat4& baseTransform) {
         }
     }
 
-    _glDrawArrays(GL_TRIANGLES, 0, mesh->num_points);
+    _glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+    _glDrawElements(GL_TRIANGLES,                     // mode
+                    mesh->num_tris * 3,               // count
+                    WORLDSPACE_MESH_INDEX_TYPE_NAME,  // type
+                    (void*)0                          // offset
+    );
 }
 
 void MeshRenderer::setModelTransform(mat4 t) {

@@ -40,11 +40,22 @@ void fillMeshColors(glm::vec3 color, GLfloat* out) {
     }
 }
 
+void fillMeshIndecies(WORLDSPACE_MESH_INDEX_TYPE* out) {
+    for (size_t i = 0; i < 36; i++) {
+        out[i] = i;
+    }
+}
+
 void EcbMesh::init(Ecb& e) {
     updateMeshToEcb(e, vectorBuffer);
     fillMeshColors(glm::vec3(212 / 255.0f, 112 / 255.0f, 95 / 255.0f),
                    colorBuffer);
-    WorldspaceMesh::init(vectorBuffer, colorBuffer, NULL, 12);
+    fillMeshIndecies(indexBuffer);
+    WorldspaceMesh::init(vectorBuffer, indexBuffer, colorBuffer,
+                         NULL,  // uv_buffer
+                         12,    // num_verts
+                         4      // num_tris
+    );
 }
 
 void EcbMesh::update(Ecb& e) {

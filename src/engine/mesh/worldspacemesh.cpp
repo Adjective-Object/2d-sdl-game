@@ -1,18 +1,31 @@
 #include "worldspacemesh.hpp"
 #include <glm/detail/type_mat.hpp>
 #include <iostream>
+#include <limits>
 #include "engine/gl.h"
 
 void WorldspaceMesh::init(const GLfloat* verts,
+                          const WORLDSPACE_MESH_INDEX_TYPE* indecies,
                           const GLfloat* colors,
                           const GLfloat* uvs,
-                          size_t num_points) {
+                          size_t num_points,
+                          size_t num_tris) {
     this->num_points = num_points;
-
-    if (verts) {
-        _glGenBuffers(1, &vertexbuffer);
-        _glGenVertexArrays(1, &vertexArray);
+    this->num_tris = num_tris;
+    size_t max_indexable_points =
+        std::numeric_limits<WORLDSPACE_MESH_INDEX_TYPE>::max();
+    if (num_points > max_indexable_points) {
+        throw std::invalid_argument("More points in mesh than can be indexed");
     }
+
+    if (verts == nullptr || indecies == nullptr) {
+        throw std::invalid_argument(
+            "verts and indecies must both be specified");
+    }
+
+    _glGenBuffers(1, &vertexbuffer);
+    _glGenVertexArrays(1, &vertexArray);
+    _glGenBuffers(1, &indexBuffer);
 
     if (colors) {
         _glGenBuffers(1, &colorbuffer);
@@ -24,7 +37,7 @@ void WorldspaceMesh::init(const GLfloat* verts,
         _glGenVertexArrays(1, &uvArray);
     }
 
-    updateMesh(verts, colors, uvs);
+    updateMesh(verts, indecies, colors, uvs);
 }
 
 void WorldspaceMesh::initSkeleton(const uint8_t* vertBoneCounts,
@@ -46,12 +59,22 @@ void WorldspaceMesh::initSkeleton(const uint8_t* vertBoneCounts,
 }
 
 void WorldspaceMesh::updateMesh(const GLfloat* verts,
+                                const WORLDSPACE_MESH_INDEX_TYPE* indecies,
                                 const GLfloat* colors,
                                 const GLfloat* uvs) {
     if (verts) {
+        std::cout << "num_pts: " << num_points << std::endl;
         _glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         _glBufferData(GL_ARRAY_BUFFER, num_points * 3 * sizeof(GLfloat), verts,
                       GL_STATIC_DRAW);
+    }
+
+    if (indecies) {
+        std::cout << "num_tris: " << num_tris << std::endl;
+        _glBindBuffer(GL_ARRAY_BUFFER, indexBuffer);
+        _glBufferData(GL_ARRAY_BUFFER,
+                      num_tris * 3 * sizeof(WORLDSPACE_MESH_INDEX_TYPE),
+                      indecies, GL_STATIC_DRAW);
     }
 
     if (colors) {
@@ -75,22 +98,21 @@ void WorldspaceMesh::updateSkeleton(const uint8_t* vertBoneCounts,
     this->num_bones = num_bones;
     this->num_weights_per_point = num_weights_per_point;
 
-        std::cout << "vertBoneIndecies:";
-        for (int i = 0; i < num_weights_per_point * num_points; i++) {
-            std::cout << vertBoneIndecies[i] << ", ";
-        }
-        std::cout << std::endl;
-        std::cout << "vertBoneWeights:";
-        for (int i = 0; i < num_weights_per_point * num_points; i++) {
-            std::cout << vertBoneWeights[i] << ", ";
-        }
-        std::cout << std::endl;
-        std::cout << "vertBoneCounts:";
-        for (int i = 0; i < num_points; i++) {
-            std::cout << (int)(vertBoneCounts[i]) << ", ";
-        }
-        std::cout << std::endl;
-
+    std::cout << "vertBoneIndecies:";
+    for (int i = 0; i < num_weights_per_point * num_points; i++) {
+        std::cout << vertBoneIndecies[i] << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "vertBoneWeights:";
+    for (int i = 0; i < num_weights_per_point * num_points; i++) {
+        std::cout << vertBoneWeights[i] << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "vertBoneCounts:";
+    for (int i = 0; i < num_points; i++) {
+        std::cout << (int)(vertBoneCounts[i]) << ", ";
+    }
+    std::cout << std::endl;
 
     std::cout << "buffering bone counts to " << boneCountBuffer << std::endl;
     _glBindBuffer(GL_ARRAY_BUFFER, boneCountBuffer);

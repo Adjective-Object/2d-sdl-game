@@ -28,8 +28,12 @@ using namespace Terrain;
 widthstream Terrain::out(255, std::cout);
 
 void Map::makeMapMesh() {
-    std::vector<float>* meshPoints = new std::vector<float>();
-    std::vector<float>* meshColors = new std::vector<float>();
+    std::vector<GLfloat>* meshPoints = new std::vector<GLfloat>();
+    std::vector<GLfloat>* meshColors = new std::vector<GLfloat>();
+    std::vector<WORLDSPACE_MESH_INDEX_TYPE>* meshIndecies =
+        new std::vector<WORLDSPACE_MESH_INDEX_TYPE>();
+    WORLDSPACE_MESH_INDEX_TYPE totalNumPoints = 0;
+    size_t totalNumTris = 0;
     for (PlatformSegment p : getSegments()) {
         Pair a = *p.firstPoint();
         Pair b = *p.secondPoint();
@@ -49,17 +53,9 @@ void Map::makeMapMesh() {
 
         meshPoints->push_back(b.x);
         meshPoints->push_back(b.y);
-        meshPoints->push_back(0.5);
-
-        meshPoints->push_back(b.x);
-        meshPoints->push_back(b.y);
         meshPoints->push_back(-0.5);
 
-        meshPoints->push_back(a.x);
-        meshPoints->push_back(a.y);
-        meshPoints->push_back(-0.5);
-
-        for (size_t i = 0; i < 6; i++) {
+        for (size_t i = 0; i < 4; i++) {
             if (p.getPlatform()->isPassable()) {
                 meshColors->push_back(0.39f);
                 meshColors->push_back(0.30f);
@@ -78,13 +74,33 @@ void Map::makeMapMesh() {
                 meshColors->push_back(0.5f);
             }
         }
+
+        meshIndecies->push_back(totalNumPoints);
+        meshIndecies->push_back(totalNumPoints + 1);
+        meshIndecies->push_back(totalNumPoints + 2);
+
+        meshIndecies->push_back(totalNumPoints + 2);
+        meshIndecies->push_back(totalNumPoints + 1);
+        meshIndecies->push_back(totalNumPoints + 3);
+
+        totalNumPoints+=4;
+        totalNumTris+=2;
     }
 
-    std::cout << meshPoints->size();
+    std::cout << "=== MAP MESH ===" <<std::endl;
+    std::cout << "meshPoints->size(): " << meshPoints->size() << std::endl;
+    std::cout << "meshIndecies->size(): " << meshIndecies->size() << std::endl;
+    std::cout << "totalNumTris: " << totalNumTris << std::endl;
+    std::cout << "=== END MESH ===" << std::endl;   
 
     WorldspaceMesh* m = new WorldspaceMesh();
-    m->init(&(*meshPoints)[0], &(*meshColors)[0], NULL,
-            (meshPoints->size()) / 3);
+    m->init(&(*meshPoints)[0],         // verticies
+            &(*meshIndecies)[0],       // indecies
+            &(*meshColors)[0],         // colours
+            NULL,                      // uvs
+            (meshPoints->size()) / 3,  // num_verts
+            totalNumTris               // num_tris
+    );
 
     renderer = new MeshRenderer(&vertexColorShader, m);
 }

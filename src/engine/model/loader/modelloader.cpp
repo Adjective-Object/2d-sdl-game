@@ -14,6 +14,7 @@
 #include <assimp/Importer.hpp>
 // locals
 #include "AnimationLoader.hpp"
+#include "VertexLoader.hpp"
 #include "boneweightloader.hpp"
 #include "engine/material/material.hpp"
 #include "engine/mesh/worldspacemesh.hpp"
@@ -54,35 +55,8 @@ LoadedMesh* makeModel(const aiScene* scene, const aiMesh* assimpMesh) {
         uvs = new GLfloat[assimpMesh->mNumFaces * 6];
     }
 
-    // Duplicate points shared between faces of triangles so that
-    // everything can be rendered with _glDrawArrays( GL_TRIANGLES ..
-    size_t tri = 0;
-    for (size_t f = 0; f < assimpMesh->mNumFaces; f++) {
-        aiFace face = assimpMesh->mFaces[f];
-        for (size_t ind = 0; ind < face.mNumIndices; ind++) {
-            size_t vertexIndex = face.mIndices[ind];
-
-            aiVector3D originalVertex = assimpMesh->mVertices[vertexIndex];
-            verts[tri * 3] = originalVertex.x;
-            verts[tri * 3 + 1] = originalVertex.y;
-            verts[tri * 3 + 2] = originalVertex.z;
-
-            if (colors) {
-                aiColor4D color = assimpMesh->mColors[0][vertexIndex];
-                colors[tri * 3] = color.r;
-                colors[tri * 3 + 1] = color.g;
-                colors[tri * 3 + 2] = color.b;
-            }
-
-            if (uvs) {
-                aiVector3D uv = assimpMesh->mTextureCoords[0][vertexIndex];
-                uvs[tri * 2] = uv.x;
-                uvs[tri * 2 + 1] = uv.y;
-            }
-
-            tri++;
-        }
-    }
+    VertexLoader vertexLoader(assimpMesh);
+    vertexLoader.loadMeshVerticiesAndIndecies();
 
     // build an array of bone weights if the model has bones
     BoneWeightLoader boneWeights;
@@ -90,7 +64,12 @@ LoadedMesh* makeModel(const aiScene* scene, const aiMesh* assimpMesh) {
 
     // assemble the final mesh
     WorldspaceMesh* outMesh = new WorldspaceMesh();
-    outMesh->init(verts, colors, uvs, tri);
+    outMesh->init(&(vertexLoader.getVerts()->front()),     // verts
+                  &(vertexLoader.getIndecies()->front()),  // indecies
+                  colors, uvs,
+                  vertexLoader.getVerts()->size() / 3,     // num_verts
+                  vertexLoader.getIndecies()->size() / 3   // num_tris
+    );
     if (boneWeights.isInitialized()) {
         outMesh->initSkeleton(
             boneWeights.getBoneCounts(), boneWeights.getBoneIndecies(),
